@@ -1,0 +1,118 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>se.litsec.sweid.idp</groupId>
+  <artifactId>shibboleth-base</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+
+  <name>Swedish eID :: Base packaging of Shibboleth IdP 3.X</name>
+  <description>Base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
+  <url>https://github.com/litsec/swedish-eid-shibboleth-base</url>
+
+  <licenses>
+    <license>
+      <name>GNU General Public License, Version 3</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+      <distribution>repo</distribution>
+      <comments>A free, copyleft license for software and other kinds of works</comments>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</connection>
+    <developerConnection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</developerConnection>
+    <url>https://github.com/litsec/swedish-eid-shibboleth-base/tree/master</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <name>Martin Lindström</name>
+      <email>martin.lindstrom@litsec.se</email>
+      <organization>Litsec AB</organization>
+      <organizationUrl>http://www.litsec.se</organizationUrl>
+    </developer>
+  </developers>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+
+    <!-- Versions on dependencies -->
+    <shibboleth.version>3.3.0</shibboleth.version>
+    <opensaml.version>3.2.0</opensaml.version>
+
+    <slf4j.version>1.7.5</slf4j.version>
+
+    <junit.version>4.12</junit.version>
+
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>shibboleth</id>
+      <name>Shibboleth Maven Repo</name>
+      <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
+
+  <dependencies>
+
+  </dependencies>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <!-- https://maven.apache.org/plugins/maven-dependency-plugin/unpack-mojo.html -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>net.shibboleth.idp</groupId>
+                  <artifactId>idp-distribution</artifactId>
+                  <version>${shibboleth.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+
+              </artifactItems>
+            </configuration>
+          </execution>
+
+          <!-- <execution> <id>copy</id> <phase>prepare-package</phase> <goals> 
+            <goal>copy-dependencies</goal> </goals> <configuration> <outputDirectory>${project.build.directory}/shibboleth/edit-webapp/WEB-INF/lib</outputDirectory> 
+            <overWriteReleases>false</overWriteReleases> <overWriteSnapshots>true</overWriteSnapshots> 
+            <includeScope>runtime</includeScope> </configuration> </execution> -->
+        </executions>
+      </plugin>
+
+
+
+    </plugins>
+
+  </build>
+
+</project>
