@@ -78,11 +78,13 @@
 
     <plugins>
 
+      <!-- Unpacks the Shibboleth zip to target. -->
       <plugin>
-        <!-- https://maven.apache.org/plugins/maven-dependency-plugin/unpack-mojo.html -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.0.0</version>
         <executions>
+
           <execution>
             <id>unpack</id>
             <phase>generate-resources</phase>
@@ -96,20 +98,89 @@
                   <artifactId>idp-distribution</artifactId>
                   <version>${shibboleth.version}</version>
                   <type>zip</type>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
                 </artifactItem>
 
               </artifactItems>
             </configuration>
           </execution>
 
-          <!-- <execution> <id>copy</id> <phase>prepare-package</phase> <goals> 
-            <goal>copy-dependencies</goal> </goals> <configuration> <outputDirectory>${project.build.directory}/shibboleth/edit-webapp/WEB-INF/lib</outputDirectory> 
-            <overWriteReleases>false</overWriteReleases> <overWriteSnapshots>true</overWriteSnapshots> 
-            <includeScope>runtime</includeScope> </configuration> </execution> -->
         </executions>
       </plugin>
 
+      <!-- Copies our extensions into the Shibboleth distribution -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>3.0.2</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}</outputDirectory>
+              <overwrite>true</overwrite>
+              <includeEmptyDirs>true</includeEmptyDirs>
+              <resources>
+                <resource>
+                  <directory>${basedir}/src/main/resources</directory>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
+      <!-- Build the distribution zip -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <descriptors>
+            <descriptor>${basedir}/src/assembly/shibboleth.xml</descriptor>
+          </descriptors>
+          <finalName>${project.artifactId}-${project.version}</finalName>
+        </configuration>
+        <executions>
+          <execution>
+            <id>build-shibboleth</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Attach the zip file as an artifact of this build to get it installed and deployed -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>attach-artifacts</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${project.artifactId}-${project.version}.zip</file>
+                  <type>zip</type>
+                  <!-- <classifier></classifier> -->
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
 
     </plugins>
 
