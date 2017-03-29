@@ -3,10 +3,14 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>se.litsec.sweid.idp</groupId>
+  <parent>
+    <groupId>se.litsec.sweid.idp</groupId>
+    <artifactId>shibboleth-base-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
   <artifactId>shibboleth-base</artifactId>
   <packaging>pom</packaging>
-  <version>1.0.0-SNAPSHOT</version>
 
   <name>Swedish eID :: Base packaging of Shibboleth IdP 3.X</name>
   <description>Base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -37,40 +41,15 @@
   </developers>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>
-
-    <!-- Versions on dependencies -->
-    <shibboleth.version>3.3.0</shibboleth.version>
-    <opensaml.version>3.2.0</opensaml.version>
-
-    <slf4j.version>1.7.5</slf4j.version>
-
-    <junit.version>4.12</junit.version>
-
   </properties>
 
-  <repositories>
-    <repository>
-      <id>shibboleth</id>
-      <name>Shibboleth Maven Repo</name>
-      <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
-    </repository>
-  </repositories>
-
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
-
-
   <dependencies>
+  
+    <dependency>
+      <groupId>se.litsec.sweid.idp</groupId>
+      <artifactId>shibboleth-attribute-support</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
   </dependencies>
 
@@ -100,8 +79,18 @@
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}</outputDirectory>
                 </artifactItem>
-
               </artifactItems>
+            </configuration>
+          </execution>
+          
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib</outputDirectory>
             </configuration>
           </execution>
 
