@@ -3,15 +3,14 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <artifactId>shibboleth-attribute-support</artifactId>
+  <packaging>jar</packaging>
+
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-
-  <artifactId>shibboleth-attribute-support</artifactId>
-  <packaging>jar</packaging>
-
 
   <name>Swedish eID :: Shibboleth IdP Attribute Support</name>
   <description>Attribute resolver support for Shibboleth IdP 3.X for the Swedish eID Framework</description>
