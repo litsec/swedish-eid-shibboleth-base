@@ -134,6 +134,7 @@
             <descriptor>${basedir}/src/assembly/shibboleth.xml</descriptor>
           </descriptors>
           <finalName>${project.artifactId}-${project.version}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
         <executions>
           <execution>
@@ -161,7 +162,7 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>${project.artifactId}-${project.version}.zip</file>
+                  <file>${project.build.directory}/${project.artifactId}-${project.version}.zip</file>
                   <type>zip</type>
                   <!-- <classifier></classifier> -->
                 </artifact>
