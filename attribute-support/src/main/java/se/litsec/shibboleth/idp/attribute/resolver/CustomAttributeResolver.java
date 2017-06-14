@@ -31,7 +31,7 @@ import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
 
 /**
- * Interface for the bean that is installed as a scriped attribute resolver in conf/attribute-resolver.xml.
+ * Interface for the bean that is installed as a scripted attribute resolver in conf/attribute-resolver.xml.
  * <p>
  * The bean implementing this interface is installed as a custom resolver in the conf/attribute-resolver.xml file as
  * follows:
@@ -50,7 +50,7 @@ import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
 public interface CustomAttributeResolver {
 
   /**
-   * Resolves the principal objects found into a list of IdPAttribute objects.
+   * Resolves the principal objects found into a list of {@link IdPAttribute} objects.
    * 
    * @param profileRequestContext
    *          the request context
@@ -58,7 +58,7 @@ public interface CustomAttributeResolver {
    *          the resolution context
    * @params subjects an array of the {@code Subject} objects associated with this authorization. Note that these will
    *         only be present if the attribute resolution has been associated with an Authentication
-   * @return a list of IdPAttribute objects
+   * @return a list of {@link IdPAttribute} objects
    */
   List<IdPAttribute> resolve(ProfileRequestContext<?, ?> profileRequestContext,
       AttributeResolutionContext attributeResolutionContext, Subject[] subjects);
