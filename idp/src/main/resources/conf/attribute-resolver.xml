@@ -132,7 +132,7 @@
 
     <!--
     The uid is the closest thing to a "standard" LDAP attribute
-    representing a local username, but you should generally *never*
+    representing a local username, but you sxhould generally *never*
     expose uid to federated services, as it is rarely globally unique.
     -->
     <AttributeDefinition id="uid" xsi:type="PrincipalName">
