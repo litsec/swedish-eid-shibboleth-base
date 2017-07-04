@@ -123,6 +123,39 @@
           </execution>
         </executions>
       </plugin>
+      
+      <!-- Copy the changed files into the dist directory (so that Shib install works correctly). -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>copy-to-dist</id>
+            <phase>process-resources</phase>
+            <configuration>
+              <target name="copy-to-dist">
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/conf" overwrite="true" force="true">
+                  <fileset dir="${basedir}/src/main/resources/conf" includes="**/*">
+                    <type type="file" />           
+                  </fileset>
+                  <mapper type="glob" from="*" to="*.dist" />
+                </copy>
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/messages" overwrite="true" force="true">
+                  <fileset dir="${basedir}/src/main/resources/messages" includes="**/*">
+                    <type type="file" />
+                  </fileset>
+                  <mapper type="glob" from="*" to="*.dist" />
+                </copy>
+                <!-- TODO: add flows and views later on -->     
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
       <!-- Build the distribution zip -->
       <plugin>
