@@ -114,7 +114,7 @@
         
         <!-- ==================== Swedish eID extensions - BEGIN ==================== -->
         
-        <entry key="CancelAuthn" value-ref="sweeid.SAML2Status.Cancel" />
+        <entry key="CancelAuthn" value-ref="sweid.SAML2Status.Cancel" />
         <entry key="Fraud" value-ref="sweid.SAML2Status.Fraud" />
         <entry key="PossibleFraud" value-ref="sweid.SAML2Status.PossibleFraud" />
         
