@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>shibboleth-attribute-support</artifactId>
+  <artifactId>shibboleth-metadata-support</artifactId>
   <packaging>jar</packaging>
 
   <parent>
@@ -12,8 +12,8 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>Swedish eID :: Shibboleth IdP Attribute Support</name>
-  <description>Attribute resolver support for Shibboleth IdP 3.X for the Swedish eID Framework</description>
+  <name>Swedish eID :: Shibboleth IdP Metadata Support</name>
+  <description>SAML metadata publishing support for Shibboleth IdP 3.X for the Swedish eID Framework</description>
   <url>https://github.com/litsec/swedish-eid-shibboleth-base</url>
 
   <licenses>
@@ -40,18 +40,58 @@
   <dependencies>
 
     <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>se.litsec.opensaml</groupId>
+      <artifactId>opensaml3-ext</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.opensaml</groupId>
-      <artifactId>opensaml-profile-api</artifactId>
+      <artifactId>opensaml-core</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.opensaml</groupId>
+      <artifactId>opensaml-saml-api</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.opensaml</groupId>
+      <artifactId>opensaml-xmlsec-api</artifactId>
+    </dependency>    
+
+    <dependency>
+      <groupId>net.shibboleth.utilities</groupId>
+      <artifactId>java-support</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>net.shibboleth.idp</groupId>
-      <artifactId>idp-attribute-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>net.shibboleth.idp</groupId>
-      <artifactId>idp-attribute-resolver-api</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
   </dependencies>

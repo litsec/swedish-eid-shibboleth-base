@@ -30,5 +30,12 @@
       p:alwaysMustRevalidate="true" />
 
   </mvc:interceptors>
+
+  <!--
+    Controller for publishing the IdP metadata.
+    Path: /idp/profile/metadata 
+   -->
+  <bean id="sweid.MetadataPublishingController" class="se.litsec.shibboleth.idp.metadata.controller.MetadataPublishingController" 
+    p:metadataContainer-ref="sweid.IdpMetadataContainer" />
     
 </beans>
