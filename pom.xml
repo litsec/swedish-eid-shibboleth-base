@@ -42,7 +42,7 @@
     <java.version>1.8</java.version>
 
     <!-- Versions on dependencies -->
-    <shibboleth.version>3.3.0</shibboleth.version>
+    <shibboleth.version>3.3.1</shibboleth.version>
     <opensaml.version>3.3.0</opensaml.version>
     <opensaml-ext.version>0.9-SNAPSHOT</opensaml-ext.version>
     <spring.version>4.3.2.RELEASE</spring.version>
@@ -75,17 +75,17 @@
     <dependencies>
 
       <dependency>
-	<groupId>javax.servlet</groupId>
-	<artifactId>javax.servlet-api</artifactId>
-	<version>3.1.0</version>
-	<scope>provided</scope>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.1.0</version>
+        <scope>provided</scope>
       </dependency>
 
       <!-- OpenSAML extensions -->
       <dependency>
-	<groupId>se.litsec.opensaml</groupId>
-	<artifactId>opensaml3-ext</artifactId>
-	<version>${opensaml-ext.version}</version>
+        <groupId>se.litsec.opensaml</groupId>
+        <artifactId>opensaml3-ext</artifactId>
+        <version>${opensaml-ext.version}</version>
         <type>jar</type>
         <scope>compile</scope>
       </dependency>
@@ -123,10 +123,10 @@
       </dependency>
 
       <dependency>
-	<groupId>org.opensaml</groupId>
-	<artifactId>opensaml-xmlsec-api</artifactId>
-	<version>${opensaml.version}</version>
-	<scope>provided</scope>
+        <groupId>org.opensaml</groupId>
+        <artifactId>opensaml-xmlsec-api</artifactId>
+        <version>${opensaml.version}</version>
+        <scope>provided</scope>
       </dependency>
 
       <!-- Shibboleth -->
@@ -135,6 +135,13 @@
         <artifactId>java-support</artifactId>
         <version>7.3.0</version>
         <type>jar</type>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>net.shibboleth.idp</groupId>
+        <artifactId>idp-authn-api</artifactId>
+        <version>${shibboleth.version}</version>
         <scope>provided</scope>
       </dependency>
 
@@ -154,31 +161,31 @@
 
       <!-- Spring -->
       <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-core</artifactId>
-	<version>${spring.version}</version>
-	<scope>provided</scope>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
+        <scope>provided</scope>
       </dependency>
 
       <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-context</artifactId>
-	<version>${spring.version}</version>
-	<scope>provided</scope>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.version}</version>
+        <scope>provided</scope>
       </dependency>
 
       <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-beans</artifactId>
-	<version>${spring.version}</version>
-	<scope>provided</scope>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-beans</artifactId>
+        <version>${spring.version}</version>
+        <scope>provided</scope>
       </dependency>
 
       <dependency>
-	<groupId>org.springframework</groupId>
-	<artifactId>spring-web</artifactId>
-	<version>${spring.version}</version>
-	<scope>provided</scope>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${spring.version}</version>
+        <scope>provided</scope>
       </dependency>
 
       <!-- Misc -->
@@ -187,7 +194,7 @@
         <artifactId>joda-time</artifactId>
         <version>2.9</version>
         <type>jar</type>
-	<scope>provided</scope>
+        <scope>provided</scope>
       </dependency>
 
       <dependency>
@@ -195,7 +202,7 @@
         <artifactId>commons-lang</artifactId>
         <version>2.4</version>
         <type>jar</type>
-	<scope>provided</scope>
+        <scope>provided</scope>
       </dependency>
 
       <!-- For logging -->
@@ -204,7 +211,7 @@
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
         <type>jar</type>
-	<scope>provided</scope>
+        <scope>provided</scope>
       </dependency>
 
       <!-- For testing -->
@@ -297,6 +304,7 @@
   <modules>
     <module>attribute-support</module>
     <module>metadata-support</module>
+    <module>authn-support</module>
     <module>idp</module>
   </modules>
 

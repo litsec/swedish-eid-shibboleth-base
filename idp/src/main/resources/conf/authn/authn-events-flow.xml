@@ -11,5 +11,11 @@
     <!-- End-states for the fraud errors -->    
     <end-state id="Fraud" />
     <end-state id="PossibleFraud" />
+    
+    <global-transitions>
+      <transition on="CancelAuthn" to="CancelAuthn" />
+      <transition on="Fraud" to="Fraud" />
+      <transition on="PossibleFraud" to="PossibleFraud" />
+    </global-transitions>
 
 </flow>
