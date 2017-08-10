@@ -73,7 +73,6 @@ public class ExtendedSpringStatusMessageLookupFunction implements Function<Profi
         final RequestContext springRequestContext = springContext.getRequestContext();
         final Event previousEvent = springRequestContext != null ? springRequestContext.getCurrentEvent() : null;
         if (previousEvent != null) {
-          String eventId = previousEvent.getId();          
           try {
             String msg = messageSource.getMessage(previousEvent.getId(), null, springRequestContext.getExternalContext().getLocale());            
             return this.messageSource.getMessage(msg + ".message", null, msg, springRequestContext.getExternalContext().getLocale());
