@@ -52,6 +52,14 @@
   
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
+      <artifactId>shibboleth-sweid-extensions</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>    
+  
+    <dependency>
+      <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-attribute-support</artifactId>
       <version>${project.version}</version>
       <type>jar</type>
@@ -72,8 +80,8 @@
       <version>${project.version}</version>
       <type>jar</type>
       <scope>compile</scope>
-    </dependency>    
-
+    </dependency>
+    
   </dependencies>
 
   <build>
@@ -86,7 +94,26 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>3.0.0</version>
         <executions>
-
+<!-- 
+          <execution>
+            <id>unpack2</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>net.shibboleth.idp</groupId>
+                  <artifactId>idp-distribution</artifactId>
+                  <version>${shibboleth.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/shib-orig</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+-->
           <execution>
             <id>unpack</id>
             <phase>generate-resources</phase>
