@@ -90,16 +90,20 @@
             </list>
         </property>
         <property name="statusCodesLookupStrategy">
+          <!--
+            LITSEC           
             <bean class="org.opensaml.saml.saml2.profile.impl.AddStatusToResponse.StatusCodeMappingFunction"
                     c:mappings-ref="shibboleth.SAML2StatusMappings" />
-        </property>
+           -->
+          <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusCodeMappingFunction"
+                    c:mappings-ref="shibboleth.SAML2StatusMappings" />
+        </property>                  
         <property name="statusMessageLookupStrategy">
           <!--
-            LITSEC: Changed so that we don't get the symbolic name for error codes, instead we
-            look for x.message (and not just x which is the error code). 
+            LITSEC
             <bean class="net.shibboleth.idp.profile.context.navigate.SpringStatusMessageLookupFunction" />
            -->
-           <bean class="se.litsec.shibboleth.idp.context.ExtendedSpringStatusMessageLookupFunction" />
+           <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusMessageLookupFunction" />
         </property>
     </bean>
 
