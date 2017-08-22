@@ -155,6 +155,13 @@
 
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
+        <artifactId>idp-saml-api</artifactId>
+        <version>${shibboleth.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-profile-api</artifactId>
         <version>${shibboleth.version}</version>
         <scope>provided</scope>
