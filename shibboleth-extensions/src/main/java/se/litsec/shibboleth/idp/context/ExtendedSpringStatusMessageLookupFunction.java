@@ -21,6 +21,8 @@
  */
 package se.litsec.shibboleth.idp.context;
 
+import java.util.Locale;
+
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.opensaml.saml.saml2.profile.impl.AddStatusToResponse;
 import org.springframework.context.MessageSource;
@@ -64,6 +66,9 @@ public class ExtendedSpringStatusMessageLookupFunction implements Function<Profi
   /** The message source. */
   protected MessageSource messageSource;
 
+  /** Locale to use for error messages. If not assigned, the locale from the request context is used. */
+  protected Locale locale;
+
   /** {@inheritDoc} */
   @Override
   public String apply(final ProfileRequestContext input) {
@@ -74,8 +79,8 @@ public class ExtendedSpringStatusMessageLookupFunction implements Function<Profi
         final Event previousEvent = springRequestContext != null ? springRequestContext.getCurrentEvent() : null;
         if (previousEvent != null) {
           try {
-            String msg = messageSource.getMessage(previousEvent.getId(), null, springRequestContext.getExternalContext().getLocale());            
-            return this.messageSource.getMessage(msg + ".message", null, msg, springRequestContext.getExternalContext().getLocale());
+            String msg = messageSource.getMessage(previousEvent.getId(), null, this.getLocale(springRequestContext));
+            return this.messageSource.getMessage(msg + ".message", null, msg, this.getLocale(springRequestContext));
           }
           catch (final NoSuchMessageException e) {
             return null;
@@ -87,10 +92,31 @@ public class ExtendedSpringStatusMessageLookupFunction implements Function<Profi
     return null;
   }
 
+  /**
+   * Returns the locale to use when resolving messages.
+   * 
+   * @param context
+   *          the request context
+   * @return the locale to use
+   */
+  protected Locale getLocale(RequestContext context) {
+    return this.locale != null ? this.locale : context.getExternalContext().getLocale();
+  }
+
   /** {@inheritDoc} */
   @Override
   public void setMessageSource(final MessageSource source) {
     this.messageSource = source;
+  }
+
+  /**
+   * Assigns the locale to use for error messages. If not assigned, the locale from the request context is used.
+   * 
+   * @param locale
+   *          the locale to assign
+   */
+  public void setLocale(Locale locale) {
+    this.locale = locale;
   }
 
 }

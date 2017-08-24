@@ -103,7 +103,7 @@
             LITSEC
             <bean class="net.shibboleth.idp.profile.context.navigate.SpringStatusMessageLookupFunction" />
            -->
-           <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusMessageLookupFunction" />
+           <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusMessageLookupFunction" p:locale="en" />
         </property>
     </bean>
 
