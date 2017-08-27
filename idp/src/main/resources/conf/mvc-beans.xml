@@ -38,4 +38,12 @@
   <bean id="sweid.MetadataPublishingController" class="se.litsec.shibboleth.idp.metadata.controller.MetadataPublishingController" 
     p:metadataContainer-ref="sweid.IdpMetadataContainer" />
     
+  <!--
+    Abstract base controller for external authentication controllers.
+    Path: /idp/profile/extauth 
+   -->
+  <bean id="sweid.AbstractExternalAuthenticationController" class="se.litsec.shibboleth.idp.authn.controller.sweid.AbstractExternalAuthenticationController"
+    abstract="true" p:attributeToIdMapping-ref="sweid.SAML2AttributeNameToIdMapperService" />
+    
+    
 </beans>

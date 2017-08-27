@@ -28,11 +28,7 @@
     <AttributeDefinition id="gender" xsi:type="SubjectDerivedAttribute" principalAttributeName="gender">
       <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.5.5.7.9.3" friendlyName="gender" />
     </AttributeDefinition>
-    
-    <AttributeDefinition id="gender" xsi:type="SubjectDerivedAttribute" principalAttributeName="gender">
-      <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.5.5.7.9.3" friendlyName="gender" />
-    </AttributeDefinition>
-    
+        
     <AttributeDefinition id="dateOfBirth" xsi:type="SubjectDerivedAttribute" principalAttributeName="dateOfBirth">
       <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.5.5.7.9.1" friendlyName="dateOfBirth" />
     </AttributeDefinition>
