@@ -47,16 +47,12 @@
     <property name="wantAuthnRequestsSigned" value="%{idp.metadata.wantAuthnRequestsSigned}" />
     
     <!--
-      The signature and encryption keys for the IdP. In case of a key rollover, make sure to include both the old
-      and the new encryption key in the metadata for a period of time. 
+      The signature and encryption keys for the IdP. 
      -->
     <property name="keyDescriptors">
       <util:list>
         <bean class="se.litsec.opensaml.saml2.metadata.build.spring.KeyDescriptorFactoryBean" p:use="SIGNING" p:certificateResource="%{idp.signing.cert}" />
         <bean class="se.litsec.opensaml.saml2.metadata.build.spring.KeyDescriptorFactoryBean" p:use="ENCRYPTION" p:certificateResource="%{idp.encryption.cert}" />
-        <!-- 
-          <bean class="se.litsec.opensaml.saml2.metadata.build.spring.KeyDescriptorFactoryBean" p:use="ENCRYPTION" p:certificate="%{idp.encryption.cert.2}" />
-         -->
       </util:list>
     </property>
     
