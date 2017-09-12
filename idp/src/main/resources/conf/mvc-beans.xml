@@ -43,7 +43,7 @@
     Path: /idp/profile/extauth 
    -->
   <bean id="sweid.AbstractExternalAuthenticationController" class="se.litsec.shibboleth.idp.authn.controller.sweid.AbstractExternalAuthenticationController"
-    abstract="true" p:attributeToIdMapping-ref="sweid.SAML2AttributeNameToIdMapperService" />
+    abstract="true" p:attributeToIdMapping-ref="sweid.SAML2AttributeNameToIdMapperService" p:flowName="authn/External" />
     
     
 </beans>

@@ -23,6 +23,9 @@ package se.litsec.shibboleth.idp.authn.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpServletRequest;
@@ -53,8 +56,11 @@ import com.google.common.base.Functions;
 
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
+import net.shibboleth.idp.authn.AuthenticationFlowDescriptor;
 import net.shibboleth.idp.authn.ExternalAuthentication;
 import net.shibboleth.idp.authn.ExternalAuthenticationException;
+import net.shibboleth.idp.authn.context.AuthenticationContext;
+import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 import net.shibboleth.idp.authn.principal.IdPAttributePrincipal;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
@@ -82,14 +88,24 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   /** Helper that maps from SAML 2 attribute names to their corresponding Shibboleth attribute id:s. */
   private SAML2AttributeNameToIdMapperService attributeToIdMapping;
 
+  /** The name of the Shibboleth flow that this controller supports. */
+  private String flowName;
+
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
   @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
     new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
 
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
   @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
-    new PeerMetadataContextLookup(),
-    Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
+    new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
+
+  /** Strategy that gives us the AuthenticationContext. */
+  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
+
+  /** Strategy used to locate the requested LoA URI:s. */
+  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
+    .compose(
+      new RequestedPrincipalContextLookup(), this.authenticationContextLookupStrategy);
 
   /**
    * Main entry point for the external authentication controller. The implementation starts a Shibboleth external
@@ -377,6 +393,66 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
+   * Returns a list of the requested AuthnContextClassRef URI:s (level of assurance URI:s) that match what is supported
+   * by this authenticator.
+   * 
+   * @param context
+   *          the profile context
+   * @return requested AuthnContextClassRef URI:s
+   */
+  protected List<String> getRequestedAuthnContextClassRefs(ProfileRequestContext<?, ?> context) {
+    RequestedPrincipalContext requestedPrincipalContext = this.requestedPrincipalLookupStrategy.apply(context);
+    if (requestedPrincipalContext == null) {
+      return Collections.emptyList();
+    }
+
+    List<String> supportedUri = this.getSupportedAuthnContextClassRefs(context);
+
+    return requestedPrincipalContext.getRequestedPrincipals()
+      .stream()
+      .map(p -> p.getName())
+      .filter(u -> supportedUri.contains(u))
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * See {@link #getRequestedAuthnContextClassRefs(ProfileRequestContext)}.
+   * 
+   * @param httpRequest
+   *          The HTTP request
+   * @return requested AuthnContextClassRef URI:s
+   * @throws ExternalAuthenticationException
+   *           for Shibboleth session errors
+   */
+  protected List<String> getRequestedAuthnContextClassRefs(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+    return this.getRequestedAuthnContextClassRefs(this.getProfileRequestContext(httpRequest));
+  }
+
+  /**
+   * Returns a list of AuthnContextClassRef URI:s (level of assurance URI:s) that is supported by this authenticator.
+   * 
+   * @param context
+   *          the profile context
+   * @return a list of supported AuthnContextClassRef URI:s
+   */
+  protected List<String> getSupportedAuthnContextClassRefs(ProfileRequestContext<?, ?> context) {
+    AuthenticationContext authenticationContext = this.authenticationContextLookupStrategy.apply(context);
+    if (authenticationContext == null) {
+      return Collections.emptyList();
+    }
+    AuthenticationFlowDescriptor authenticationFlowDescriptor = authenticationContext.getAvailableFlows().get(this.flowName);
+    if (authenticationFlowDescriptor == null) {
+      logger.error("No authentication flow descriptor exists for {}", this.flowName);
+      return Collections.emptyList();
+    }
+    return authenticationFlowDescriptor.getSupportedPrincipals()
+      .stream()
+      .filter(AuthnContextClassRefPrincipal.class::isInstance)
+      .map(p -> p.getName())
+      .collect(Collectors.toList());
+  }
+
+  /**
    * Utility method that finds out whether the request that we are processing was sent by a "signature service".
    * 
    * @param context
@@ -463,20 +539,27 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
-   * Adds the service that provides mappings from SAML 2 attribute names to their corresponding Shibboleth attribute
-   * id:s.
-   * 
-   * @param attributeToIdMapping
-   *          mapper service
+   * Lookup function for finding a {@link AuthenticationContext}.
    */
-  public void setAttributeToIdMapping(SAML2AttributeNameToIdMapperService attributeToIdMapping) {
-    this.attributeToIdMapping = attributeToIdMapping;
+  @SuppressWarnings("rawtypes")
+  public static class AuthenticationContextLookup implements ContextDataLookupFunction<ProfileRequestContext, AuthenticationContext> {
+
+    @Override
+    public AuthenticationContext apply(ProfileRequestContext input) {
+      return input != null ? input.getSubcontext(AuthenticationContext.class, false) : null;
+    }
   }
 
-  /** {@inheritDoc} */
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    Assert.notNull(this.attributeToIdMapping, "Property 'attributeToIdMapping' must be assigned");
+  /**
+   * Lookup function for finding a {@link RequestedPrincipalContext}.
+   */
+  public static class RequestedPrincipalContextLookup implements
+      ContextDataLookupFunction<AuthenticationContext, RequestedPrincipalContext> {
+
+    @Override
+    public RequestedPrincipalContext apply(AuthenticationContext input) {
+      return input != null ? input.getSubcontext(RequestedPrincipalContext.class, false) : null;
+    }
   }
 
   /**
@@ -495,7 +578,34 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       }
       return null;
     }
+  }
 
+  /**
+   * Adds the service that provides mappings from SAML 2 attribute names to their corresponding Shibboleth attribute
+   * id:s.
+   * 
+   * @param attributeToIdMapping
+   *          mapper service
+   */
+  public void setAttributeToIdMapping(SAML2AttributeNameToIdMapperService attributeToIdMapping) {
+    this.attributeToIdMapping = attributeToIdMapping;
+  }
+
+  /**
+   * Assigns the flow name for the authentication flow that this controller supports, e.g. "authn/External".
+   * 
+   * @param flowName
+   *          the flow name
+   */
+  public void setFlowName(String flowName) {
+    this.flowName = flowName;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    Assert.notNull(this.attributeToIdMapping, "Property 'attributeToIdMapping' must be assigned");
+    Assert.notNull(this.flowName, "Property 'flowName' must be assigned");
   }
 
   protected SubjectBuilder getSubjectBuilder(String principal) {
