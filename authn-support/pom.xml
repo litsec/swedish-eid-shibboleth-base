@@ -70,6 +70,11 @@
     </dependency>
 
     <dependency>
+      <groupId>se.litsec.opensaml.sweid</groupId>
+      <artifactId>swedish-eid-opensaml3</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-core</artifactId>
     </dependency>
@@ -93,13 +98,20 @@
       <groupId>net.shibboleth.utilities</groupId>
       <artifactId>java-support</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-attribute-support</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>se.litsec.sweid.idp</groupId>
+      <artifactId>shibboleth-sweid-extensions</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>    
 
     <dependency>
       <groupId>org.slf4j</groupId>
