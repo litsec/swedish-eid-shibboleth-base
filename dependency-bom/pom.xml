@@ -94,6 +94,12 @@
         <scope>provided</scope>
       </dependency>
 
+      <dependency>
+        <groupId>jstl</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+      </dependency>
+
       <!-- OpenSAML extensions -->
       <dependency>
         <groupId>se.litsec.opensaml</groupId>
@@ -391,6 +397,12 @@
         <version>${shibboleth.version}</version>
         <type>jar</type>
         <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -559,7 +571,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>org.springframework.mobile</groupId>
         <artifactId>spring-mobile-device</artifactId>
@@ -609,8 +621,16 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
-        <scope>test</scope>
         <type>jar</type>
+        <scope>test</scope>        
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring.version}</version>
+        <type>jar</type>
+        <scope>test</scope>
       </dependency>
 
       <dependency>
