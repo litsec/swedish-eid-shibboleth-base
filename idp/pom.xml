@@ -5,12 +5,13 @@
 
   <artifactId>shibboleth-base</artifactId>
   <packaging>pom</packaging>
-  
+
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-  </parent>  
+    <relativePath>../parent-pom</relativePath>
+  </parent>
 
   <name>Swedish eID :: Base packaging of Shibboleth IdP 3.X</name>
   <description>Base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -43,45 +44,56 @@
   <properties>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>${project.groupId}</groupId>
+        <artifactId>shibboleth-base-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
   
-    <dependency>  
+    <dependency>
       <groupId>se.litsec.opensaml</groupId>
       <artifactId>opensaml3-ext</artifactId>
-    </dependency>  
+    </dependency>
   
+    <!-- 
+      The shibboleth-base-bom BOM is intended for users of the Shibboleth base package so all 
+      dependencies are scoped as 'provided'. Therefore we have to change to scopes for this 
+      build (to get the jar files included in the resulting zip). 
+    -->
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-sweid-extensions</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
       <scope>compile</scope>
-    </dependency>    
-  
+    </dependency>
+
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-attribute-support</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-metadata-support</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-authn-support</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
       <scope>compile</scope>
     </dependency>
-    
+
   </dependencies>
 
   <build>
@@ -94,26 +106,10 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>3.0.0</version>
         <executions>
-<!-- 
-          <execution>
-            <id>unpack2</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>net.shibboleth.idp</groupId>
-                  <artifactId>idp-distribution</artifactId>
-                  <version>${shibboleth.version}</version>
-                  <type>zip</type>
-                  <outputDirectory>${project.build.directory}/shib-orig</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
--->
+          <!-- <execution> <id>unpack2</id> <phase>generate-resources</phase> <goals> <goal>unpack</goal> </goals> <configuration> 
+            <artifactItems> <artifactItem> <groupId>net.shibboleth.idp</groupId> <artifactId>idp-distribution</artifactId> <version>${shibboleth.version}</version> 
+            <type>zip</type> <outputDirectory>${project.build.directory}/shib-orig</outputDirectory> </artifactItem> </artifactItems> 
+            </configuration> </execution> -->
           <execution>
             <id>unpack</id>
             <phase>generate-resources</phase>
@@ -132,7 +128,7 @@
               </artifactItems>
             </configuration>
           </execution>
-           
+
           <execution>
             <id>copy-dependencies</id>
             <phase>package</phase>
@@ -173,7 +169,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- Copy additional files -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -186,9 +182,10 @@
             <phase>process-resources</phase>
             <configuration>
               <target name="copy-webapp">
-                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp" overwrite="true">
-                  <fileset dir="${project.basedir}/src/main/webapp"/>
-                </copy>                
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp"
+                  overwrite="true">
+                  <fileset dir="${project.basedir}/src/main/webapp" />
+                </copy>
               </target>
             </configuration>
             <goals>
@@ -201,19 +198,21 @@
             <phase>process-resources</phase>
             <configuration>
               <target name="copy-to-dist">
-                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/conf" overwrite="true" force="true">
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/conf"
+                  overwrite="true" force="true">
                   <fileset dir="${basedir}/src/main/resources/conf" includes="**/*">
                     <type type="file" />
                   </fileset>
                   <mapper type="glob" from="*" to="*.dist" />
                 </copy>
-                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/messages" overwrite="true" force="true">
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/messages"
+                  overwrite="true" force="true">
                   <fileset dir="${basedir}/src/main/resources/messages" includes="**/*">
                     <type type="file" />
                   </fileset>
                   <mapper type="glob" from="*" to="*.dist" />
                 </copy>
-                <!-- TODO: add flows and views later on -->     
+                <!-- TODO: add flows and views later on -->
               </target>
             </configuration>
             <goals>
