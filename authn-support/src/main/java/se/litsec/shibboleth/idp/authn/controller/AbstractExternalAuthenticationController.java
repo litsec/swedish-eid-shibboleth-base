@@ -44,6 +44,7 @@ import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
+import org.opensaml.xmlsec.encryption.support.DecryptionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -68,8 +69,10 @@ import se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperS
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
+import se.litsec.shibboleth.idp.subsystem.signservice.SignMessageDecryptionService;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
+import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
 import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessage;
 
 /**
@@ -87,6 +90,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
   /** Helper that maps from SAML 2 attribute names to their corresponding Shibboleth attribute id:s. */
   private SAML2AttributeNameToIdMapperService attributeToIdMapping;
+
+  /** The SignMessageDecrypter service. */
+  private SignMessageDecryptionService signMessageDecrypter;
 
   /** The name of the Shibboleth flow that this controller supports. */
   private String flowName;
@@ -527,6 +533,19 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
+   * Decrypts an encrypted {@link SignMessage}.
+   * 
+   * @param signMessage
+   *          the message holding the encrypted message
+   * @return a cleartext {@link Message} object
+   * @throws DecryptionException
+   *           for decryption errors
+   */
+  protected Message decryptSignMessage(SignMessage signMessage) throws DecryptionException {
+    return this.signMessageDecrypter.decrypt(signMessage);
+  }
+
+  /**
    * Lookup function for finding a {@link SAMLPeerEntityContext}.
    */
   @SuppressWarnings("rawtypes")
@@ -592,6 +611,16 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
+   * Assigns the sign message decrypter.
+   * 
+   * @param signMessageDecrypter
+   *          the decrypter
+   */
+  public void setSignMessageDecrypter(SignMessageDecryptionService signMessageDecrypter) {
+    this.signMessageDecrypter = signMessageDecrypter;
+  }
+
+  /**
    * Assigns the flow name for the authentication flow that this controller supports, e.g. "authn/External".
    * 
    * @param flowName
@@ -605,6 +634,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(this.attributeToIdMapping, "Property 'attributeToIdMapping' must be assigned");
+    Assert.notNull(this.signMessageDecrypter, "The property 'signMessageDecrypter' must be assigned");
     Assert.notNull(this.flowName, "Property 'flowName' must be assigned");
   }
 
