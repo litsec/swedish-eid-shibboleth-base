@@ -64,6 +64,11 @@
       <groupId>se.litsec.opensaml</groupId>
       <artifactId>opensaml3-ext</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>se.litsec.opensaml.sweid</groupId>
+      <artifactId>swedish-eid-opensaml3</artifactId>
+    </dependency>
   
     <!-- 
       The shibboleth-base-bom BOM is intended for users of the Shibboleth base package so all 

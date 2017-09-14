@@ -13,6 +13,7 @@
        default-destroy-method="destroy">
 
   <!-- Includes Spring context files that extends the core Shibboleth -->
+  <import resource="services-extensions.xml" />
   <import resource="../../metadata/idp-metadata-config.xml" />
   
   <bean id="sweid.SAML2AttributeNameToIdMapperService" class="se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService" 
