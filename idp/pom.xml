@@ -59,22 +59,19 @@
   </dependencyManagement>
 
   <dependencies>
-  
+
     <dependency>
       <groupId>se.litsec.opensaml</groupId>
       <artifactId>opensaml3-ext</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>se.litsec.opensaml.sweid</groupId>
       <artifactId>swedish-eid-opensaml3</artifactId>
     </dependency>
-  
-    <!-- 
-      The shibboleth-base-bom BOM is intended for users of the Shibboleth base package so all 
-      dependencies are scoped as 'provided'. Therefore we have to change to scopes for this 
-      build (to get the jar files included in the resulting zip). 
-    -->
+
+    <!-- The shibboleth-base-bom BOM is intended for users of the Shibboleth base package so all dependencies are scoped 
+      as 'provided'. Therefore we have to change to scopes for this build (to get the jar files included in the resulting zip). -->
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-sweid-extensions</artifactId>
@@ -96,6 +93,13 @@
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-authn-support</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- For mobile device support -->
+    <dependency>
+      <groupId>org.springframework.mobile</groupId>
+      <artifactId>spring-mobile-device</artifactId>
       <scope>compile</scope>
     </dependency>
 

@@ -577,7 +577,7 @@
         <artifactId>spring-mobile-device</artifactId>
         <version>${spring.mobile.version}</version>
         <type>jar</type>
-        <scope>compile</scope>
+        <scope>provided</scope>
         <exclusions>
           <exclusion>
             <groupId>org.springframework</groupId>

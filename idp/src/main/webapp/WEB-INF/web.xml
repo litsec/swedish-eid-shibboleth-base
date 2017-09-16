@@ -55,19 +55,26 @@
         <filter-name>SLF4JMDCServletFilter</filter-name>
         <filter-class>net.shibboleth.idp.log.SLF4JMDCServletFilter</filter-class>
     </filter>
+    
+    <!-- For detecting mobile devices -->
+    <filter>
+      <filter-name>deviceResolverRequestFilter</filter-name>
+      <filter-class>org.springframework.mobile.device.DeviceResolverRequestFilter</filter-class>
+    </filter>
+        
     <filter-mapping>
         <!-- Only listen on URL-patterns that match bindings supported by the Swedish eID Framework -->
         <filter-name>CookieBufferingFilter</filter-name>
-        <!-- <url-pattern>/profile/Logout</url-pattern> -->
-        <!-- <url-pattern>/profile/Shibboleth/SSO</url-pattern> -->
-        <!-- <url-pattern>/profile/SAML2/Unsolicited/SSO</url-pattern> -->
+        <url-pattern>/profile/Logout</url-pattern>
+        <url-pattern>/profile/Shibboleth/SSO</url-pattern>
+        <url-pattern>/profile/SAML2/Unsolicited/SSO</url-pattern>
         <url-pattern>/profile/SAML2/Redirect/SSO</url-pattern>
         <url-pattern>/profile/SAML2/POST/SSO</url-pattern>
-        <!-- <url-pattern>/profile/SAML2/POST-SimpleSign/SSO</url-pattern> -->
-        <!-- <url-pattern>/profile/SAML2/Redirect/SLO</url-pattern> -->
-        <!-- <url-pattern>/profile/SAML2/POST/SLO</url-pattern> -->
-        <!-- <url-pattern>/profile/SAML2/POST-SimpleSign/SLO</url-pattern> -->
-        <!-- <url-pattern>/profile/cas/login</url-pattern> -->
+        <url-pattern>/profile/SAML2/POST-SimpleSign/SSO</url-pattern>
+        <url-pattern>/profile/SAML2/Redirect/SLO</url-pattern>
+        <url-pattern>/profile/SAML2/POST/SLO</url-pattern>
+        <url-pattern>/profile/SAML2/POST-SimpleSign/SLO</url-pattern>
+        <url-pattern>/profile/cas/login</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>CharacterEncodingFilter</filter-name>
@@ -81,6 +88,11 @@
         <filter-name>SLF4JMDCServletFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    
+    <filter-mapping>
+      <filter-name>deviceResolverRequestFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+    </filter-mapping>    
 
     <!-- Servlets and servlet mappings -->    
     <servlet>
@@ -100,6 +112,24 @@
         <servlet-name>idp</servlet-name>
         <url-pattern>/status</url-pattern>
         <url-pattern>/profile/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+      <servlet-name>metadata-publisher</servlet-name>
+      <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+      <init-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>${idp.home}/system/conf/shibext-mvc-beans.xml, ${idp.home}/conf/metadata-mvc-beans.xml</param-value>
+      </init-param>
+      <init-param>
+        <param-name>contextClass</param-name>
+        <param-value>net.shibboleth.ext.spring.context.DelimiterAwareApplicationContext</param-value>
+      </init-param>
+      <load-on-startup>2</load-on-startup>      
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>metadata-publisher</servlet-name>
+      <url-pattern>/metadata/*</url-pattern>
     </servlet-mapping>
 
     <!-- Servlet protected by container used for RemoteUser authentication -->
@@ -127,17 +157,6 @@
         <url-pattern>/Authn/X509</url-pattern>
     </servlet-mapping>
     -->
-
-    <!-- Send request for the EntityID to the SAML metadata echoing JSP. -->
-    <!-- TODO: Change -->
-    <servlet>
-        <servlet-name>shibboleth_jsp</servlet-name>
-        <jsp-file>/WEB-INF/jsp/metadata.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>shibboleth_jsp</servlet-name>
-        <url-pattern>/shibboleth</url-pattern>
-    </servlet-mapping>
     
     <!-- Send servlet errors through the IdP's MVC error handling. -->
     <error-page>
