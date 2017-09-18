@@ -19,6 +19,6 @@
     Controller for publishing the IdP metadata.
     Path: idp/metadata 
    -->
-  <bean class="se.litsec.shibboleth.idp.metadata.controller.MetadataPublishingController" p:metadataContainer-ref="sweid.IdpMetadataContainer" />
+  <bean class="se.litsec.shibboleth.idp.metadata.controller.MetadataPublishingController" c:metadataContainer-ref="sweid.IdpMetadataContainer" />
         
 </beans>

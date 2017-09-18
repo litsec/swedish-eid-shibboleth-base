@@ -45,7 +45,7 @@
                 <ref bean="SAML2.ArtifactResolution" />
                 <ref bean="Liberty.SSOS" />
               -->
-              <ref bean="swedish-eid.SAML2.SSO" /> 
+              <ref bean="sweid.SAML2.SSO" /> 
             </list>
         </property>
     </bean>
@@ -53,7 +53,7 @@
     <!--
        SAML2 WebSSO Profile for the Swedish eID Framework.
      -->
-    <bean id="swedish-eid.SAML2.SSO" parent="SAML2.SSO"
+    <bean id="sweid.SAML2.SSO" parent="SAML2.SSO"
       p:encryptAssertions="true" 
       p:signResponses="true" 
       p:signRequests="true"

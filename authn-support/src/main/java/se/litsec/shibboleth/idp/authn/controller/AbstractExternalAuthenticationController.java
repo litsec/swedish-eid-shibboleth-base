@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.common.base.Function;
@@ -128,7 +129,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws IOException
    *           for IO errors
    */
-  @RequestMapping("/extauth")
+  @RequestMapping(method = RequestMethod.GET)
   public final ModelAndView processExternalAuthentication(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
       throws ExternalAuthenticationException, IOException {
 

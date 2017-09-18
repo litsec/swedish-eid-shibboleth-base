@@ -14,21 +14,14 @@
        default-init-method="initialize"
        default-destroy-method="destroy">
 
-    <!--
-    Use this file to define any custom MVC beans needed. Its contents are imported
-    by system/conf/mvc-beans.xml, which configures a lot of the low-level Spring Web
-    behavior of the IdP. You can ignore this file otherwise.
-    -->
-    
-  <mvc:interceptors> 
-  
-    <bean id="webContentInterceptor" class="org.springframework.web.servlet.mvc.WebContentInterceptor"
-      p:cacheSeconds="0" 
-      p:useExpiresHeader="true" 
-      p:useCacheControlHeader="true"
-      p:useCacheControlNoStore="true"
-      p:alwaysMustRevalidate="true" />
-
-  </mvc:interceptors>
+  <!--
+    Abstract base controller for external authentication controllers.
+    Path: /idp/extauth 
+   -->
+  <bean id="sweid.AbstractExternalAuthenticationController" class="se.litsec.shibboleth.idp.authn.controller.sweid.AbstractExternalAuthenticationController"
+    abstract="true" 
+    p:attributeToIdMapping-ref="sweid.SAML2AttributeNameToIdMapperService"
+    p:signMessageDecrypter-ref="sweid.SignMessageDecryptionService" 
+    p:flowName="authn/External" />    
         
 </beans>

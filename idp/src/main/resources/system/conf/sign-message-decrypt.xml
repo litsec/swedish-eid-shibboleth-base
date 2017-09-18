@@ -14,23 +14,23 @@
 
 
   <bean class="se.litsec.shibboleth.idp.subsystem.signservice.ReloadingSignMessageDecryptionService"
-    c:signMessageDecrypter-ref="swedish-eid.SignMessageDecrypter" />
+    c:signMessageDecrypter-ref="sweid.SignMessageDecrypter" />
 
-  <bean id="swedish-eid.SignMessageDecrypter" class="se.litsec.swedisheid.opensaml.saml2.signservice.SignMessageDecrypter" scope="singleton">
-    <constructor-arg name="keyEncryptionKeyResolver" ref="swedish-eid.KeyEncryptionKeyResolver" />
+  <bean id="sweid.SignMessageDecrypter" class="se.litsec.swedisheid.opensaml.saml2.signservice.SignMessageDecrypter" scope="singleton">
+    <constructor-arg name="keyEncryptionKeyResolver" ref="sweid.KeyEncryptionKeyResolver" />
     <property name="blacklistedAlgorithms">
       <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" 
-        p:targetObject-ref="swedish-eid.DecryptionConfig" p:targetMethod="getBlacklistedAlgorithms" />
+        p:targetObject-ref="sweid.DecryptionConfig" p:targetMethod="getBlacklistedAlgorithms" />
     </property>
     <property name="whitelistedAlgorithms">
       <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" 
-        p:targetObject-ref="swedish-eid.DecryptionConfig" p:targetMethod="getWhitelistedAlgorithms" />
+        p:targetObject-ref="sweid.DecryptionConfig" p:targetMethod="getWhitelistedAlgorithms" />
     </property>    
   </bean>
 
-  <bean id="swedish-eid.KeyEncryptionKeyResolver" class="org.opensaml.xmlsec.keyinfo.impl.StaticKeyInfoCredentialResolver"
+  <bean id="sweid.KeyEncryptionKeyResolver" class="org.opensaml.xmlsec.keyinfo.impl.StaticKeyInfoCredentialResolver"
     c:credentials-ref="shibboleth.EncryptionCredentials" />
     
-  <bean id="swedish-eid.DecryptionConfig" parent="shibboleth.BasicDecryptionConfiguration" />
+  <bean id="sweid.DecryptionConfig" parent="shibboleth.BasicDecryptionConfiguration" />
     
 </beans>

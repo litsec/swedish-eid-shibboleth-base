@@ -63,7 +63,7 @@
         <value>%{idp.home}/system/messages/messages</value>
     </util:list>
     
-    <util:list id="swedish-eid.SignMessageDecryptionResources">
+    <util:list id="sweid.SignMessageDecryptionResources">
         <value>%{idp.home}/conf/credentials.xml</value>
         <value>%{idp.home}/system/conf/sign-message-decrypt.xml</value>
     </util:list>
