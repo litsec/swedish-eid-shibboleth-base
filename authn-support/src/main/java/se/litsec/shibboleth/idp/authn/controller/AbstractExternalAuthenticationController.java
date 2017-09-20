@@ -38,6 +38,7 @@ import org.opensaml.messaging.context.navigate.ContextDataLookupFunction;
 import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
+import org.opensaml.saml.common.messaging.context.SAMLBindingContext;
 import org.opensaml.saml.common.messaging.context.SAMLMetadataContext;
 import org.opensaml.saml.common.messaging.context.SAMLPeerEntityContext;
 import org.opensaml.saml.saml2.core.AuthnRequest;
@@ -106,13 +107,15 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
     new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
 
+  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
+    .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
+
   /** Strategy that gives us the AuthenticationContext. */
   @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
 
   /** Strategy used to locate the requested LoA URI:s. */
   @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
-    .compose(
-      new RequestedPrincipalContextLookup(), this.authenticationContextLookupStrategy);
+    .compose(new RequestedPrincipalContextLookup(), this.authenticationContextLookupStrategy);
 
   /**
    * Main entry point for the external authentication controller. The implementation starts a Shibboleth external
@@ -390,7 +393,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * See {@link #getPeerMetadata(ProfileRequestContext)}.
    * 
    * @param httpRequest
-   *          The HTTP request
+   *          the HTTP request
    * @return the entity descriptor
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
@@ -398,6 +401,58 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   protected EntityDescriptor getPeerMetadata(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getPeerMetadata(this.getProfileRequestContext(httpRequest));
   }
+
+  /**
+   * Utility method that may be used to obtain the binding that was used to pass the AuthnRequest message.
+   * 
+   * @param context
+   *          the profile context
+   * @return the binding URI
+   * @see #getBinding(HttpServletRequest)
+   */
+  protected String getBinding(ProfileRequestContext<?, ?> context) {
+    SAMLBindingContext samlBinding = this.samlBindingContextLookupStrategy.apply(context);
+    return samlBinding != null ? samlBinding.getBindingUri() : null;
+  }
+
+  /**
+   * See {@link #getBinding(ProfileRequestContext)}.
+   * 
+   * @param httpRequest
+   *          the HTTP request
+   * @return the binding URI
+   * @throws ExternalAuthenticationException
+   *           for Shibboleth session errors
+   */
+  protected String getBinding(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+    return this.getBinding(this.getProfileRequestContext(httpRequest));
+  }
+  
+  /**
+   * Utility method that may be used to obtain the Relay State for the request.
+   * 
+   * @param context
+   *          the profile context
+   * @return the relay state
+   * @see #getRelayState(HttpServletRequest)
+   */
+  protected String getRelayState(ProfileRequestContext<?, ?> context) {
+    SAMLBindingContext samlBinding = this.samlBindingContextLookupStrategy.apply(context);
+    return samlBinding != null ? samlBinding.getRelayState() : null;
+  }
+
+  /**
+   * See {@link #getRelayState(ProfileRequestContext)}.
+   * 
+   * @param httpRequest
+   *          the HTTP request
+   * @return the relay state
+   * @throws ExternalAuthenticationException
+   *           for Shibboleth session errors
+   */
+  protected String getRelayState(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+    return this.getRelayState(this.getProfileRequestContext(httpRequest));
+  }  
 
   /**
    * Returns a list of the requested AuthnContextClassRef URI:s (level of assurance URI:s) that match what is supported
@@ -589,12 +644,26 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
     @Override
     public EntityDescriptor apply(SAMLPeerEntityContext input) {
-
       if (input != null) {
         SAMLMetadataContext metadataContext = input.getSubcontext(SAMLMetadataContext.class, false);
         if (metadataContext != null) {
           return metadataContext.getEntityDescriptor();
         }
+      }
+      return null;
+    }
+  }
+
+  /**
+   * Lookup function for finding a {@link SAMLBindingContext}.
+   */
+  @SuppressWarnings("rawtypes")
+  public static class SAMLBindingContextLookup implements ContextDataLookupFunction<MessageContext, SAMLBindingContext> {
+
+    @Override
+    public SAMLBindingContext apply(MessageContext input) {
+      if (input != null) {
+        return input.getSubcontext(SAMLBindingContext.class, false);
       }
       return null;
     }
