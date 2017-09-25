@@ -23,13 +23,15 @@ package se.litsec.shibboleth.idp.authn;
 
 import org.opensaml.saml.saml2.core.Status;
 
+import net.shibboleth.idp.authn.AuthnEventIds;
+
 /**
  * Exception that Proxy IdP:s may use to signal errors received from the SP-part, or by "ordinary" IdP:s to signal a
  * detailed error.
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-public class IdpErrorStatusException extends Exception {
+public class IdpErrorStatusException extends ExternalAutenticationErrorCodeException {
 
   /** For serializing. */
   private static final long serialVersionUID = -8301077213844939978L;
@@ -44,19 +46,35 @@ public class IdpErrorStatusException extends Exception {
    *          the error status
    */
   public IdpErrorStatusException(Status status) {
+    super(AuthnEventIds.AUTHN_EXCEPTION);
     this.status = status;
   }
 
   /**
-   * Constructor accepting a status object and an error message.
+   * Constructor accepting a status object and an error event ID.
    * 
    * @param status
    *          the error status
-   * @param msg
-   *          the error message
+   * @param authnEventId
+   *          the error event ID
    */
-  public IdpErrorStatusException(Status status, String msg) {
-    super(msg);
+  public IdpErrorStatusException(Status status, String authnEventId) {
+    super(authnEventId);
+    this.status = status;
+  }
+
+  /**
+   * Constructor accepting a status object and an error event ID.
+   * 
+   * @param status
+   *          the error status
+   * @param authnEventId
+   *          the error event ID
+   * @param message
+   *          the textual error message
+   */
+  public IdpErrorStatusException(Status status, String authnEventId, String message) {
+    super(authnEventId, message);
     this.status = status;
   }
 
