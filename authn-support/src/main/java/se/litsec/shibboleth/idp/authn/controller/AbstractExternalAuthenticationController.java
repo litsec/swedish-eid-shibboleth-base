@@ -100,21 +100,21 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   private String flowName;
 
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
     new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
 
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
-  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
     new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
 
-  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
     .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
 
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
 
   /** Strategy used to locate the requested LoA URI:s. */
-  @SuppressWarnings("rawtypes") private Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
     .compose(new RequestedPrincipalContextLookup(), this.authenticationContextLookupStrategy);
 
   /**
