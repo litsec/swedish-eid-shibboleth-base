@@ -41,6 +41,7 @@ import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
 import org.opensaml.saml.common.messaging.context.SAMLBindingContext;
 import org.opensaml.saml.common.messaging.context.SAMLMetadataContext;
 import org.opensaml.saml.common.messaging.context.SAMLPeerEntityContext;
+import org.opensaml.saml.saml2.core.Attribute;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
@@ -67,6 +68,7 @@ import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 import net.shibboleth.idp.authn.principal.IdPAttributePrincipal;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
+import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
@@ -251,6 +253,39 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
+   * Method that should be invoked to exit the external authentication process with a successful result.
+   * 
+   * @param httpRequest
+   *          the HTTP request
+   * @param httpResponse
+   *          the HTTP response
+   * @param principal
+   *          the principal that was authenticated
+   * @param attributes
+   *          the attributes to release
+   * @param authnContextClassUri
+   *          the authentication context class URI (LoA)
+   * @param authnInstant
+   *          the authentication instant - if {@code null} the current time will be used
+   * @param cacheForSSO
+   *          should the result be cached for later SSO? If {@code null}, the result will be cached
+   * @throws ExternalAuthenticationException
+   *           for Shibboleth session errors
+   * @throws IOException
+   *           for IO errors
+   */
+  protected void success(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String principal, List<Attribute> attributes,
+      String authnContextClassUri, DateTime authnInstant, Boolean cacheForSSO) throws ExternalAuthenticationException, IOException {
+
+    SubjectBuilder builder = this.getSubjectBuilder(principal);
+    for (Attribute a : attributes) {
+      builder.attribute(a);
+    }
+    builder.authnContextClassRef(authnContextClassUri);
+    this.success(httpRequest, httpResponse, builder.build(), authnInstant, cacheForSSO);
+  }
+
+  /**
    * Method that should be invoked before exiting the external authentication process and indicate that the user
    * cancelled the authentication.
    * 
@@ -427,7 +462,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   protected String getBinding(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getBinding(this.getProfileRequestContext(httpRequest));
   }
-  
+
   /**
    * Utility method that may be used to obtain the Relay State for the request.
    * 
@@ -452,7 +487,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    */
   protected String getRelayState(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getRelayState(this.getProfileRequestContext(httpRequest));
-  }  
+  }
 
   /**
    * Returns a list of the requested AuthnContextClassRef URI:s (level of assurance URI:s) that match what is supported
@@ -728,23 +763,27 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       return this.subject;
     }
 
-    public SubjectBuilder shibbolethAttribute(String attributeId, String value) {
-      if (value == null) {
+    public SubjectBuilder shibbolethAttribute(String attributeId, String... values) {
+      if (values == null) {
         return this;
       }
       IdPAttribute attr = new IdPAttribute(attributeId);
-      attr.setValues(Arrays.asList(new StringAttributeValue(value)));
+      attr.setValues(Arrays.asList(values).stream().map(v -> new StringAttributeValue(v)).collect(Collectors.toList()));
       this.subject.getPrincipals().add(new IdPAttributePrincipal(attr));
       return this;
     }
 
-    public SubjectBuilder attribute(String name, String value) {
+    public SubjectBuilder attribute(String name, String... values) {
       String attributeId = this.attributeToIdMapping.getAttributeID(name);
       if (attributeId == null) {
         // TODO: throw
         return this;
       }
-      return this.shibbolethAttribute(attributeId, value);
+      return this.shibbolethAttribute(attributeId, values);
+    }
+
+    public SubjectBuilder attribute(Attribute attribute) {
+      return this.attribute(attribute.getName(), AttributeUtils.getAttributeStringValues(attribute).toArray(new String[] {}));
     }
 
     public SubjectBuilder authnContextClassRef(String uri) {
