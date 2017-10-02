@@ -747,22 +747,52 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     return new SubjectBuilder(principal, this.attributeToIdMapping);
   }
 
+  /**
+   * Helper for building {@link Subject} objects.
+   */
   protected static class SubjectBuilder {
 
+    /** Logging instance. */
+    private final Logger logger = LoggerFactory.getLogger(SubjectBuilder.class);
+
+    /** The subject being built. */
     private Subject subject;
 
+    /** Maps between attribute names and corresponding Shibboleth ID:s. */
     private SAML2AttributeNameToIdMapperService attributeToIdMapping;
 
+    /**
+     * Constructor.
+     * 
+     * @param principal
+     *          the principal ID
+     * @param attributeToIdMapping
+     *          the attribute mapper
+     */
     private SubjectBuilder(String principal, SAML2AttributeNameToIdMapperService attributeToIdMapping) {
       this.attributeToIdMapping = attributeToIdMapping;
       this.subject = new Subject();
       subject.getPrincipals().add(new UsernamePrincipal(principal));
     }
 
+    /**
+     * Builds the subject object.
+     * 
+     * @return the {@code Subject} object
+     */
     public Subject build() {
       return this.subject;
     }
 
+    /**
+     * Adds an attribute by giving the Shibboleth attribute ID and one or more values.
+     * 
+     * @param attributeId
+     *          the Shibboleth attribute ID
+     * @param values
+     *          the value(s)
+     * @return the builder
+     */
     public SubjectBuilder shibbolethAttribute(String attributeId, String... values) {
       if (values == null) {
         return this;
@@ -773,19 +803,46 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       return this;
     }
 
-    public SubjectBuilder attribute(String name, String... values) {
+    /**
+     * Adds an attribute by first transforming it to Shibboleth's representation.
+     * 
+     * @param name
+     *          the attribute name
+     * @param values
+     *          the attribute value(s)
+     * @return the builder
+     * @throws IllegalArgumentException
+     *           if no mapping exists between the supplied attribute name and a Shibboleth attribute ID
+     */
+    public SubjectBuilder attribute(String name, String... values) throws IllegalArgumentException {
       String attributeId = this.attributeToIdMapping.getAttributeID(name);
       if (attributeId == null) {
-        // TODO: throw
+        logger.error("No mapping exists for attribute '{}'", name);
         return this;
       }
       return this.shibbolethAttribute(attributeId, values);
     }
 
-    public SubjectBuilder attribute(Attribute attribute) {
+    /**
+     * Adds an attribute by first transforming it to Shibboleth's representation.
+     * 
+     * @param attribute
+     *          the attribute to add
+     * @return the builder
+     * @throws IllegalArgumentException
+     *           if no mapping exists between the supplied attribute name and a Shibboleth attribute ID
+     */
+    public SubjectBuilder attribute(Attribute attribute) throws IllegalArgumentException {
       return this.attribute(attribute.getName(), AttributeUtils.getAttributeStringValues(attribute).toArray(new String[] {}));
     }
 
+    /**
+     * Adds the {@code AuthenticationContextClassRef} as a {@link AuthnContextClassRefPrincipal} object.
+     * 
+     * @param uri
+     *          the AuthnContext class reference URI
+     * @return the builder
+     */
     public SubjectBuilder authnContextClassRef(String uri) {
       this.subject.getPrincipals().add(new AuthnContextClassRefPrincipal(uri));
       return this;
