@@ -72,6 +72,8 @@ import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
+import se.litsec.shibboleth.idp.authn.context.strategy.RequestedPrincipalContextLookup;
+import se.litsec.shibboleth.idp.authn.context.strategy.SAMLPeerEntityContextLookup;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
 import se.litsec.shibboleth.idp.subsystem.signservice.SignMessageDecryptionService;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -150,10 +152,58 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     HttpSession session = httpRequest.getSession();
     session.setAttribute(EXTAUTHN_KEY_ATTRIBUTE_NAME, key);
 
+    // Perform some initial checks to ensure the request is valid.
+    //
+
     // Hand over to implementation ...
     //
     return this.doExternalAuthentication(httpRequest, httpResponse, key, profileRequestContext);
   }
+
+  //
+  // TODO: This method should set a context holding the requests's LoA:s
+  //
+  protected void initializeExternalAuthentication(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String key,
+      ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAuthenticationException, IOException, IdpErrorStatusException {
+    
+    final AuthnRequest authnRequest = this.getAuthnRequest(profileRequestContext);
+    
+    // First handle the SignMessage if it's there.
+    //
+    final SignMessage signMessage = this.getSignMessage(profileRequestContext);
+    if (signMessage != null) {
+      
+      // TODO: Check display entity
+      
+    }
+       
+    final boolean isSignService = this.isSignatureServicePeer(profileRequestContext);
+    
+    
+    final String spEntityID = authnRequest.getIssuer().getValue();
+
+    if (signMessage != null && !isSignService) {
+      logger.info(
+        "SignMessage extension was included in AuthnRequest by relying party '{}' that is not a sign service. Will ignore SignMessage extension.", spEntityID);
+      
+      // TODO: Or should we throw?
+    }
+
+    if (isSignService) {
+      if (signMessage == null) {
+        logger.info("AuthnRequest from Signature Service '{}' does not contain a SignMessage extension ...", spEntityID);
+        
+        // Check all requested LoA:s and filter away those the includes sigmessage. 
+        // Are there any possible LoA:s left? If not, return error.        
+      }
+      else {
+        
+      }
+    }
+
+  }
+  
+  //protected abstract boolean supportsSignMessage(SignMessage signMessage);
 
   /**
    * Abstract method that must be implemented by subclasses in order to implement the authentication.
@@ -637,18 +687,6 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
-   * Lookup function for finding a {@link SAMLPeerEntityContext}.
-   */
-  @SuppressWarnings("rawtypes")
-  public static class SAMLPeerEntityContextLookup implements ContextDataLookupFunction<MessageContext, SAMLPeerEntityContext> {
-
-    @Override
-    public SAMLPeerEntityContext apply(MessageContext input) {
-      return input != null ? input.getSubcontext(SAMLPeerEntityContext.class, false) : null;
-    }
-  }
-
-  /**
    * Lookup function for finding a {@link AuthenticationContext}.
    */
   @SuppressWarnings("rawtypes")
@@ -657,18 +695,6 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     @Override
     public AuthenticationContext apply(ProfileRequestContext input) {
       return input != null ? input.getSubcontext(AuthenticationContext.class, false) : null;
-    }
-  }
-
-  /**
-   * Lookup function for finding a {@link RequestedPrincipalContext}.
-   */
-  public static class RequestedPrincipalContextLookup implements
-      ContextDataLookupFunction<AuthenticationContext, RequestedPrincipalContext> {
-
-    @Override
-    public RequestedPrincipalContext apply(AuthenticationContext input) {
-      return input != null ? input.getSubcontext(RequestedPrincipalContext.class, false) : null;
     }
   }
 

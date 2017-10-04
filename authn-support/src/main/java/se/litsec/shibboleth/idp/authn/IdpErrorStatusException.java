@@ -22,8 +22,11 @@
 package se.litsec.shibboleth.idp.authn;
 
 import org.opensaml.saml.saml2.core.Status;
+import org.opensaml.saml.saml2.core.StatusCode;
+import org.opensaml.saml.saml2.core.StatusMessage;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
+import se.litsec.opensaml.utils.ObjectUtils;
 
 /**
  * Exception that Proxy IdP:s may use to signal errors received from the SP-part, or by "ordinary" IdP:s to signal a
@@ -85,6 +88,57 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
    */
   public Status getStatus() {
     return this.status;
+  }
+
+  /**
+   * Returns a builder for a shorter way of creating a basic Status object.
+   * 
+   * @param code
+   *          the main status code
+   * @return a status builder
+   */
+  public static StatusBuilder getStatusBuilder(String code) {
+    return new StatusBuilder(code);
+  }
+
+  public static class StatusBuilder {
+
+    private String statusCode;
+    private String subStatusCode;
+    private String statusMessage;
+
+    public StatusBuilder(String statusCode) {
+      this.statusCode = statusCode;
+    }
+
+    public Status build() {
+      Status status = ObjectUtils.createSamlObject(Status.class);
+      StatusCode sc = ObjectUtils.createSamlObject(StatusCode.class);
+      sc.setValue(this.statusCode);
+      if (subStatusCode != null) {
+        StatusCode ssc = ObjectUtils.createSamlObject(StatusCode.class);
+        ssc.setValue(this.subStatusCode);
+        sc.setStatusCode(sc);
+      }
+      status.setStatusCode(sc);
+      if (statusMessage != null) {
+        StatusMessage sm = ObjectUtils.createSamlObject(StatusMessage.class);
+        sm.setMessage(this.statusMessage);
+        status.setStatusMessage(sm);
+      }
+      return status;
+    }
+
+    public StatusBuilder subStatusCode(String code) {
+      this.subStatusCode = code;
+      return this;
+    }
+
+    public StatusBuilder statusMessage(String message) {
+      this.statusMessage = message;
+      return this;
+    }
+
   }
 
 }
