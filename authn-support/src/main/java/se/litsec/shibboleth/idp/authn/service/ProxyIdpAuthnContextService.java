@@ -36,7 +36,7 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
 
   /**
    * The method matches the supplied URI:s from the IdP:s assurance certification against the
-   * {@link AuthnContextClassContext} for the current requests, and updates this context, i.e., removes those not
+   * {@link AuthnContextClassContext} for the current request, and updates this context, i.e., removes those not
    * supported by the IdP.
    * <p>
    * If no AuthnContext URI:s remains in the {@link AuthnContextClassContext} after matching, an error is thrown since
@@ -52,6 +52,10 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    * Therefore, the method must be told whether the receiving IdP supports sign message (and understands the
    * sigmessage-URI:s).
    * </p>
+   * <p>
+   * Finally, a list of URI:s to include in the AuthnRequest to be sent to the IdP is returned. These are also saved in
+   * the current {@link AuthnContextClassContext}.
+   * </p>
    * 
    * @param context
    *          the request context
@@ -62,20 +66,30 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    * @throws ExternalAutenticationErrorCodeException
    *           if no AuthnContext URI:s matches
    */
-  void matchIdpAssuranceURIs(ProfileRequestContext<?, ?> context, List<String> assuranceURIs, boolean idpSupportsSignMessage)
+  List<String> getSendAuthnContextClassRefs(ProfileRequestContext<?, ?> context, List<String> assuranceURIs, boolean idpSupportsSignMessage)
       throws ExternalAutenticationErrorCodeException;
 
   /**
    * When the Proxy-IdP receives an assertion it contains an {@code AuthnContextClassRef} holding the URI describing how
    * the IdP authenticated the user. This method verifies that this URI matches any of the URI:s the IdP-Proxy SP
-   * included in the AuthnRequest.
+   * included in the AuthnRequest, and throws an exception otherwise.
+   * <p>
+   * If the above is successful BUT the external IdP did not support sign messages, we may have to return another URI
+   * depending on whether the Proxy-IdP display an sign message. So, after the check, this method calculates which LoA
+   * URI to use in the resulting assertion.
+   * </p>
    * 
    * @param context
-   *          the request context
+   *          the request mapping
    * @param authnContextUri
    *          the URI from the {@code AuthnContextClassRef} element of the assertion
-   * @return if there is a match {@code true} is returned, otherwise {@code false}
+   * @param displayedSignMessage
+   *          flag telling if the connector displayed a sign message
+   * @return the LoA URI to include in the assertion back to the SP
+   * @throws ExternalAutenticationErrorCodeException
+   *           if the issued URI can not be used in the Proxy-IdP assertion
    */
-  boolean verifyIssuedAuthnContextURI(ProfileRequestContext<?, ?> context, String authnContextUri);
+  String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
+      throws ExternalAutenticationErrorCodeException;
 
 }

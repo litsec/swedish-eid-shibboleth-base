@@ -29,24 +29,11 @@ import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 
 /**
- * Provides IdP services for handling Authentication Contexts (level of assurance). 
+ * Provides IdP services for handling Authentication Contexts (level of assurance).
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public interface AuthnContextService extends AuthenticationBaseService {
-
-  /**
-   * Processes the requested AuthnContextClass URI:s and verifies that they are valid regarding the type of request and
-   * what is supported by the authentication method. The method may update the current context, for example filter out
-   * URI:s that does not match the current authentication method.
-   * 
-   * @param context
-   *          the context to validate and update
-   * @throws ExternalAutenticationErrorCodeException
-   *           if the requested AuthnContextClass URI:s are invalid in the context they are applied
-   */
-  void processRequestedAuthnContextClassRefs(ProfileRequestContext<?, ?> context)
-      throws ExternalAutenticationErrorCodeException;
 
   /**
    * Returns the current {@link AuthnContextClassContext}.
@@ -54,8 +41,10 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * @param context
    *          the request context
    * @return the current {@link AuthnContextClassContext}, or {@code null} if none is available
+   * @throws if
+   *           no context exists
    */
-  AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context);
+  AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
 
   /**
    * If a relying party does not specify an AuthnContext URI in the AuthnContext the IdP chooses a default one to use.

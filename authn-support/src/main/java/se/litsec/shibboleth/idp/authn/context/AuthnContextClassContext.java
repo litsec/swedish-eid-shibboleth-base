@@ -22,12 +22,12 @@
 package se.litsec.shibboleth.idp.authn.context;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.opensaml.messaging.context.BaseContext;
 
 import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
-import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthenticationContextURI.LoaEnum;
 
 /**
  * Context class for holding the requested AuthnContextClassRef URI:s for a relying party. OpenSAML offers a similar
@@ -40,14 +40,17 @@ import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthen
  */
 public class AuthnContextClassContext extends BaseContext {
 
-  /** Base AuthnContextClassRef URI:s, meaning that they do not include a 'sigmessage' use. */
-  private List<String> baseAuthnContextClassRefs = new ArrayList<>();
+  /** AuthnContextClassRef URI:s requested by the SP. May be filtered along the process. */
+  protected List<String> authnContextClassRefs;
 
-  /** AuthnContextClassRef URI:s that specify 'sigmessage' use. */
-  private List<String> sigMessageAuthnContextClassRefs = new ArrayList<>();
+  /** Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages. */
+  private boolean proxiedIdPSupportsSignMessage = false;
 
-  /** URI:s that are not understood by this IdP. */
-  private List<String> unsupportedAuthnContextClassRefs = new ArrayList<>();
+  /**
+   * A Proxy-IdP needs to remember which URI:s that were sent to the remote IdP so that it can perform a validation of
+   * the received assertion. This property holds this or these URI:s.
+   */
+  protected List<String> proxiedAuthnContextClassRefs;
 
   /**
    * Constructor.
@@ -56,64 +59,31 @@ public class AuthnContextClassContext extends BaseContext {
    *          the AuthnContextClassRef URI:s received in the SP AuthnRequest
    */
   public AuthnContextClassContext(List<String> authnContextClassRefs) {
-    if (authnContextClassRefs == null) {
-      return;
-    }
-
-    for (String uri : authnContextClassRefs) {
-      LoaEnum loa = LoaEnum.parse(uri);
-      if (loa == null) {
-        this.unsupportedAuthnContextClassRefs.add(uri);
-      }
-      else if (loa.isSignatureMessageUri()) {
-        if (!this.sigMessageAuthnContextClassRefs.contains(uri)) {
-          this.sigMessageAuthnContextClassRefs.add(uri);
-        }
-      }
-      else {
-        if (!this.baseAuthnContextClassRefs.contains(uri)) {
-          this.baseAuthnContextClassRefs.add(uri);
-        }
-      }
-    }
+    this.authnContextClassRefs = authnContextClassRefs != null ? new ArrayList<>(authnContextClassRefs) : new ArrayList<>();
   }
 
   /**
-   * Returns a list of all valid URI:s held by the context.
+   * Protected copy constructor (for subclasses).
    * 
-   * @return a list of all valid URI:s
+   * @param context
+   *          the context to copy
    */
-  public List<String> getValidAuthnContextClassRefs() {
-    List<String> uris = new ArrayList<String>(this.baseAuthnContextClassRefs);
-    uris.addAll(this.sigMessageAuthnContextClassRefs);
-    return uris;
+  protected AuthnContextClassContext(AuthnContextClassContext context) {
+    this.authnContextClassRefs = context.authnContextClassRefs;
+    this.proxiedAuthnContextClassRefs = context.proxiedAuthnContextClassRefs;
+    this.proxiedIdPSupportsSignMessage = context.proxiedIdPSupportsSignMessage;
   }
 
   /**
-   * Returns the base AuthnContextClassRef URI:s.
+   * Returns the AuthnContextClassRef URI:s held by the context.
+   * <p>
+   * Note that the returned list in unmodifiable.
+   * </p>
    * 
-   * @return an immutable list of base AuthnContextClassRef URI:s
+   * @return a list of AuthnContextClassRef URI:s
    */
-  public List<String> getBaseAuthnContextClassRefs() {
-    return new ArrayList<>(this.baseAuthnContextClassRefs);
-  }
-
-  /**
-   * Returns the sigmessage AuthnContextClassRef URI:s.
-   * 
-   * @return a list of sigmessage AuthnContextClassRef URI:s
-   */
-  public List<String> getSigMessageAuthnContextClassRefs() {
-    return new ArrayList<>(this.sigMessageAuthnContextClassRefs);
-  }
-
-  /**
-   * Returns the URI:s that are not understood by this IdP.
-   * 
-   * @return unsupported AuthnContextClassRef URI:s
-   */
-  public List<String> getUnsupportedAuthnContextClassRefs() {
-    return new ArrayList<>(this.unsupportedAuthnContextClassRefs);
+  public List<String> getAuthnContextClassRefs() {
+    return Collections.unmodifiableList(this.authnContextClassRefs);
   }
 
   /**
@@ -124,15 +94,47 @@ public class AuthnContextClassContext extends BaseContext {
    *          the URI to delete
    */
   public void deleteAuthnContextClassRef(String uri) {
-    LoaEnum loa = LoaEnum.parse(uri);
-    if (loa != null) {
-      if (loa.isSignatureMessageUri()) {
-        this.sigMessageAuthnContextClassRefs.remove(uri);
-      }
-      else {
-        this.baseAuthnContextClassRefs.remove(uri);
-      }
-    }
+    this.authnContextClassRefs.remove(uri);
+  }
+
+  /**
+   * Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages.
+   * 
+   * @return {@code true} if the peer IdP supports sign messages and {@code false} otherwise
+   */
+  public boolean isProxiedIdPSupportsSignMessage() {
+    return this.proxiedIdPSupportsSignMessage;
+  }
+
+  /**
+   * Assigns whether the peer IdP supports sign messages.
+   * 
+   * @param proxiedIdPSupportsSignMessage
+   *          flag
+   */
+  public void setProxiedIdPSupportsSignMessage(boolean proxiedIdPSupportsSignMessage) {
+    this.proxiedIdPSupportsSignMessage = proxiedIdPSupportsSignMessage;
+  }
+
+  /**
+   * A Proxy-IdP needs to remember which URI:s that were sent to the remote IdP so that it can perform a validation of
+   * the received assertion. This method returns these URI:s.
+   * 
+   * @return a list of {@code AuthnContextClassRef} URI:s
+   */
+  public List<String> getProxiedAuthnContextClassRefs() {
+    return this.proxiedAuthnContextClassRefs;
+  }
+
+  /**
+   * A Proxy-IdP needs to remember which URI:s that were sent to the remote IdP so that it can perform a validation of
+   * the received assertion. This method assigns these URI:s.
+   * 
+   * @param proxiedAuthnContextClassRefs
+   *          a list of {@code AuthnContextClassRef} URI:s
+   */
+  public void setProxiedAuthnContextClassRefs(List<String> proxiedAuthnContextClassRefs) {
+    this.proxiedAuthnContextClassRefs = proxiedAuthnContextClassRefs;
   }
 
   /**
@@ -141,17 +143,7 @@ public class AuthnContextClassContext extends BaseContext {
    * @return if no URI:s are stored {@code true} is returned, otherwise {@code false}
    */
   public boolean isEmpty() {
-    return this.baseAuthnContextClassRefs.isEmpty() && this.sigMessageAuthnContextClassRefs.isEmpty();
-  }
-
-  /**
-   * Predicate that returns {@code true} if the context does not hold any URI:s at all (including non supported).
-   * 
-   * @return if no URI:s are stored {@code true} is returned, otherwise {@code false}
-   */
-  public boolean isAllEmpty() {
-    return this.baseAuthnContextClassRefs.isEmpty() && this.sigMessageAuthnContextClassRefs.isEmpty()
-        && this.unsupportedAuthnContextClassRefs.isEmpty();
+    return this.authnContextClassRefs.isEmpty();
   }
 
 }

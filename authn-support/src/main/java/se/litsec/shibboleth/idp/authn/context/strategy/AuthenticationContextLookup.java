@@ -19,36 +19,25 @@
  * You should have received a copy of the GNU General Public License 
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package se.litsec.shibboleth.idp.authn.service;
+package se.litsec.shibboleth.idp.authn.context.strategy;
 
+import org.opensaml.messaging.context.navigate.ContextDataLookupFunction;
 import org.opensaml.profile.context.ProfileRequestContext;
 
-import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
+import net.shibboleth.idp.authn.context.AuthenticationContext;
 
 /**
- * Base interface for authentication services.
+ * Lookup function for finding a {@link AuthenticationContext}.
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-public interface AuthenticationBaseService {
+@SuppressWarnings("rawtypes")
+public class AuthenticationContextLookup implements ContextDataLookupFunction<ProfileRequestContext, AuthenticationContext> {
 
-  /**
-   * Initializes the supplied context with the service's particular context (if any).
-   * 
-   * @param context
-   *          the request context to update
-   * @throws ExternalAutenticationErrorCodeException
-   *           if the context cannot be initialized
-   */
-  void initializeContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
+  @Override
+  public AuthenticationContext apply(ProfileRequestContext input) {
+    return input != null ? input.getSubcontext(AuthenticationContext.class, false) : null;
+  }
 
-  /**
-   * Performs processing of the recived request.
-   * 
-   * @param context
-   *          the context to validate and update
-   * @throws ExternalAutenticationErrorCodeException
-   *           if the requested AuthnContextClass URI:s are invalid in the context they are applied
-   */
-  void processRequest(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
+
 }

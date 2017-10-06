@@ -23,7 +23,6 @@ package se.litsec.shibboleth.idp.authn.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,20 +59,20 @@ import com.google.common.base.Functions;
 
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
-import net.shibboleth.idp.authn.AuthenticationFlowDescriptor;
 import net.shibboleth.idp.authn.ExternalAuthentication;
 import net.shibboleth.idp.authn.ExternalAuthenticationException;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
-import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 import net.shibboleth.idp.authn.principal.IdPAttributePrincipal;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
+import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
-import se.litsec.shibboleth.idp.authn.context.strategy.RequestedPrincipalContextLookup;
+import se.litsec.shibboleth.idp.authn.context.strategy.AuthenticationContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.SAMLPeerEntityContextLookup;
+import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
 import se.litsec.shibboleth.idp.subsystem.signservice.SignMessageDecryptionService;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
@@ -94,6 +93,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   /** Logging instance. */
   private final Logger logger = LoggerFactory.getLogger(AbstractExternalAuthenticationController.class);
 
+  /** The service for handling AuthnContext class processing. */
+  private AuthnContextService authnContextService;
+
   /** Helper that maps from SAML 2 attribute names to their corresponding Shibboleth attribute id:s. */
   private SAML2AttributeNameToIdMapperService attributeToIdMapping;
 
@@ -113,13 +115,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
   @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
     .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
-
+  
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
-
-  /** Strategy used to locate the requested LoA URI:s. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
-    .compose(new RequestedPrincipalContextLookup(), this.authenticationContextLookupStrategy);
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();  
 
   /**
    * Main entry point for the external authentication controller. The implementation starts a Shibboleth external
@@ -152,58 +150,46 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     HttpSession session = httpRequest.getSession();
     session.setAttribute(EXTAUTHN_KEY_ATTRIBUTE_NAME, key);
 
-    // Perform some initial checks to ensure the request is valid.
-    //
+    // Initialize services and process the request
+    try {
+      this.initializeServices(profileRequestContext);
+      this.servicesProcessRequest(profileRequestContext);
+    }
+    catch (ExternalAutenticationErrorCodeException e) {
+      this.error(httpRequest, httpResponse, e);
+      return null;
+    }
 
     // Hand over to implementation ...
     //
     return this.doExternalAuthentication(httpRequest, httpResponse, key, profileRequestContext);
   }
 
-  //
-  // TODO: This method should set a context holding the requests's LoA:s
-  //
-  protected void initializeExternalAuthentication(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String key,
-      ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAuthenticationException, IOException, IdpErrorStatusException {
-    
-    final AuthnRequest authnRequest = this.getAuthnRequest(profileRequestContext);
-    
-    // First handle the SignMessage if it's there.
-    //
-    final SignMessage signMessage = this.getSignMessage(profileRequestContext);
-    if (signMessage != null) {
-      
-      // TODO: Check display entity
-      
-    }
-       
-    final boolean isSignService = this.isSignatureServicePeer(profileRequestContext);
-    
-    
-    final String spEntityID = authnRequest.getIssuer().getValue();
-
-    if (signMessage != null && !isSignService) {
-      logger.info(
-        "SignMessage extension was included in AuthnRequest by relying party '{}' that is not a sign service. Will ignore SignMessage extension.", spEntityID);
-      
-      // TODO: Or should we throw?
-    }
-
-    if (isSignService) {
-      if (signMessage == null) {
-        logger.info("AuthnRequest from Signature Service '{}' does not contain a SignMessage extension ...", spEntityID);
-        
-        // Check all requested LoA:s and filter away those the includes sigmessage. 
-        // Are there any possible LoA:s left? If not, return error.        
-      }
-      else {
-        
-      }
-    }
-
+  /**
+   * Initializes the services for the controller. Subclasses should override this method to initialize their own
+   * services.
+   * 
+   * @param profileRequestContext
+   *          the request context
+   * @throws ExternalAutenticationErrorCodeException
+   *           for errors during initialization
+   */
+  protected void initializeServices(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
+    this.authnContextService.initializeContext(profileRequestContext);
   }
-  
-  //protected abstract boolean supportsSignMessage(SignMessage signMessage);
+
+  /**
+   * Invokes request processing for all installed services. Subclasses should override this method to invoke their own
+   * services.
+   * 
+   * @param profileRequestContext
+   *          the request context
+   * @throws ExternalAutenticationErrorCodeException
+   *           for errors during processing
+   */
+  protected void servicesProcessRequest(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
+    this.authnContextService.processRequest(profileRequestContext);
+  }
 
   /**
    * Abstract method that must be implemented by subclasses in order to implement the authentication.
@@ -540,66 +526,6 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
-   * Returns a list of the requested AuthnContextClassRef URI:s (level of assurance URI:s) that match what is supported
-   * by this authenticator.
-   * 
-   * @param context
-   *          the profile context
-   * @return requested AuthnContextClassRef URI:s
-   */
-  protected List<String> getRequestedAuthnContextClassRefs(ProfileRequestContext<?, ?> context) {
-    RequestedPrincipalContext requestedPrincipalContext = this.requestedPrincipalLookupStrategy.apply(context);
-    if (requestedPrincipalContext == null) {
-      return Collections.emptyList();
-    }
-
-    List<String> supportedUri = this.getSupportedAuthnContextClassRefs(context);
-
-    return requestedPrincipalContext.getRequestedPrincipals()
-      .stream()
-      .map(p -> p.getName())
-      .filter(u -> supportedUri.contains(u))
-      .collect(Collectors.toList());
-  }
-
-  /**
-   * See {@link #getRequestedAuthnContextClassRefs(ProfileRequestContext)}.
-   * 
-   * @param httpRequest
-   *          The HTTP request
-   * @return requested AuthnContextClassRef URI:s
-   * @throws ExternalAuthenticationException
-   *           for Shibboleth session errors
-   */
-  protected List<String> getRequestedAuthnContextClassRefs(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
-    return this.getRequestedAuthnContextClassRefs(this.getProfileRequestContext(httpRequest));
-  }
-
-  /**
-   * Returns a list of AuthnContextClassRef URI:s (level of assurance URI:s) that is supported by this authenticator.
-   * 
-   * @param context
-   *          the profile context
-   * @return a list of supported AuthnContextClassRef URI:s
-   */
-  protected List<String> getSupportedAuthnContextClassRefs(ProfileRequestContext<?, ?> context) {
-    AuthenticationContext authenticationContext = this.authenticationContextLookupStrategy.apply(context);
-    if (authenticationContext == null) {
-      return Collections.emptyList();
-    }
-    AuthenticationFlowDescriptor authenticationFlowDescriptor = authenticationContext.getAvailableFlows().get(this.flowName);
-    if (authenticationFlowDescriptor == null) {
-      logger.error("No authentication flow descriptor exists for {}", this.flowName);
-      return Collections.emptyList();
-    }
-    return authenticationFlowDescriptor.getSupportedPrincipals()
-      .stream()
-      .filter(AuthnContextClassRefPrincipal.class::isInstance)
-      .map(p -> p.getName())
-      .collect(Collectors.toList());
-  }
-
-  /**
    * Utility method that finds out whether the request that we are processing was sent by a "signature service".
    * 
    * @param context
@@ -687,18 +613,6 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
-   * Lookup function for finding a {@link AuthenticationContext}.
-   */
-  @SuppressWarnings("rawtypes")
-  public static class AuthenticationContextLookup implements ContextDataLookupFunction<ProfileRequestContext, AuthenticationContext> {
-
-    @Override
-    public AuthenticationContext apply(ProfileRequestContext input) {
-      return input != null ? input.getSubcontext(AuthenticationContext.class, false) : null;
-    }
-  }
-
-  /**
    * Lookup function for finding a {@link EntityDescriptor} in a {@code SAMLPeerEntityContext}.
    */
   public static class PeerMetadataContextLookup implements ContextDataLookupFunction<SAMLPeerEntityContext, EntityDescriptor> {
@@ -728,6 +642,16 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       }
       return null;
     }
+  }
+
+  /**
+   * Assigns the service that handles processing of AuthnContext classes.
+   * 
+   * @param authnContextService
+   *          service
+   */
+  public void setAuthnContextService(AuthnContextService authnContextService) {
+    this.authnContextService = authnContextService;
   }
 
   /**
@@ -764,6 +688,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   /** {@inheritDoc} */
   @Override
   public void afterPropertiesSet() throws Exception {
+    Assert.notNull(this.authnContextService, "Property 'authnContextService' must be assigned");
     Assert.notNull(this.attributeToIdMapping, "Property 'attributeToIdMapping' must be assigned");
     Assert.notNull(this.signMessageDecrypter, "The property 'signMessageDecrypter' must be assigned");
     Assert.notNull(this.flowName, "Property 'flowName' must be assigned");

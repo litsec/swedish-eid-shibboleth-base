@@ -45,10 +45,11 @@ import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
+import se.litsec.shibboleth.idp.authn.context.strategy.AuthenticationContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.AuthnContextClassContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.RequestedPrincipalContextLookup;
-import se.litsec.shibboleth.idp.authn.controller.AbstractExternalAuthenticationController.AuthenticationContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
+import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthenticationContextURI.LoaEnum;
 
 /**
  * Implementation of {@link AuthnContextService}.
@@ -83,13 +84,13 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
 
   /** {@inheritDoc} */
   @Override
-  public void initializeContext(ProfileRequestContext<?, ?> context) {
+  public void initializeContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException {
     final String logId = this.getLogString(context);
 
     AuthenticationContext authenticationContext = this.authenticationContextLookupStrategy.apply(context);
     if (authenticationContext == null) {
       log.error("No AuthenticationContext available [{}]", logId);
-      return;
+      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "No AuthenticationContext available");
     }
 
     RequestedPrincipalContext requestedPrincipalContext = this.requestedPrincipalLookupStrategy.apply(context);
@@ -112,26 +113,33 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
 
   /** {@inheritDoc} */
   @Override
-  public AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context) {
-    return this.authnContextClassLookupStrategy.apply(context);
+  public AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context)
+      throws ExternalAutenticationErrorCodeException {
+    AuthnContextClassContext authnContextClassContext = this.authnContextClassLookupStrategy.apply(context);
+    if (authnContextClassContext == null) {
+      if (authnContextClassContext == null) {
+        log.error("No AuthnContextClassContext available [{}]", this.getLogString(context));
+        throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthnContextClassContext");
+      }
+    }
+    return authnContextClassContext;
   }
 
-  /** {@inheritDoc} */
+  /**
+   * Processes the requested AuthnContextClass URI:s and verifies that they are valid regarding the type of request and
+   * what is supported by the authentication method. The method may update the current context, for example filter out
+   * URI:s that does not match the current authentication method.
+   */
   @Override
-  public void processRequestedAuthnContextClassRefs(ProfileRequestContext<?, ?> context)
-      throws ExternalAutenticationErrorCodeException {
+  public void processRequest(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException {
 
     final String logId = this.getLogString(context);
 
     AuthnContextClassContext authnContextContext = this.getAuthnContextClassContext(context);
-    if (authnContextContext == null) {
-      log.error("No RequestedAuthnContextClassContext available [{}]", logId);
-      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthnContextClassContext");
-    }
 
     // If no URI is specified in the request, we add the IdP default choice(s)
     //
-    if (authnContextContext.isAllEmpty()) {
+    if (authnContextContext.isEmpty()) {
       List<String> defaultUris = this.getDefaultAuthnContextClassRefs(context);
       log.info("No AuthnContext URI:s given in AuthnRequest - using IdP default(s): {} [{}]", defaultUris, logId);
 
@@ -145,7 +153,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       // First filter away those URI:s not supported by this authentication method.
       //
       final List<String> supportedUris = this.getSupportedAuthnContextClassRefs(context);
-      for (String uri : authnContextContext.getValidAuthnContextClassRefs()) {
+      for (String uri : authnContextContext.getAuthnContextClassRefs()) {
         if (!supportedUris.contains(uri)) {
           log.info("Requested AuthnContext URI '{}' is not supported by the current authentication method ({}), ignoring [{}]", uri,
             this.flowName, logId);
@@ -153,17 +161,10 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
         }
       }
 
-      // Warn about unsupported URI:s
-      //
-      if (!authnContextContext.getUnsupportedAuthnContextClassRefs().isEmpty()) {
-        log.warn("Supplied AuthnContext URI(s) {} not supported, ignoring [{}]", authnContextContext.getUnsupportedAuthnContextClassRefs(),
-          logId);
-      }
-      
       // Now, if we don't have any URI:s left there is an error. The SP specified URI:s, but they were not accepted.
       //
       if (authnContextContext.isEmpty()) {
-        final String msg = "No valid AuthnContext URI:s were specified in AuthnRequest"; 
+        final String msg = "No valid AuthnContext URI:s were specified in AuthnRequest";
         log.info("{} - can not proceed [{}]", msg, logId);
         throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, msg);
       }
@@ -229,6 +230,56 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       log.error("No default AuthnContext URI defined in Shibboleth for flow '{}'", this.flowName);
     }
     return Arrays.asList(uri);
+  }
+
+  /**
+   * Predicate that tells if the supplied URI is a URI indicating sign message display.
+   * 
+   * @param uri
+   *          the URI to test
+   * @return {@code true} if the supplied URI is for sign message, and {@code false} otherwise
+   */
+  protected boolean isSignMessageURI(String uri) {
+    LoaEnum loa = LoaEnum.parse(uri);
+    return (loa != null && loa.isSignatureMessageUri());
+  }
+
+  /**
+   * Given a base URI, the method returns its corresponding sigmessage URI.
+   * 
+   * @param uri
+   *          the URI to transform
+   * @return the sigmessage URI, or {@code null} if no such exists
+   */
+  protected String toSignMessageURI(String uri) {
+    LoaEnum loa = LoaEnum.parse(uri);
+    if (loa == null) {
+      return null;
+    }
+    if (loa.isSignatureMessageUri()) {
+      return uri;
+    }
+    for (LoaEnum l : LoaEnum.values()) {
+      if (l.getBaseUri().equals(loa.getBaseUri()) && l.isSignatureMessageUri() && l.isNotified() == loa.isNotified()) {
+        return l.getUri();
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Given an URI its base form is returned. This means that the URI minus any potential sigmessage extension.
+   * 
+   * @param uri
+   *          the URI to convert
+   * @return the base URI
+   */
+  protected String toBaseURI(String uri) {
+    LoaEnum loa = LoaEnum.parse(uri);
+    if (loa != null && loa.isSignatureMessageUri()) {
+      return LoaEnum.minusSigMessage(loa).getUri();
+    }
+    return uri;
   }
 
   /**
