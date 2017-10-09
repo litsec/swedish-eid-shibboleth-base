@@ -22,7 +22,6 @@
 package se.litsec.shibboleth.idp.authn.context;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.opensaml.messaging.context.BaseContext;
@@ -45,6 +44,12 @@ public class AuthnContextClassContext extends BaseContext {
 
   /** Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages. */
   private boolean proxiedIdPSupportsSignMessage = false;
+  
+  /**
+   * Holds information whether the a remote IdP supports the concept on non notified eID schemes, or if it treats
+   * notified and non notified eID schemes the same. (Applies to proxy IdP:s and certailn schemes).
+   */
+  private boolean supportsNonNotifiedConcept = true;  
 
   /**
    * A Proxy-IdP needs to remember which URI:s that were sent to the remote IdP so that it can perform a validation of
@@ -76,14 +81,11 @@ public class AuthnContextClassContext extends BaseContext {
 
   /**
    * Returns the AuthnContextClassRef URI:s held by the context.
-   * <p>
-   * Note that the returned list in unmodifiable.
-   * </p>
    * 
    * @return a list of AuthnContextClassRef URI:s
    */
   public List<String> getAuthnContextClassRefs() {
-    return Collections.unmodifiableList(this.authnContextClassRefs);
+    return new ArrayList<>(this.authnContextClassRefs);
   }
 
   /**
@@ -145,5 +147,27 @@ public class AuthnContextClassContext extends BaseContext {
   public boolean isEmpty() {
     return this.authnContextClassRefs.isEmpty();
   }
+  
+  /**
+   * Tells whether the remote IdP supports a non notified eID scheme concept.
+   * <p>
+   * Default is {@code true}.
+   * </p>
+   * 
+   * @return if the IdP supports the non notified concept {@code true} is returned, otherwise {@code false}
+   */
+  public boolean isSupportsNonNotifiedConcept() {
+    return this.supportsNonNotifiedConcept;
+  }
 
+  /**
+   * Assigns whether the remote IdP supports a non notified eID scheme concept.
+   * 
+   * @param supportsNonNotifiedConcept
+   *          whether the IdP supports the non notified concept
+   */
+  public void setSupportsNonNotifiedConcept(boolean supportsNonNotifiedConcept) {
+    this.supportsNonNotifiedConcept = supportsNonNotifiedConcept;
+  }
+  
 }

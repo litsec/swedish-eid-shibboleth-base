@@ -87,12 +87,6 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
   public void initializeContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException {
     final String logId = this.getLogString(context);
 
-    AuthenticationContext authenticationContext = this.authenticationContextLookupStrategy.apply(context);
-    if (authenticationContext == null) {
-      log.error("No AuthenticationContext available [{}]", logId);
-      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "No AuthenticationContext available");
-    }
-
     RequestedPrincipalContext requestedPrincipalContext = this.requestedPrincipalLookupStrategy.apply(context);
     List<String> requstedPrincipals;
     if (requestedPrincipalContext == null) {
@@ -108,7 +102,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     }
 
     log.debug("Initializing RequestedAuthnContextClassContext with AuthnContextClassRef URI:s: {} [{}]", requestedPrincipalContext, logId);
-    authenticationContext.addSubcontext(new AuthnContextClassContext(requstedPrincipals), true);
+    this.addAuthnContextClassContext(context, new AuthnContextClassContext(requstedPrincipals));
   }
 
   /** {@inheritDoc} */
@@ -117,12 +111,30 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       throws ExternalAutenticationErrorCodeException {
     AuthnContextClassContext authnContextClassContext = this.authnContextClassLookupStrategy.apply(context);
     if (authnContextClassContext == null) {
-      if (authnContextClassContext == null) {
-        log.error("No AuthnContextClassContext available [{}]", this.getLogString(context));
-        throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthnContextClassContext");
-      }
+      log.error("No AuthnContextClassContext available [{}]", this.getLogString(context));
+      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthnContextClassContext");
     }
     return authnContextClassContext;
+  }
+
+  /**
+   * Adds the supplied {@code AuthnContextClassContext} to the request context
+   * 
+   * @param context
+   *          the request context
+   * @param authnContextClassContext
+   *          the context to add
+   * @throws ExternalAutenticationErrorCodeException
+   *           if no context exists
+   */
+  protected void addAuthnContextClassContext(ProfileRequestContext<?, ?> context, AuthnContextClassContext authnContextClassContext)
+      throws ExternalAutenticationErrorCodeException {
+    AuthenticationContext authnContext = this.authenticationContextLookupStrategy.apply(context);
+    if (authnContext == null) {
+      log.error("No AuthenticationContext available [{}]", this.getLogString(context));
+      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthenticationContext");
+    }
+    authnContext.addSubcontext(authnContextClassContext, true);
   }
 
   /**
@@ -144,7 +156,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       log.info("No AuthnContext URI:s given in AuthnRequest - using IdP default(s): {} [{}]", defaultUris, logId);
 
       // Replace current context with new one.
-      this.authenticationContextLookupStrategy.apply(context).addSubcontext(new AuthnContextClassContext(defaultUris), true);
+      this.addAuthnContextClassContext(context, new AuthnContextClassContext(defaultUris));
 
     }
     // Else, make checks and remove URI:s that are not relevant.
