@@ -45,7 +45,6 @@ import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
-import se.litsec.shibboleth.idp.authn.context.strategy.AuthenticationContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.AuthnContextClassContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.RequestedPrincipalContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
@@ -71,23 +70,20 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
   /** The name of the Shibboleth flow that this authentication method uses. */
   protected String flowName;
 
-  /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
-
   /** Strategy used to locate the requested principal context. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
-    .compose(new RequestedPrincipalContextLookup(), this.authenticationContextLookupStrategy);
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
+    .compose(new RequestedPrincipalContextLookup(), authenticationContextLookupStrategy);
 
   /** Strategy used to locate the AuthnContextClassContext. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthnContextClassContext> authnContextClassLookupStrategy = Functions
-    .compose(new AuthnContextClassContextLookup(), this.authenticationContextLookupStrategy);
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthnContextClassContext> authnContextClassLookupStrategy = Functions
+    .compose(new AuthnContextClassContextLookup(), authenticationContextLookupStrategy);
 
   /** {@inheritDoc} */
   @Override
   public void initializeContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException {
     final String logId = this.getLogString(context);
 
-    RequestedPrincipalContext requestedPrincipalContext = this.requestedPrincipalLookupStrategy.apply(context);
+    RequestedPrincipalContext requestedPrincipalContext = requestedPrincipalLookupStrategy.apply(context);
     List<String> requstedPrincipals;
     if (requestedPrincipalContext == null) {
       log.info("No RequestedPrincipalContext available - no AuthnContextClassRefs in AuthnRequest [{}]", logId);
@@ -109,7 +105,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
   @Override
   public AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context)
       throws ExternalAutenticationErrorCodeException {
-    AuthnContextClassContext authnContextClassContext = this.authnContextClassLookupStrategy.apply(context);
+    AuthnContextClassContext authnContextClassContext = authnContextClassLookupStrategy.apply(context);
     if (authnContextClassContext == null) {
       log.error("No AuthnContextClassContext available [{}]", this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthnContextClassContext");
@@ -129,7 +125,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
    */
   protected void addAuthnContextClassContext(ProfileRequestContext<?, ?> context, AuthnContextClassContext authnContextClassContext)
       throws ExternalAutenticationErrorCodeException {
-    AuthenticationContext authnContext = this.authenticationContextLookupStrategy.apply(context);
+    AuthenticationContext authnContext = authenticationContextLookupStrategy.apply(context);
     if (authnContext == null) {
       log.error("No AuthenticationContext available [{}]", this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthenticationContext");
@@ -181,29 +177,12 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
         throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, msg);
       }
     }
-
-    // TODO: Move these to SignatureMessageService!
-
-    // Make additional checks regarding the use of AuthnContext URI:s by signature services, and
-    // make sure they are compliant with the Swedish eID deployment profile.
-    //
-    // boolean isSignatureService = signatureMessageService.isSignatureServicePeer(context);
-    //
-    // if (!isSignatureService && !authnContextContext.getSigMessageAuthnContextClassRefs().isEmpty()) {
-    // // It is not valid to include a "sigmessage" URI in a request if you are not a "Signature Service",
-    // // but we can safely filter those out.
-    // log.info("AuthnRequest contains sigmessage AuthnContext URI(s) ({}), but SP is not a signature service, ignoring
-    // [{}]'",
-    // authnContextContext.getSigMessageAuthnContextClassRefs(), logId);
-    // authnContextContext.getSigMessageAuthnContextClassRefs().stream().forEach(authnContextContext::deleteAuthnContextClassRef);
-    // }
-
   }
 
   /** {@inheritDoc} */
   @Override
   public List<String> getSupportedAuthnContextClassRefs(ProfileRequestContext<?, ?> context) {
-    AuthenticationContext authenticationContext = this.authenticationContextLookupStrategy.apply(context);
+    AuthenticationContext authenticationContext = authenticationContextLookupStrategy.apply(context);
     if (authenticationContext == null) {
       log.error("No AuthenticationContext available");
       return Collections.emptyList();

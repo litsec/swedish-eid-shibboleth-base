@@ -24,6 +24,7 @@ package se.litsec.shibboleth.idp.authn.service;
 import org.opensaml.profile.context.ProfileRequestContext;
 
 import se.litsec.shibboleth.idp.authn.context.SignMessageContext;
+import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessageMimeTypeEnum;
 
 /**
  * Service for handling requests from a "Signature Service".
@@ -49,5 +50,14 @@ public interface SignatureMessageService extends AuthenticationBaseService {
    * @return if the peer is a signature service {@code true} is returned, otherwise {@code false}
    */
   boolean isSignatureServicePeer(ProfileRequestContext<?, ?> context);
+
+  /**
+   * Predicate that tells whether the current IdP supports displaying a message of the supplied MIME type.
+   * 
+   * @param mimeType
+   *          the type
+   * @return {@code true} if the IdP can display messages of the supplied type, and {@code false} otherwise
+   */
+  boolean supportsMimeType(SignMessageMimeTypeEnum mimeType);
 
 }

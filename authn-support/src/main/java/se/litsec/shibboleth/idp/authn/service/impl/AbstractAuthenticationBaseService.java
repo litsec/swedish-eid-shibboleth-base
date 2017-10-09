@@ -32,6 +32,8 @@ import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 
+import net.shibboleth.idp.authn.context.AuthenticationContext;
+import se.litsec.shibboleth.idp.authn.context.strategy.AuthenticationContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.SAMLPeerEntityContextLookup;
 import se.litsec.shibboleth.idp.authn.controller.AbstractExternalAuthenticationController.PeerMetadataContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthenticationBaseService;
@@ -42,16 +44,19 @@ import se.litsec.shibboleth.idp.authn.service.AuthenticationBaseService;
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
 public abstract class AbstractAuthenticationBaseService implements AuthenticationBaseService {
-  
+
+  /** Strategy that gives us the AuthenticationContext. */
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = 
+      new AuthenticationContextLookup();
+
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
-  @SuppressWarnings("rawtypes") 
-  protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
-    new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));  
-  
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = 
+      Functions.compose(new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
+
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
-    new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());  
-  
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = 
+      Functions.compose(new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
+
   /**
    * Utility method that may be used to obtain the SAML metadata for the peer (i.e., the Service Provider) that sent the
    * authentication request.
@@ -62,7 +67,7 @@ public abstract class AbstractAuthenticationBaseService implements Authenticatio
    * @see #getPeerMetadata(HttpServletRequest)
    */
   protected EntityDescriptor getPeerMetadata(ProfileRequestContext<?, ?> context) {
-    return this.peerMetadataLookupStrategy.apply(context);
+    return peerMetadataLookupStrategy.apply(context);
   }
 
   /**
@@ -74,9 +79,9 @@ public abstract class AbstractAuthenticationBaseService implements Authenticatio
    * @return the authentication request message
    */
   protected AuthnRequest getAuthnRequest(ProfileRequestContext<?, ?> context) {
-    return this.requestLookupStrategy.apply(context);
+    return requestLookupStrategy.apply(context);
   }
-  
+
   /**
    * Returns a string to include in logging statements. The returned log string contains information about the current
    * request being processed. The format on the log string is {@code key1='value1',key2='value2', ...}.
@@ -88,11 +93,11 @@ public abstract class AbstractAuthenticationBaseService implements Authenticatio
   protected String getLogString(ProfileRequestContext<?, ?> context) {
     try {
       AuthnRequest authnRequest = this.getAuthnRequest(context);
-      return String.format("request-id='%s',sp='%s'", authnRequest.getID(), authnRequest.getIssuer().getValue());          
+      return String.format("request-id='%s',sp='%s'", authnRequest.getID(), authnRequest.getIssuer().getValue());
     }
     catch (Exception e) {
       return "";
     }
   }
-    
+
 }

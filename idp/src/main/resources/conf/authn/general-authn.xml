@@ -17,6 +17,10 @@
     <bean id="sweid.AuthnContextService" class="se.litsec.shibboleth.idp.authn.service.impl.AuthnContextServiceImpl" scope="singleton"
       p:flowName="authn/External"
       p:authnContextweightMap-ref="shibboleth.AuthenticationPrincipalWeightMap" />
+      
+    <bean id="sweid.SignMessageService" class="se.litsec.shibboleth.idp.authn.service.impl.SignatureMessageServiceImpl" scope="singleton"
+      p:authnContextService-ref="sweid.AuthnContextService"
+      p:signMessageDecrypter-ref="sweid.SignMessageDecryptionService" />
 
 
     <!--

@@ -45,7 +45,6 @@ import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
-import org.opensaml.xmlsec.encryption.support.DecryptionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -73,12 +72,8 @@ import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
 import se.litsec.shibboleth.idp.authn.context.strategy.AuthenticationContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.SAMLPeerEntityContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
+import se.litsec.shibboleth.idp.authn.service.SignatureMessageService;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
-import se.litsec.shibboleth.idp.subsystem.signservice.SignMessageDecryptionService;
-import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
-import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessage;
 
 /**
  * Abstract base class for controllers implementing "external authentication".
@@ -96,11 +91,11 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   /** The service for handling AuthnContext class processing. */
   private AuthnContextService authnContextService;
 
+  /** The service for sign message processing. */
+  protected SignatureMessageService signMessageService;
+
   /** Helper that maps from SAML 2 attribute names to their corresponding Shibboleth attribute id:s. */
   private SAML2AttributeNameToIdMapperService attributeToIdMapping;
-
-  /** The SignMessageDecrypter service. */
-  private SignMessageDecryptionService signMessageDecrypter;
 
   /** The name of the Shibboleth flow that this controller supports. */
   private String flowName;
@@ -115,9 +110,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
   @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
     .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
-  
+
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();  
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
 
   /**
    * Main entry point for the external authentication controller. The implementation starts a Shibboleth external
@@ -176,6 +171,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    */
   protected void initializeServices(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
     this.authnContextService.initializeContext(profileRequestContext);
+    this.signMessageService.initializeContext(profileRequestContext);
   }
 
   /**
@@ -189,6 +185,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    */
   protected void servicesProcessRequest(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
     this.authnContextService.processRequest(profileRequestContext);
+    this.signMessageService.processRequest(profileRequestContext);
   }
 
   /**
@@ -526,93 +523,6 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
-   * Utility method that finds out whether the request that we are processing was sent by a "signature service".
-   * 
-   * @param context
-   *          the profile context
-   * @return if the peer is a signature service {@code true} is returned, otherwise {@code false}
-   * @see #isSignatureServicePeer(HttpServletRequest)
-   */
-  protected boolean isSignatureServicePeer(ProfileRequestContext<?, ?> context) {
-    EntityDescriptor peerMetadata = this.getPeerMetadata(context);
-    if (peerMetadata == null) {
-      logger.error("No metadata available for connecting SP");
-      return false;
-    }
-    return EntityCategoryMetadataHelper.getEntityCategories(peerMetadata)
-      .stream()
-      .filter(c -> EntityCategoryConstants.SERVICE_TYPE_CATEGORY_SIGSERVICE.getUri().equals(c))
-      .findFirst()
-      .isPresent();
-  }
-
-  /**
-   * See {@link #isSignatureServicePeer(ProfileRequestContext)}.
-   * 
-   * @param httpRequest
-   *          The HTTP request
-   * @return if the peer is a signature service {@code true} is returned, otherwise {@code false}
-   * @throws ExternalAuthenticationException
-   *           for Shibboleth session errors
-   */
-  protected boolean isSignatureServicePeer(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
-    return this.isSignatureServicePeer(this.getProfileRequestContext(httpRequest));
-  }
-
-  /**
-   * If the IdP was called by a signature service ({@link #isSignatureServicePeer(ProfileRequestContext)} returns
-   * {@code true}), the {@code AuthnRequest} should contain a {@code SignMessage} element extension. This method returns
-   * this object.
-   * 
-   * @param context
-   *          the profile context
-   * @return a {@code SignMessage} or {@code null} if none is available
-   */
-  protected SignMessage getSignMessage(ProfileRequestContext<?, ?> context) {
-    AuthnRequest authnRequest = this.getAuthnRequest(context);
-    if (authnRequest == null) {
-      logger.error("No AuthnRequest is available");
-      return null;
-    }
-    if (authnRequest.getExtensions() == null) {
-      return null;
-    }
-    return authnRequest.getExtensions()
-      .getUnknownXMLObjects()
-      .stream()
-      .filter(SignMessage.class::isInstance)
-      .map(SignMessage.class::cast)
-      .findFirst()
-      .orElse(null);
-  }
-
-  /**
-   * See {@link #getSignMessage(ProfileRequestContext)}.
-   * 
-   * @param httpRequest
-   *          the HTTP request
-   * @return a {@code SignMessage} or {@code null} if none is available
-   * @throws ExternalAuthenticationException
-   *           for Shibboleth session errors
-   */
-  protected SignMessage getSignMessage(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
-    return this.getSignMessage(this.getProfileRequestContext(httpRequest));
-  }
-
-  /**
-   * Decrypts an encrypted {@link SignMessage}.
-   * 
-   * @param signMessage
-   *          the message holding the encrypted message
-   * @return a cleartext {@link Message} object
-   * @throws DecryptionException
-   *           for decryption errors
-   */
-  protected Message decryptSignMessage(SignMessage signMessage) throws DecryptionException {
-    return this.signMessageDecrypter.decrypt(signMessage);
-  }
-
-  /**
    * Lookup function for finding a {@link EntityDescriptor} in a {@code SAMLPeerEntityContext}.
    */
   public static class PeerMetadataContextLookup implements ContextDataLookupFunction<SAMLPeerEntityContext, EntityDescriptor> {
@@ -655,6 +565,16 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
+   * Assigns the service for sign message processing.
+   * 
+   * @param signMessageService
+   *          service
+   */
+  public void setSignMessageService(SignatureMessageService signMessageService) {
+    this.signMessageService = signMessageService;
+  }
+
+  /**
    * Adds the service that provides mappings from SAML 2 attribute names to their corresponding Shibboleth attribute
    * id:s.
    * 
@@ -663,16 +583,6 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    */
   public void setAttributeToIdMapping(SAML2AttributeNameToIdMapperService attributeToIdMapping) {
     this.attributeToIdMapping = attributeToIdMapping;
-  }
-
-  /**
-   * Assigns the sign message decrypter.
-   * 
-   * @param signMessageDecrypter
-   *          the decrypter
-   */
-  public void setSignMessageDecrypter(SignMessageDecryptionService signMessageDecrypter) {
-    this.signMessageDecrypter = signMessageDecrypter;
   }
 
   /**
@@ -689,8 +599,8 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(this.authnContextService, "Property 'authnContextService' must be assigned");
+    Assert.notNull(this.signMessageService, "Property 'signMessageService' must be assigned");
     Assert.notNull(this.attributeToIdMapping, "Property 'attributeToIdMapping' must be assigned");
-    Assert.notNull(this.signMessageDecrypter, "The property 'signMessageDecrypter' must be assigned");
     Assert.notNull(this.flowName, "Property 'flowName' must be assigned");
   }
 

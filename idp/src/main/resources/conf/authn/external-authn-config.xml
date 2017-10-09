@@ -60,7 +60,7 @@
             <value>PossibleFraud</value>
           </list>
         </entry>
-        <entry key="DecryptionError">
+        <entry key="UnableToDecode">
           <list>
             <value>UnableToDecode</value>
           </list>

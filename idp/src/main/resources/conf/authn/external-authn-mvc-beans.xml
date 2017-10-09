@@ -21,8 +21,8 @@
   <bean id="sweid.AbstractExternalAuthenticationController" class="se.litsec.shibboleth.idp.authn.controller.sweid.AbstractExternalAuthenticationController"
     abstract="true" 
     p:authnContextService-ref="sweid.AuthnContextService"
-    p:attributeToIdMapping-ref="sweid.SAML2AttributeNameToIdMapperService"
-    p:signMessageDecrypter-ref="sweid.SignMessageDecryptionService" 
+    p:signMessageService-ref="sweid.SignMessageService"
+    p:attributeToIdMapping-ref="sweid.SAML2AttributeNameToIdMapperService"    
     p:flowName="authn/External" />    
         
 </beans>

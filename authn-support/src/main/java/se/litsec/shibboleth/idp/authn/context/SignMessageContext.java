@@ -40,7 +40,10 @@ public class SignMessageContext extends BaseContext {
 
   /** The cleartext message. */
   private Message clearTextMessage;
-  
+
+  /** Flag telling whether the IdP should display the message. */
+  private boolean displayMessage = true;
+
   /**
    * Constructor.
    * 
@@ -52,6 +55,15 @@ public class SignMessageContext extends BaseContext {
     if (this.signMessage.getMessage() != null) {
       this.clearTextMessage = this.signMessage.getMessage();
     }
+  }
+
+  /**
+   * Returns the {@code SignMessage}.
+   * 
+   * @return the {@code SignMessage}
+   */
+  public SignMessage getSignMessage() {
+    return this.signMessage;
   }
 
   /**
@@ -92,6 +104,25 @@ public class SignMessageContext extends BaseContext {
    */
   public SignMessageMimeTypeEnum getMimeType() {
     return this.signMessage.getMimeType() != null ? this.signMessage.getMimeTypeEnum() : SignMessageMimeTypeEnum.TEXT;
+  }
+
+  /**
+   * Predicate telling whether the message should be displayed by the IdP.
+   * 
+   * @return {@code true} if the message should be displayed, and {@code false} otherwise
+   */
+  public boolean isDisplayMessage() {
+    return this.displayMessage;
+  }
+
+  /**
+   * Assigns whether the message should be displayed by the IdP.
+   * 
+   * @param displayMessage
+   *          {@code true} if the message should be displayed, and {@code false} otherwise
+   */
+  public void setDisplayMessage(boolean displayMessage) {
+    this.displayMessage = displayMessage;
   }
 
 }
