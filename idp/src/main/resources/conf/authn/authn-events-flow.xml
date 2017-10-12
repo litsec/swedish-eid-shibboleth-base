@@ -12,10 +12,16 @@
     <end-state id="Fraud" />
     <end-state id="PossibleFraud" />
     
+    <!-- End-states for SignMessage errors -->
+    <end-state id="SignMessageDecryptionError" />
+    <end-state id="SignMessageTypeNotSupported" />
+    
     <global-transitions>
       <transition on="CancelAuthn" to="CancelAuthn" />
       <transition on="Fraud" to="Fraud" />
       <transition on="PossibleFraud" to="PossibleFraud" />
+      <transition on="SignMessageDecryptionError" to="SignMessageDecryptionError" />
+      <transition on="SignMessageTypeNotSupported" to="SignMessageTypeNotSupported" />
     </global-transitions>
 
 </flow>

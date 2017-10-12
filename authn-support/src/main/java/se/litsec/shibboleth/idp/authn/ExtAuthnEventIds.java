@@ -47,5 +47,15 @@ public class ExtAuthnEventIds {
    * ID of event returned if the authentication process is terminated due to a possible (or suspected) fraud attempt.
    */
   public static final String POSSIBLE_FRAUD = "PossibleFraud";
+  
+  /**
+   * ID that signals that the IdP failed to decrypt an encrypted SignMessage.
+   */
+  public static final String SIGN_MESSAGE_DECRYPTION_ERROR = "SignMessageDecryptionError";
+  
+  /**
+   * ID that signals that the IdP does not support the given MIME type of a SignMessage.
+   */
+  public static final String SIGN_MESSAGE_TYPE_NOT_SUPPORTED = "SignMessageTypeNotSupported";
 
 }

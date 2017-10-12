@@ -35,6 +35,7 @@ import com.google.common.base.Functions;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
+import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 import se.litsec.shibboleth.idp.authn.context.SignMessageContext;
@@ -158,7 +159,7 @@ public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseServi
           catch (DecryptionException e) {
             final String msg = String.format("Failed to decrypt SignMessage - %s", e.getMessage());
             log.error("{} [{}]", msg, logId);
-            throw new ExternalAutenticationErrorCodeException("UnableToDecode", msg);
+            throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.SIGN_MESSAGE_DECRYPTION_ERROR, msg);
           }
         }
         else {
@@ -170,7 +171,7 @@ public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseServi
           signMessageContext.setDisplayMessage(false);
 
           if (signMessageContext.mustShow()) {
-            throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Unsupported SignMessage mime type");
+            throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.SIGN_MESSAGE_TYPE_NOT_SUPPORTED, "Unsupported SignMessage mime type");
           }
         }
         // If the SignMessage element from the signature request includes a MustShow attribute with the value true, the

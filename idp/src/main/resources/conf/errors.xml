@@ -118,6 +118,9 @@
         <entry key="Fraud" value-ref="sweid.SAML2Status.Fraud" />
         <entry key="PossibleFraud" value-ref="sweid.SAML2Status.PossibleFraud" />
         
+        <entry key="SignMessageDecryptionError" value-ref="shibboleth.SAML2Status.RequestUnsupported" />
+        <entry key="SignMessageTypeNotSupported" value-ref="shibboleth.SAML2Status.RequestUnsupported" />
+        
         <!-- ==================== Swedish eID extensions - END ==================== -->
         
     </util:map>
