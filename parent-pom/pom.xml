@@ -59,9 +59,26 @@
       <name>Shibboleth Maven Repo</name>
       <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
     </repository>
+    <repository>
+      <id>eidasrl</id>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <name>eIDAS releases</name>
+      <url>https://maven.eidastest.se/artifactory/eidas-release-local</url>
+    </repository>
+    <repository>
+      <id>eidassh</id>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <name>eIDAS snapshots</name>
+      <url>https://maven.eidastest.se/artifactory/eidas-snapshot-local</url>
+    </repository>    
   </repositories>
 
   <distributionManagement>
+    <!-- 
     <snapshotRepository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -70,6 +87,15 @@
       <id>ossrh</id>
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
+    -->
+    <snapshotRepository>
+      <id>eidassh</id>
+      <url>https://maven.eidastest.se/artifactory/eidas-snapshot-local</url>
+    </snapshotRepository>
+    <repository>
+      <id>eidasrl</id>
+      <url>https://maven.eidastest.se/artifactory/eidas-release-local</url>
+    </repository>    
   </distributionManagement>
 
   <dependencyManagement>
@@ -128,6 +154,54 @@
     </pluginManagement>
 
   </build>
+  
+  <profiles>
+    <profile>
+      <id>release</id>
+      
+      <build>
+        <plugins>
+        
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.0.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>attach-test-sources</id>
+                <goals>
+                  <goal>test-jar-no-fork</goal>
+                </goals>
+              </execution>              
+            </executions>
+          </plugin>
+          
+        </plugins>
+      </build>
+      
+    </profile>
+  </profiles>  
 
   <modules>
     <module>../shibboleth-extensions</module>

@@ -12,6 +12,17 @@
   <description>Builder POM for base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
   <url>https://github.com/litsec/swedish-eid-shibboleth-base</url>
 
+  <distributionManagement>
+    <snapshotRepository>
+      <id>eidassh</id>
+      <url>https://maven.eidastest.se/artifactory/eidas-snapshot-local</url>
+    </snapshotRepository>
+    <repository>
+      <id>eidasrl</id>
+      <url>https://maven.eidastest.se/artifactory/eidas-release-local</url>
+    </repository>    
+  </distributionManagement>
+
   <modules>
     <module>dependency-bom</module>
     <module>parent-pom</module>
