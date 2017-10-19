@@ -44,8 +44,8 @@
     <!-- Versions on dependencies -->
     <shibboleth.version>3.3.1</shibboleth.version>
     <opensaml.version>3.3.0</opensaml.version>
-    <opensaml-ext.version>0.9.1-SNAPSHOT</opensaml-ext.version>
-    <opensaml.swedish-eid.version>0.9.1-SNAPSHOT</opensaml.swedish-eid.version>
+    <opensaml-ext.version>0.9.1</opensaml-ext.version>
+    <opensaml.swedish-eid.version>0.9.1</opensaml.swedish-eid.version>
     <spring.version>4.3.2.RELEASE</spring.version>
     <spring.webflow.version>2.4.4.RELEASE</spring.webflow.version>
 
