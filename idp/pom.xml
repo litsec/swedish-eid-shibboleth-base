@@ -8,7 +8,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -29,7 +29,7 @@
     <connection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</connection>
     <developerConnection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</developerConnection>
     <url>https://github.com/litsec/swedish-eid-shibboleth-base/tree/master</url>
-    <tag>1.0.0-release-tag</tag>
+    <tag>release/1.0.0-release</tag>
   </scm>
 
   <developers>
