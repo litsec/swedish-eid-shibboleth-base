@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -30,6 +29,7 @@
     <connection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</connection>
     <developerConnection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</developerConnection>
     <url>https://github.com/litsec/swedish-eid-shibboleth-base/tree/master</url>
+    <tag>release/1.0.0-release</tag>
   </scm>
 
   <developers>
@@ -191,8 +191,7 @@
             <phase>process-resources</phase>
             <configuration>
               <target name="copy-webapp">
-                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp"
-                  overwrite="true">
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp" overwrite="true">
                   <fileset dir="${project.basedir}/src/main/webapp" />
                 </copy>
               </target>
@@ -207,15 +206,13 @@
             <phase>process-resources</phase>
             <configuration>
               <target name="copy-to-dist">
-                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/conf"
-                  overwrite="true" force="true">
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/conf" overwrite="true" force="true">
                   <fileset dir="${basedir}/src/main/resources/conf" includes="**/*">
                     <type type="file" />
                   </fileset>
                   <mapper type="glob" from="*" to="*.dist" />
                 </copy>
-                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/messages"
-                  overwrite="true" force="true">
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/messages" overwrite="true" force="true">
                   <fileset dir="${basedir}/src/main/resources/messages" includes="**/*">
                     <type type="file" />
                   </fileset>
