@@ -53,7 +53,7 @@ public class MetadataPublishingController extends AbstractMetadataPublishingCont
   /** {@inheritDoc} */
   @RequestMapping(value = "/idp.xml", method = RequestMethod.GET)
   @ResponseBody
-  public HttpEntity<byte[]> getMetadata(HttpServletRequest request, @RequestHeader("Accept") String acceptHeader) {
+  public HttpEntity<byte[]> getMetadata(HttpServletRequest request, @RequestHeader(name = "Accept", required = false) String acceptHeader) {
     return super.getMetadata(request, acceptHeader);
   }
 

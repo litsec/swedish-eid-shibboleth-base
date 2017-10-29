@@ -80,7 +80,7 @@ public abstract class AbstractMetadataPublishingController {
    *          the Accept header value
    * @return an HttpEntity holding the SAML metadata
    */
-  public HttpEntity<byte[]> getMetadata(HttpServletRequest request, @RequestHeader("Accept") String acceptHeader) {
+  public HttpEntity<byte[]> getMetadata(HttpServletRequest request, @RequestHeader(name = "Accept", required = false) String acceptHeader) {
 
     logger.debug("Request to download metadata from {}", request.getRemoteAddr());
 
