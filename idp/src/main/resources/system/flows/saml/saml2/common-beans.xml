@@ -27,7 +27,7 @@
                 p:defaultIdentifierGenerationStrategy-ref="shibboleth.DefaultIdentifierGenerationStrategy" />
         </property>
     </bean>
-
+    
     <bean id="AddAuthnStatementToAssertion"
             class="net.shibboleth.idp.saml.saml2.profile.impl.AddAuthnStatementToAssertion" scope="prototype"
             p:httpServletRequest-ref="shibboleth.HttpServletRequest">
@@ -70,6 +70,12 @@
                 p:defaultIdentifierGenerationStrategy-ref="shibboleth.DefaultIdentifierGenerationStrategy" />
         </property>
     </bean>
+
+    <!-- Litsec -->
+    <bean id="UpdateAssertionForProxyIdp" 
+      class="se.litsec.shibboleth.idp.authn.actions.UpdateAssertionForProxyIdpAction" scope="prototype"
+      p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+    </bean>    
 
     <bean id="InitializeOutboundMessageContextForError"
             class="net.shibboleth.idp.saml.profile.impl.InitializeOutboundMessageContextForError" scope="prototype">
