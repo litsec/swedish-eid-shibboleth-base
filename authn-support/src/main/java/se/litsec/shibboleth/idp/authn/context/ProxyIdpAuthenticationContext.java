@@ -25,11 +25,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.opensaml.messaging.context.BaseContext;
+import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 
 /**
  * When Shibboleth is running as a Proxy-IdP, we need to be able to store information about the SP AuthnRequest that was
  * sent for later response processing. This context will store the necessary data.
+ * <p>
+ * The context can also be used to store assertion received from the proxied IdP.
+ * </p>
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  *
@@ -38,6 +42,9 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
 
   /** The AuthnRequest sent by the SP-part of the Proxy-IdP. */
   private AuthnRequest authnRequest;
+
+  /** The assertion received from the proxied IdP. */
+  private Assertion assertion;
 
   /** Additional state data. */
   private Map<String, Object> additionalDataMap = new HashMap<>();
@@ -59,6 +66,25 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    */
   public AuthnRequest getAuthnRequest() {
     return this.authnRequest;
+  }
+
+  /**
+   * Returns the assertion.
+   * 
+   * @return the assertion or {@code null} if it is not set
+   */
+  public Assertion getAssertion() {
+    return this.assertion;
+  }
+
+  /**
+   * Assigns the assertion recived from the proxied IdP.
+   * 
+   * @param assertion
+   *          the assertion to add
+   */
+  public void setAssertion(Assertion assertion) {
+    this.assertion = assertion;
   }
 
   /**
