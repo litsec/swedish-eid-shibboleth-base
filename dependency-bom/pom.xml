@@ -5,7 +5,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>shibboleth-base-dependency-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.1</version>
+  <version>1.1.1</version>
 
   <name>Swedish eID :: Dependency BOM :: Shibboleth IdP base dependencies</name>
   <description>BOM (Bill of Materials) for dependencies for users of the base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -38,8 +38,8 @@
 
   <properties>
     <opensaml.version>3.3.0</opensaml.version>
-    <opensaml-ext.version>0.9.1</opensaml-ext.version>
-    <opensaml.swedish-eid.version>0.9.1</opensaml.swedish-eid.version>
+    <opensaml-ext.version>0.9.2</opensaml-ext.version>
+    <opensaml.swedish-eid.version>0.9.2</opensaml.swedish-eid.version>
 
     <shibboleth.version>3.3.1</shibboleth.version>
     <shibboleth.java-support.version>7.3.0</shibboleth.java-support.version>
