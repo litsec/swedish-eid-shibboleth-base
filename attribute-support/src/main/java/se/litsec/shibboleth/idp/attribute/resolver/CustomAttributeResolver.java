@@ -32,11 +32,12 @@ import net.shibboleth.idp.attribute.resolver.context.AttributeResolutionContext;
  * </p>
  * 
  * <pre>
+ * {@code 
  * <resolver:DataConnector id="ScriptedAttributeConnector" xsi:type="ScriptedDataConnector" customObjectRef="bean-name">
  *   <dc:Script><![CDATA[
  *     connectorResults.addAll(custom.resolve(profileContext, resolutionContext, subjects));
  *     ]]></dc:Script>
- * </resolver:DataConnector>
+ * </resolver:DataConnector>}
  * </pre>
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
@@ -50,7 +51,7 @@ public interface CustomAttributeResolver {
    *          the request context
    * @param attributeResolutionContext
    *          the resolution context
-   * @params subjects an array of the {@code Subject} objects associated with this authorization. Note that these will
+   * @param subjects an array of the {@code Subject} objects associated with this authorization. Note that these will
    *         only be present if the attribute resolution has been associated with an Authentication
    * @return a list of {@link IdPAttribute} objects
    */

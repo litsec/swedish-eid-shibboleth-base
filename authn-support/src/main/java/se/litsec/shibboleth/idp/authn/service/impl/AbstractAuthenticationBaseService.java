@@ -15,8 +15,6 @@
  */
 package se.litsec.shibboleth.idp.authn.service.impl;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
@@ -40,16 +38,15 @@ import se.litsec.shibboleth.idp.authn.service.AuthenticationBaseService;
 public abstract class AbstractAuthenticationBaseService implements AuthenticationBaseService {
 
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = 
-      new AuthenticationContextLookup();
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
 
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
-  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = 
-      Functions.compose(new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions
+    .compose(new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
 
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = 
-      Functions.compose(new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
+  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
+    new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
 
   /**
    * Utility method that may be used to obtain the SAML metadata for the peer (i.e., the Service Provider) that sent the
@@ -58,7 +55,6 @@ public abstract class AbstractAuthenticationBaseService implements Authenticatio
    * @param context
    *          the profile context
    * @return the entity descriptor
-   * @see #getPeerMetadata(HttpServletRequest)
    */
   protected EntityDescriptor getPeerMetadata(ProfileRequestContext<?, ?> context) {
     return peerMetadataLookupStrategy.apply(context);

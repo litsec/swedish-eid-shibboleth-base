@@ -35,8 +35,8 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * @param context
    *          the request context
    * @return the current {@link AuthnContextClassContext}, or {@code null} if none is available
-   * @throws if
-   *           no context exists
+   * @throws ExternalAutenticationErrorCodeException
+   *           if no context exists
    */
   AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
 

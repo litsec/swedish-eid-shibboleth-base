@@ -20,6 +20,7 @@ import java.util.List;
 import org.opensaml.profile.context.ProfileRequestContext;
 
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
+import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 
 /**
  * Extends the {@link AuthnContextService} interface with methods useful for a Proxy IdP.
@@ -57,6 +58,7 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    *          IdP assurance certification URI:s
    * @param idpSupportsSignMessage
    *          does not receiving IdP support the sign message-concept?
+   * @return a list of URI:s to include in the AuthnRequest to be sent to the IdP
    * @throws ExternalAutenticationErrorCodeException
    *           if no AuthnContext URI:s matches
    */

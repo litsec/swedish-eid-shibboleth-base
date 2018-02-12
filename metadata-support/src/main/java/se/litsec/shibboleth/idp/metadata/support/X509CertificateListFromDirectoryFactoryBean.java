@@ -53,6 +53,8 @@ public class X509CertificateListFromDirectoryFactoryBean extends AbstractFactory
    * 
    * @param directory
    *          the directory to scan
+   * @throws IOException
+   *           for IO errors
    */
   public X509CertificateListFromDirectoryFactoryBean(String directory) throws IOException {
     File dir = new File(directory);
@@ -68,7 +70,8 @@ public class X509CertificateListFromDirectoryFactoryBean extends AbstractFactory
       logger.info("Directory {} does not exist - returning empty list");
       return Collections.emptyList();
     }
-    Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("file:" + this.directory.getAbsolutePath() + "/*");
+    Resource[] resources = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("file:" + this.directory
+      .getAbsolutePath() + "/*");
     List<X509Certificate> list = new ArrayList<>();
     for (Resource resource : resources) {
       if (resource.getFile().isDirectory()) {
