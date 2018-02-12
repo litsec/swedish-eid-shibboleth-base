@@ -13,30 +13,28 @@
 
   <licenses>
     <license>
-      <name>GNU General Public License, Version 3</name>
-      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
-      <comments>A free, copyleft license for software and other kinds of works</comments>
     </license>
   </licenses>
-
+  
   <scm>
     <connection>scm:git:https://github.com/litsec/swedish-eid-shibboleth-base.git</connection>
     <developerConnection>scm:git:https://github.com/litsec/swedish-eid-shibboleth-base.git</developerConnection>
     <url>https://github.com/litsec/swedish-eid-shibboleth-base/tree/master</url>
-    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
     <snapshotRepository>
-      <id>eidassh</id>
-      <url>https://maven.eidastest.se/artifactory/eidas-snapshot-local</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
     <repository>
-      <id>eidasrl</id>
-      <url>https://maven.eidastest.se/artifactory/eidas-release-local</url>
-    </repository>    
-  </distributionManagement>
+    <id>ossrh</id>
+    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>  
 
   <modules>
     <module>dependency-bom</module>
