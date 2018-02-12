@@ -18,18 +18,16 @@
 
   <licenses>
     <license>
-      <name>GNU General Public License, Version 3</name>
-      <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
       <distribution>repo</distribution>
-      <comments>A free, copyleft license for software and other kinds of works</comments>
     </license>
   </licenses>
-
+  
   <scm>
     <connection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</connection>
     <developerConnection>scm:https://github.com/litsec/swedish-eid-shibboleth-base.git</developerConnection>
     <url>https://github.com/litsec/swedish-eid-shibboleth-base/tree/master</url>
-    <tag>HEAD</tag>
   </scm>
 
   <developers>
@@ -40,6 +38,11 @@
       <organizationUrl>http://www.litsec.se</organizationUrl>
     </developer>
   </developers>
+  
+  <organization>
+    <name>Litsec AB</name>
+    <url>http://www.litsec.se</url>
+  </organization>  
 
   <properties>
   </properties>
@@ -115,10 +118,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <version>3.0.0</version>
         <executions>
-          <!-- <execution> <id>unpack2</id> <phase>generate-resources</phase> <goals> <goal>unpack</goal> </goals> <configuration> 
-            <artifactItems> <artifactItem> <groupId>net.shibboleth.idp</groupId> <artifactId>idp-distribution</artifactId> <version>${shibboleth.version}</version> 
-            <type>zip</type> <outputDirectory>${project.build.directory}/shib-orig</outputDirectory> </artifactItem> </artifactItems> 
-            </configuration> </execution> -->
           <execution>
             <id>unpack</id>
             <phase>generate-resources</phase>
