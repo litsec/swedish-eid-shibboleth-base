@@ -23,9 +23,9 @@ The repository consists of the following components:
 * bom - A BOM for the above components.
 
 * idp - The actual re-packaging of the Shibboleth Identity Provider. It contains:
-	- `attribute-resolver.xml` - Definitions for all attributes defined in the Swedish eID Framework.
-	- `attribute-filter.xml` - Attribute release rules for the Swedish eID Framework.
-	- `errors.xml` - Extends the core SAML error codes with error codes defined within the Swedish eID Framework.
+	- Definitions for all attributes defined in the Swedish eID Framework.
+	- Attribute release rules for the Swedish eID Framework.
+	- Extensions of the core SAML error codes with error codes defined within the Swedish eID Framework.
 	- Metadata publishing support (via the `MetadataPublishingController` and metadata template support).
 	- MVC setup for external authentication that enables us to implement an external authentication component in a Spring MVC controller instead of in a "raw" servlet.
 	- The Shibboleth messages files in Swedish.
