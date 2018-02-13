@@ -33,6 +33,11 @@
       <organizationUrl>http://www.litsec.se</organizationUrl>
     </developer>
   </developers>
+  
+  <organization>
+    <name>Litsec AB</name>
+    <url>http://www.litsec.se</url>
+  </organization>    
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -40,30 +45,29 @@
     <java.version>1.8</java.version>
 
     <shibboleth.version>3.3.1</shibboleth.version>
+    
+    <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
+    <opensaml.version>3.3.0</opensaml.version>
+    <opensaml-ext.version>0.9.4</opensaml-ext.version>
+    <opensaml.swedish-eid.version>0.9.3</opensaml.swedish-eid.version>
   </properties>
 
   <repositories>
+    <repository>
+      <id>central</id>
+      <name>Maven Central</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
     <repository>
       <id>shibboleth</id>
       <name>Shibboleth Maven Repo</name>
       <url>https://build.shibboleth.net/nexus/content/repositories/releases</url>
     </repository>
     <repository>
-      <id>eidasrl</id>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-      <name>eIDAS releases</name>
-      <url>https://maven.eidastest.se/artifactory/eidas-release-local</url>
+      <id>spring-repo</id>
+      <name>Spring Repository</name>
+      <url>http://repo.spring.io/release</url>
     </repository>
-    <repository>
-      <id>eidassh</id>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <name>eIDAS snapshots</name>
-      <url>https://maven.eidastest.se/artifactory/eidas-snapshot-local</url>
-    </repository>    
   </repositories>
 
   <distributionManagement>
@@ -127,6 +131,18 @@
             </filesets>
           </configuration>
         </plugin>
+        
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.9</version>      
+        </plugin> 
+        
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.0.0-M1</version>
+        </plugin>
 
       </plugins>
 
@@ -140,6 +156,22 @@
       
       <build>
         <plugins>
+        
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.7</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+              <!-- 
+                Allows manual inspection of the staging repo before deploying it to the central repo. 
+                Use 'mvn nexus-staging:release -Prelease' to release and 'mvn nexus-staging:drop' to abort. 
+              -->
+            </configuration>
+          </plugin>        
         
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -175,6 +207,59 @@
               </execution>              
             </executions>
           </plugin>
+                    
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <configuration>
+              <doctitle>Shibboleth extensions for the Swedish eID Framework - ${project.version}</doctitle>
+              <windowtitle>Shibboleth extensions for the Swedish eID Framework - ${project.version}</windowtitle>
+              <links>
+                <!-- 
+                <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/3.3.0/apidocs/</link> 
+                <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/7.3.0/apidocs/</link> 
+                <link>https://build.shibboleth.net/nexus/content/sites/site/spring-extensions/5.3.0/apidocs/</link>
+                -->    
+                <link>https://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-core/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-messaging-api/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-messaging-impl/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-profile-api/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-profile-impl/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-saml-api/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-saml-impl/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-security-api/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-security-impl/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-soap-api/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-soap-impl/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-storage-api/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-storage-impl/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-xmlsec-api/${opensaml.version}/</link>
+                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-xmlsec-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/opensaml3/${opensaml-ext.version}/</link>
+                <link>https://litsec.github.io/swedish-eid-opensaml/javadoc/${opensaml.swedish-eid.version}/</link>
+              </links>
+              <detectJavaApiLink>true</detectJavaApiLink>
+            </configuration>            
+            <executions>
+              <execution>
+                <id>attach-javadoc</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+              <!--
+              Doesn't work ... 
+              <execution>
+                <id>aggregate</id>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <phase>site</phase>
+              </execution>
+              -->
+            </executions>                        
+          </plugin>          
           
         </plugins>
       </build>
