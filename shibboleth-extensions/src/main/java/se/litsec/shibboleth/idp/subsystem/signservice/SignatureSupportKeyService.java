@@ -15,6 +15,9 @@
  */
 package se.litsec.shibboleth.idp.subsystem.signservice;
 
+import java.io.IOException;
+import java.security.SignatureException;
+
 import org.opensaml.xmlsec.encryption.support.DecryptionException;
 
 import net.shibboleth.utilities.java.support.component.IdentifiedComponent;
@@ -22,14 +25,15 @@ import net.shibboleth.utilities.java.support.component.InitializableComponent;
 import net.shibboleth.utilities.java.support.component.UnmodifiableComponent;
 import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
 import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessage;
+import se.litsec.swedisheid.opensaml.saml2.signservice.sap.SAD;
 
 /**
- * A wrapper service for handling decryption of sign messages.
+ * A wrapper service handling operations for Signature Service support that involves access to IdP private key
+ * operations (decryption and signing).
  * 
- * @deprecated As of version 1.2, replaced by {@link SignatureSupportKeyService}
+ * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-@Deprecated
-public interface SignMessageDecryptionService extends InitializableComponent, IdentifiedComponent, UnmodifiableComponent {
+public interface SignatureSupportKeyService extends InitializableComponent, IdentifiedComponent, UnmodifiableComponent {
 
   /**
    * Decrypts the encrypted message of a {@link SignMessage} and returns the cleartext {@code Message}.
@@ -41,5 +45,18 @@ public interface SignMessageDecryptionService extends InitializableComponent, Id
    *           for decryption errors
    */
   Message decrypt(SignMessage signMessage) throws DecryptionException;
+
+  /**
+   * Based on the supplied Signature Activation Data ({@link SAD}) object, the method creates a SAD JWT and signs it.
+   * 
+   * @param sad
+   *          the SAD to encode as a signed JWT
+   * @return The encoded JWT
+   * @throws SignatureException
+   *           for signature errors
+   * @throws IOException
+   *           for JSON processing errors
+   */
+  String createSADJwt(SAD sad) throws SignatureException, IOException;
 
 }

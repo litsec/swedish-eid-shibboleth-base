@@ -28,8 +28,9 @@ import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessage;
  * This class uses the {@link ReloadableService} concept to implement {@link SignMessageDecryptionService} to hide the
  * details of pinning and unpinning the underlying service.
  * 
- * @author Martin Lindström (martin.lindstrom@litsec.se)
+ * @deprecated As of version 1.2, replaced by {@link DelegatingSignatureSupportKeyService}
  */
+@Deprecated
 public class DelegatingSignMessageDecryptionService extends AbstractInitializableComponent implements SignMessageDecryptionService {
 
   /** The service which manages the reloading. */

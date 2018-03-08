@@ -66,7 +66,7 @@ import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
 import se.litsec.shibboleth.idp.authn.context.strategy.AuthenticationContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.SAMLPeerEntityContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
-import se.litsec.shibboleth.idp.authn.service.SignatureMessageService;
+import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
 
 /**
@@ -85,8 +85,8 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   /** The service for handling AuthnContext class processing. */
   private AuthnContextService authnContextService;
 
-  /** The service for sign message processing. */
-  protected SignatureMessageService signMessageService;
+  /** The service for signature service processing. */
+  private SignSupportService signSupportService;
 
   /** Helper that maps from SAML 2 attribute names to their corresponding Shibboleth attribute id:s. */
   private SAML2AttributeNameToIdMapperService attributeToIdMapping;
@@ -95,18 +95,22 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   private String flowName;
 
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
     new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
 
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
     new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
 
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
     .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
 
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
 
   /**
    * Main entry point for the external authentication controller. The implementation starts a Shibboleth external
@@ -165,7 +169,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    */
   protected void initializeServices(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
     this.authnContextService.initializeContext(profileRequestContext);
-    this.signMessageService.initializeContext(profileRequestContext);
+    this.signSupportService.initializeContext(profileRequestContext);
   }
 
   /**
@@ -179,7 +183,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    */
   protected void servicesProcessRequest(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
     this.authnContextService.processRequest(profileRequestContext);
-    this.signMessageService.processRequest(profileRequestContext);
+    this.signSupportService.processRequest(profileRequestContext);
   }
 
   /**
@@ -549,6 +553,15 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
+   * Returns the service that handles processing of AuthnContext classes.
+   * 
+   * @return the authn context service
+   */
+  protected AuthnContextService getAuthnContextService() {
+    return this.authnContextService;
+  }
+
+  /**
    * Assigns the service that handles processing of AuthnContext classes.
    * 
    * @param authnContextService
@@ -559,13 +572,22 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
-   * Assigns the service for sign message processing.
+   * Returns the {@link SignSupportService}.
    * 
-   * @param signMessageService
-   *          service
+   * @return the {@code SignSupportService}
    */
-  public void setSignMessageService(SignatureMessageService signMessageService) {
-    this.signMessageService = signMessageService;
+  protected SignSupportService getSignSupportService() {
+    return this.signSupportService;
+  }
+
+  /**
+   * Assigns the signature service support service.
+   * 
+   * @param signSupportService
+   *          the signature service support service
+   */
+  public void setSignSupportService(SignSupportService signSupportService) {
+    this.signSupportService = signSupportService;
   }
 
   /**
@@ -593,7 +615,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(this.authnContextService, "Property 'authnContextService' must be assigned");
-    Assert.notNull(this.signMessageService, "Property 'signMessageService' must be assigned");
+    Assert.notNull(this.signSupportService, "Property 'signSupportService' must be assigned");
     Assert.notNull(this.attributeToIdMapping, "Property 'attributeToIdMapping' must be assigned");
     Assert.notNull(this.flowName, "Property 'flowName' must be assigned");
   }

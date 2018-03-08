@@ -16,12 +16,18 @@
     <end-state id="SignMessageDecryptionError" />
     <end-state id="SignMessageTypeNotSupported" />
     
+    <end-state id="SwEidBadRequest" />
+    <end-state id="BadSadRequest" />
+    
     <global-transitions>
       <transition on="CancelAuthn" to="CancelAuthn" />
       <transition on="Fraud" to="Fraud" />
       <transition on="PossibleFraud" to="PossibleFraud" />
       <transition on="SignMessageDecryptionError" to="SignMessageDecryptionError" />
       <transition on="SignMessageTypeNotSupported" to="SignMessageTypeNotSupported" />
+      <transition on="SwEidBadRequest" to="SwEidBadRequest" />
+      <transition on="BadSadRequest" to="BadSadRequest" />
+      
     </global-transitions>
 
 </flow>
