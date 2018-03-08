@@ -23,7 +23,7 @@ import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessageMimeTypeEn
 
 /**
  * An IdP for the Swedish eID Framework may receive a {@code SignMessage} extension indicating that a Signature Service
- * requests the IdP to display a message to the user. This context stores
+ * requests the IdP to display a message to the user.
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */

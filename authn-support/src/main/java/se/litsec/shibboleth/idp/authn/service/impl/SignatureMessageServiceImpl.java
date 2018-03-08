@@ -35,8 +35,9 @@ import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 import se.litsec.shibboleth.idp.authn.context.SignMessageContext;
 import se.litsec.shibboleth.idp.authn.context.strategy.SignMessageContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
+import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.authn.service.SignatureMessageService;
-import se.litsec.shibboleth.idp.subsystem.signservice.SignMessageDecryptionService;
+import se.litsec.shibboleth.idp.subsystem.signservice.SignatureSupportKeyService;
 import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthenticationContextURI.LoaEnum;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
@@ -48,21 +49,24 @@ import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessageMimeTypeEn
  * Implementation of the {@link SignatureMessageService} interface.
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
+ * @deprecated As of version 1.2, {@link SignSupportService} should be used instead
  */
+@Deprecated
 public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseService implements SignatureMessageService, InitializingBean {
 
   /** Logging instance. */
   private final Logger log = LoggerFactory.getLogger(SignatureMessageServiceImpl.class);
 
   /** Strategy used to locate the SignMessageContext. */
-  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, SignMessageContext> signMessageContextLookupStrategy = Functions
+  @SuppressWarnings("rawtypes")
+  protected static Function<ProfileRequestContext, SignMessageContext> signMessageContextLookupStrategy = Functions
     .compose(new SignMessageContextLookup(), authenticationContextLookupStrategy);
 
   /** The AuthnContext service that helps us checking whether a request is valid. */
   protected AuthnContextService authnContextService;
 
-  /** The SignMessageDecrypter service. */
-  private SignMessageDecryptionService signMessageDecrypter;
+  /** The SignatureSupportKey service. */
+  protected SignatureSupportKeyService signatureSupportKeyService;
 
   /** {@inheritDoc} */
   @Override
@@ -146,7 +150,7 @@ public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseServi
         //
         if (signMessageContext.getSignMessage().getEncryptedMessage() != null) {
           try {
-            Message cleartextMessage = this.signMessageDecrypter.decrypt(signMessageContext.getSignMessage());
+            Message cleartextMessage = this.signatureSupportKeyService.decrypt(signMessageContext.getSignMessage());
             log.debug("SignMessage was successfully decrypted [{}]", logId);
             signMessageContext.setClearTextMessage(cleartextMessage);
           }
@@ -165,7 +169,8 @@ public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseServi
           signMessageContext.setDisplayMessage(false);
 
           if (signMessageContext.mustShow()) {
-            throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.SIGN_MESSAGE_TYPE_NOT_SUPPORTED, "Unsupported SignMessage mime type");
+            throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.SIGN_MESSAGE_TYPE_NOT_SUPPORTED,
+              "Unsupported SignMessage mime type");
           }
         }
         // If the SignMessage element from the signature request includes a MustShow attribute with the value true, the
@@ -245,20 +250,20 @@ public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseServi
   }
 
   /**
-   * Assigns the sign message decrypter.
+   * Assigns the signature support key service.
    * 
-   * @param signMessageDecrypter
-   *          the decrypter
+   * @param signatureSupportKeyService
+   *          the service
    */
-  public void setSignMessageDecrypter(SignMessageDecryptionService signMessageDecrypter) {
-    this.signMessageDecrypter = signMessageDecrypter;
+  public void setSignatureSupportKeyService(SignatureSupportKeyService signatureSupportKeyService) {
+    this.signatureSupportKeyService = signatureSupportKeyService;
   }
 
   /** {@inheritDoc} */
   @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(this.authnContextService, "Property 'authnContextService' must be assigned");
-    Assert.notNull(this.signMessageDecrypter, "The property 'signMessageDecrypter' must be assigned");
+    Assert.notNull(this.signatureSupportKeyService, "The property 'signatureSupportKeyService' must be assigned");
   }
 
 }

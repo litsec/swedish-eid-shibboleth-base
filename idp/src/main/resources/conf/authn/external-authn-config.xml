@@ -45,6 +45,31 @@
     If you want to "fall-through" to other login flows, include a mapping to "ReselectFlow".
     -->
     <util:map id="shibboleth.authn.External.ClassifiedMessageMap">
+        <entry key="RequestUnsupported">
+          <list>
+            <value>RequestUnsupported</value>
+          </list>
+        </entry>
+        <entry key="InvalidAuthenticationContext">
+          <list>
+            <value>InvalidAuthenticationContext</value>
+          </list>
+        </entry>
+        <entry key="NoCredentials">
+          <list>
+            <value>NoCredentials</value>
+          </list>
+        </entry>
+        <entry key="InvalidCredentials">
+          <list>
+            <value>InvalidCredentials</value>
+          </list>
+        </entry>
+        <entry key="AuthenticationException">
+          <list>
+            <value>AuthenticationException</value>
+          </list>
+        </entry>
         <entry key="CancelAuthn">
           <list>
             <value>CancelAuthn</value>
@@ -73,6 +98,16 @@
         <entry key="SignMessageTypeNotSupported">
           <list>
             <value>SignMessageTypeNotSupported</value>
+          </list>
+        </entry>
+        <entry key="SwEidBadRequest">
+          <list>
+            <value>SwEidBadRequest</value>
+          </list>
+        </entry>
+        <entry key="BadSadRequest">
+          <list>
+            <value>BadSadRequest</value>
           </list>
         </entry>
         

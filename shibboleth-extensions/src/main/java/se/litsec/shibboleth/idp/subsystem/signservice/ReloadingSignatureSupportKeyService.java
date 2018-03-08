@@ -15,37 +15,48 @@
  */
 package se.litsec.shibboleth.idp.subsystem.signservice;
 
+import java.io.IOException;
+import java.security.SignatureException;
+
 import org.opensaml.xmlsec.encryption.support.DecryptionException;
 
 import net.shibboleth.ext.spring.service.AbstractServiceableComponent;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
+import se.litsec.swedisheid.opensaml.saml2.signservice.SADFactory;
 import se.litsec.swedisheid.opensaml.saml2.signservice.SignMessageDecrypter;
 import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
 import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessage;
+import se.litsec.swedisheid.opensaml.saml2.signservice.sap.SAD;
 
 /**
- * A wrapper for {@link SignMessageDecrypter} implementing the {@link SignMessageDecryptionService} interface for use in
- * a reloadable Spring subsystem.
+ * A wrapper for {@link SignMessageDecrypter} and {@link SADFactory} implementing the {@link SignatureSupportKeyService}
+ * interface for use in a reloadable Spring subsystem.
  * 
- * @deprecated As of version 1.2, replaced by {@link ReloadingSignatureSupportKeyService}
+ * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-@Deprecated
-public class ReloadingSignMessageDecryptionService extends AbstractServiceableComponent<SignMessageDecryptionService> implements SignMessageDecryptionService {
+public class ReloadingSignatureSupportKeyService extends AbstractServiceableComponent<SignatureSupportKeyService> implements
+    SignatureSupportKeyService {
 
   /** Fixed ID for this component. */
-  public static final String ID = "sign-message-decrypter";
-  
+  public static final String ID = "signature-support-key-service";
+
   /** The decrypter instance. */
   private SignMessageDecrypter signMessageDecrypter;
+
+  /** The SAD factory instance. */
+  private SADFactory sadFactory;
 
   /**
    * Constructor.
    * 
    * @param signMessageDecrypter
    *          the decrypter instance
+   * @param sadFactory
+   *          the SAD factory bean
    */
-  public ReloadingSignMessageDecryptionService(SignMessageDecrypter signMessageDecrypter) {
+  public ReloadingSignatureSupportKeyService(SignMessageDecrypter signMessageDecrypter, SADFactory sadFactory) {
     this.signMessageDecrypter = signMessageDecrypter;
+    this.sadFactory = sadFactory;
   }
 
   /** {@inheritDoc} */
@@ -56,15 +67,21 @@ public class ReloadingSignMessageDecryptionService extends AbstractServiceableCo
 
   /** {@inheritDoc} */
   @Override
-  public SignMessageDecryptionService getComponent() {
+  public String createSADJwt(SAD sad) throws SignatureException, IOException {
+    return this.sadFactory.createJwt(sad);
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public SignatureSupportKeyService getComponent() {
     return this;
   }
-  
+
   /** {@inheritDoc} */
   @Override
   protected void doInitialize() throws ComponentInitializationException {
-      this.setId(ID);
-      super.doInitialize();
-  }  
+    this.setId(ID);
+    super.doInitialize();
+  }
 
 }

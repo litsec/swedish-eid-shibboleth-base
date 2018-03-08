@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+                           
+       default-init-method="initialize"
+       default-destroy-method="destroy">
+
+
+  <bean class="se.litsec.shibboleth.idp.subsystem.signservice.ReloadingSignatureSupportKeyService"
+    c:signMessageDecrypter-ref="sweid.SignMessageDecrypter"
+    c:sadFactory-ref="sweid.SADFactory" />
+
+  <bean id="sweid.SignMessageDecrypter" class="se.litsec.swedisheid.opensaml.saml2.signservice.SignMessageDecrypter" scope="singleton">
+    <constructor-arg name="keyEncryptionKeyResolver" ref="sweid.KeyEncryptionKeyResolver" />
+    <property name="blacklistedAlgorithms">
+      <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" 
+        p:targetObject-ref="sweid.DecryptionConfig" p:targetMethod="getBlacklistedAlgorithms" />
+    </property>
+    <property name="whitelistedAlgorithms">
+      <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" 
+        p:targetObject-ref="sweid.DecryptionConfig" p:targetMethod="getWhitelistedAlgorithms" />
+    </property>    
+  </bean>
+  
+  <bean id="sweid.KeyEncryptionKeyResolver" class="org.opensaml.xmlsec.keyinfo.impl.StaticKeyInfoCredentialResolver"
+    c:credentials-ref="shibboleth.EncryptionCredentials" />
+    
+  <bean id="sweid.DecryptionConfig" parent="shibboleth.BasicDecryptionConfiguration" />
+  
+  <bean id="sweid.SADFactory" class="se.litsec.swedisheid.opensaml.saml2.signservice.SADFactory"
+    c:idpEntityID="%{idp.entityID}"
+    c:signingCredential-ref="shibboleth.DefaultSigningCredential"
+    p:validityTime="%{idp.signature-support.sad.validity-time:300}" 
+    p:userIdAttributeName="%{idp.signature-support.sad.userid-attribute-name}"
+    p:jwtIdSize="%{idp.signature-support.sad.id-size:24}"
+    p:jwtSigningAlgorithm="%{idp.signature-support.sad.jwt-signing-algorithm:RS256}" />
+    
+</beans>

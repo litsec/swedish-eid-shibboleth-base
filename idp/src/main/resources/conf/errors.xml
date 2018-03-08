@@ -121,6 +121,10 @@
         <entry key="SignMessageDecryptionError" value-ref="shibboleth.SAML2Status.RequestUnsupported" />
         <entry key="SignMessageTypeNotSupported" value-ref="shibboleth.SAML2Status.RequestUnsupported" />
         
+        <entry key="SwEidBadRequest" value-ref="shibboleth.SAML2Status.RequestDenied" />
+        <entry key="BadSadRequest" value-ref="shibboleth.SAML2Status.RequestDenied" />
+        
+        
         <!-- ==================== Swedish eID extensions - END ==================== -->
         
     </util:map>

@@ -3,12 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>shibboleth-base</artifactId>
-  <packaging>pom</packaging>
+  <packaging>pom</packaging>  
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.1.3</version>
+    <version>1.2-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -45,6 +45,7 @@
   </organization>  
 
   <properties>
+    <shibboleth-base-bom.version>1.2-SNAPSHOT</shibboleth-base-bom.version>
   </properties>
 
   <dependencyManagement>
@@ -53,7 +54,7 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>shibboleth-base-bom</artifactId>
-        <version>${project.version}</version>
+        <version>${shibboleth-base-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
