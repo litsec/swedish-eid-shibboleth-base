@@ -3,7 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>shibboleth-base</artifactId>
-  <packaging>pom</packaging>  
+  <packaging>pom</packaging>
+  <version>1.2.1</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
@@ -45,7 +46,7 @@
   </organization>  
 
   <properties>
-    <shibboleth-base-bom.version>1.2</shibboleth-base-bom.version>
+    <shibboleth-base-bom.version>1.2.1</shibboleth-base-bom.version>
   </properties>
 
   <dependencyManagement>
