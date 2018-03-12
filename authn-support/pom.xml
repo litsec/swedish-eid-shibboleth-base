@@ -4,6 +4,7 @@
 
   <artifactId>shibboleth-authn-support</artifactId>
   <packaging>jar</packaging>
+  <version>1.2.1</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
@@ -34,6 +35,8 @@
   </developers>
 
   <properties>
+    <shibboleth-attribute-support.version>1.2</shibboleth-attribute-support.version>
+    <shibboleth-sweid-extensions.version>1.2</shibboleth-sweid-extensions.version>
   </properties>
 
   <dependencies>
@@ -101,14 +104,14 @@
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-attribute-support</artifactId>
-      <version>${project.version}</version>
+      <version>${shibboleth-attribute-support.version}</version>
       <scope>provided</scope>
     </dependency>
     
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-sweid-extensions</artifactId>
-      <version>${project.version}</version>
+      <version>${shibboleth-sweid-extensions.version}</version>
       <scope>provided</scope>
     </dependency>    
 

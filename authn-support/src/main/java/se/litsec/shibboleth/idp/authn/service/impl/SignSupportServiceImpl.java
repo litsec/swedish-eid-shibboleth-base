@@ -302,7 +302,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
 
     // Verify the version is what we understand ...
     //
-    if (r.getRequestedVersion() != null && !supportedMimeTypes.contains(r.getRequestedVersion())) {
+    if (r.getRequestedVersion() != null && !supportedSadVersions.contains(r.getRequestedVersion())) {
       final String msg = String.format("Requested SAD version (%s) is not supported by the IdP", r.getRequestedVersion());
       log.info("{} [{}]", msg, this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.BAD_SAD_REQUEST, msg);
