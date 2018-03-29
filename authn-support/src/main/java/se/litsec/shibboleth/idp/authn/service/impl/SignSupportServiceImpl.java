@@ -211,6 +211,18 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
               "Unsupported SignMessage mime type");
           }
         }
+        
+        // Sanity check - If the clear text message is empty, we can not display anything.
+        //
+        if (signMessageContext.getClearTextMessage() == null || signMessageContext.getClearTextMessage().matches("\\s*")) {           
+          log.warn("Sign message is empty or contains only non-visible characters [{}]", logId);
+          signMessageContext.setDisplayMessage(false);
+          
+          if (signMessageContext.mustShow()) {
+            throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, "No sign message to show");
+          }
+        }
+        
         // If the SignMessage element from the signature request includes a MustShow attribute with the value true, the
         // Signature Service MUST require that the provided sign message is displayed by the Identity Provider, by
         // including a sigmessage authentication context URI.
