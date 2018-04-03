@@ -155,24 +155,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
   @Override
   public void processRequest(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException {
     final String logId = this.getLogString(context);
-    boolean isSignatureService = this.isSignatureServicePeer(context);
-    
-    // Remove any sig message URI:s from what was requested if this is not a signature service.
-    //
-    if (!isSignatureService) {
-      AuthnContextClassContext authnContextClassContext = this.authnContextService.getAuthnContextClassContext(context);
-      for (String loa : authnContextClassContext.getAuthnContextClassRefs()) {
-        if (this.isSignMessageURI(loa)) {
-          log.info("SP has requested '{}' but is not a signature service, removing ... [{}]", loa, logId);
-          authnContextClassContext.deleteAuthnContextClassRef(loa);
-        }
-      }
-      if (authnContextClassContext.isEmpty()) {
-        final String msg = "No valid AuthnContext URI:s were specified in AuthnRequest";
-        log.info("{} - can not proceed [{}]", msg, logId);
-        throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, msg);
-      }
-    }
+    boolean isSignatureService = this.isSignatureServicePeer(context);    
 
     SignMessageContext signMessageContext = this.getSignMessageContext(context);
     if (signMessageContext == null) {
