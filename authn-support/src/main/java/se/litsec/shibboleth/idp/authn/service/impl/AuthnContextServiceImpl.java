@@ -71,7 +71,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
   /** Strategy used to locate the AuthnContextClassContext. */
   @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthnContextClassContext> authnContextClassLookupStrategy = Functions
     .compose(new AuthnContextClassContextLookup(), authenticationContextLookupStrategy);
-
+  
   /** {@inheritDoc} */
   @Override
   public void initializeContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException {
@@ -83,12 +83,19 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       log.info("No RequestedPrincipalContext available - no AuthnContextClassRefs in AuthnRequest [{}]", logId);
       requstedPrincipals = Collections.emptyList();
     }
-    else {
+    else {      
+      final Comparator<Principal> principalComparator = (p1, p2) -> {
+        Integer w1 = this.authnContextweightMap.get(p1);
+        Integer w2 = this.authnContextweightMap.get(p2);
+        return Integer.compare(w1 != null ? w1 : 0, w2 != null ? w2 : 0); 
+      };
+
       requstedPrincipals = requestedPrincipalContext.getRequestedPrincipals()
         .stream()
         .filter(AuthnContextClassRefPrincipal.class::isInstance)
+        .sorted(principalComparator.reversed())
         .map(Principal::getName)
-        .collect(Collectors.toList());
+        .collect(Collectors.toList());      
     }
 
     log.debug("Initializing RequestedAuthnContextClassContext with AuthnContextClassRef URI:s: {} [{}]", requestedPrincipalContext, logId);

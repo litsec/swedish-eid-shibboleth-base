@@ -69,6 +69,14 @@ public interface SignSupportService extends AuthenticationBaseService {
   boolean supportsMimeType(SignMessageMimeTypeEnum mimeType);
 
   /**
+   * Returns the instance of the {@link SignMessagePreProcessor} that this instance has been configured with. A sign
+   * message pre-processor may not be required. In these cases {@code null} will be returned.
+   * 
+   * @return the pre-processor or {@code null} if none is installed
+   */
+  SignMessagePreProcessor getSignMessagePreProcessor();
+
+  /**
    * Predicate that tells whether the current IdP supports Sole Control Assurance Level 2 (SCAL2) and is able to
    * generate SAD-attributes.
    * 

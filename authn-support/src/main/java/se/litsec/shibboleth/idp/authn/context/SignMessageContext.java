@@ -35,8 +35,14 @@ public class SignMessageContext extends BaseContext {
   /** The cleartext message. */
   private Message clearTextMessage;
 
+  /**
+   * The message to display. Depending on whether processing of the clear text message was performed, this may not be
+   * exactly the same as {@link #getClearTextMessage()}.
+   */
+  private String messageToDisplay;
+
   /** Flag telling whether the IdP should display the message. */
-  private boolean displayMessage = true;
+  private boolean doDisplayMessage = true;
 
   /**
    * Constructor.
@@ -83,6 +89,29 @@ public class SignMessageContext extends BaseContext {
   }
 
   /**
+   * Returns the message to display. Depending on whether processing of the clear text message was performed, this may
+   * not be exactly the same as {@link #getClearTextMessage()}.
+   * 
+   * @return the message to display
+   */
+  public String getMessageToDisplay() {
+    if (this.messageToDisplay == null) {
+      return this.getClearTextMessage();
+    }
+    return this.messageToDisplay;
+  }
+
+  /**
+   * If a processing of the cleartext message is performed, the processed message should be assigned using this method.
+   * 
+   * @param messageToDisplay
+   *          the message to display
+   */
+  public void setMessageToDisplay(String messageToDisplay) {
+    this.messageToDisplay = messageToDisplay;
+  }
+
+  /**
    * Tells whether the {@code MustShow} attribute is set or not.
    * 
    * @return the {@code MustShow} attribute
@@ -105,8 +134,8 @@ public class SignMessageContext extends BaseContext {
    * 
    * @return {@code true} if the message should be displayed, and {@code false} otherwise
    */
-  public boolean isDisplayMessage() {
-    return this.displayMessage;
+  public boolean isDoDisplayMessage() {
+    return this.doDisplayMessage;
   }
 
   /**
@@ -115,8 +144,8 @@ public class SignMessageContext extends BaseContext {
    * @param displayMessage
    *          {@code true} if the message should be displayed, and {@code false} otherwise
    */
-  public void setDisplayMessage(boolean displayMessage) {
-    this.displayMessage = displayMessage;
+  public void setDoDisplayMessage(boolean displayMessage) {
+    this.doDisplayMessage = displayMessage;
   }
 
 }
