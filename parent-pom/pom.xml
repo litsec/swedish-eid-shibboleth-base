@@ -50,8 +50,8 @@
     
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
     <opensaml.version>3.3.0</opensaml.version>
-    <opensaml-ext.version>0.9.4</opensaml-ext.version>
-    <opensaml.swedish-eid.version>0.9.4</opensaml.swedish-eid.version>
+    <opensaml-ext.version>1.0.0</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.0.0</opensaml.swedish-eid.version>
   </properties>
 
   <repositories>
