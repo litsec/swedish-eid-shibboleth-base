@@ -76,7 +76,7 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    * </p>
    * 
    * @param context
-   *          the request mapping
+   *          the profile context
    * @param authnContextUri
    *          the URI from the {@code AuthnContextClassRef} element of the assertion
    * @param displayedSignMessage
@@ -85,7 +85,18 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    * @throws ExternalAutenticationErrorCodeException
    *           if the issued URI can not be used in the Proxy-IdP assertion
    */
+  @Override
   String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
       throws ExternalAutenticationErrorCodeException;
+
+  /**
+   * A Proxy-IdP does not perform the authentication itself. Instead the
+   * {@link #getSendAuthnContextClassRefs(ProfileRequestContext, List, boolean)} should be used.
+   */
+  @Override
+  default List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
+      throws ExternalAutenticationErrorCodeException {
+    throw new RuntimeException("Call to getPossibleAuthnContextClassRefs is not allowed for a Proxy-IdP");
+  }
 
 }

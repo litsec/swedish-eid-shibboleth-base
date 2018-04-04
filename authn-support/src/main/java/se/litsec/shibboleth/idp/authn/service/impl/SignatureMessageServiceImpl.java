@@ -166,7 +166,7 @@ public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseServi
 
         if (!this.supportsMimeType(signMessageContext.getMimeType())) {
           log.warn("IdP does not support display of SignMessage with type '{}' [{}]", signMessageContext.getMimeType(), logId);
-          signMessageContext.setDisplayMessage(false);
+          signMessageContext.setDoDisplayMessage(false);
 
           if (signMessageContext.mustShow()) {
             throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.SIGN_MESSAGE_TYPE_NOT_SUPPORTED,
@@ -192,7 +192,7 @@ public class SignatureMessageServiceImpl extends AbstractAuthenticationBaseServi
           }
         }
 
-        signMessageContext.setDisplayMessage(true);
+        signMessageContext.setDoDisplayMessage(true);
       }
     }
 

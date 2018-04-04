@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.opensaml.profile.context.ProfileRequestContext;
+import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -43,6 +44,8 @@ import se.litsec.shibboleth.idp.authn.context.strategy.AuthnContextClassContextL
 import se.litsec.shibboleth.idp.authn.context.strategy.RequestedPrincipalContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
 import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthenticationContextURI.LoaEnum;
+import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
+import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
 
 /**
  * Implementation of {@link AuthnContextService}.
@@ -65,11 +68,13 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
   protected String flowName;
 
   /** Strategy used to locate the requested principal context. */
-  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
+  @SuppressWarnings("rawtypes")
+  protected static Function<ProfileRequestContext, RequestedPrincipalContext> requestedPrincipalLookupStrategy = Functions
     .compose(new RequestedPrincipalContextLookup(), authenticationContextLookupStrategy);
 
   /** Strategy used to locate the AuthnContextClassContext. */
-  @SuppressWarnings("rawtypes") protected static Function<ProfileRequestContext, AuthnContextClassContext> authnContextClassLookupStrategy = Functions
+  @SuppressWarnings("rawtypes")
+  protected static Function<ProfileRequestContext, AuthnContextClassContext> authnContextClassLookupStrategy = Functions
     .compose(new AuthnContextClassContextLookup(), authenticationContextLookupStrategy);
 
   /** {@inheritDoc} */
@@ -84,9 +89,16 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       requstedPrincipals = Collections.emptyList();
     }
     else {
+      final Comparator<Principal> principalComparator = (p1, p2) -> {
+        Integer w1 = this.authnContextweightMap.get(p1);
+        Integer w2 = this.authnContextweightMap.get(p2);
+        return Integer.compare(w1 != null ? w1 : 0, w2 != null ? w2 : 0);
+      };
+
       requstedPrincipals = requestedPrincipalContext.getRequestedPrincipals()
         .stream()
         .filter(AuthnContextClassRefPrincipal.class::isInstance)
+        .sorted(principalComparator.reversed())
         .map(Principal::getName)
         .collect(Collectors.toList());
     }
@@ -162,6 +174,18 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
           authnContextContext.deleteAuthnContextClassRef(uri);
         }
       }
+      
+      // Remove any sig message URI:s from what was requested if this is not a signature service.
+      //      
+      boolean isSignatureService = this.isSignatureServicePeer(context);
+      if (!isSignatureService) {
+        for (String loa : authnContextContext.getAuthnContextClassRefs()) {
+          if (this.isSignMessageURI(loa)) {
+            log.info("SP has requested '{}' but is not a signature service, removing ... [{}]", loa, logId);
+            authnContextContext.deleteAuthnContextClassRef(loa);
+          }
+        }
+      }      
 
       // Now, if we don't have any URI:s left there is an error. The SP specified URI:s, but they were not accepted.
       //
@@ -217,6 +241,78 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     return Arrays.asList(uri);
   }
 
+  /** {@inheritDoc} */
+  @Override
+  public List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
+      throws ExternalAutenticationErrorCodeException {
+
+    AuthnContextClassContext authnContextContext = this.getAuthnContextClassContext(context);
+    List<String> possibleUris = null;
+    
+    if (signMessage) {
+      possibleUris = authnContextContext.getAuthnContextClassRefs()
+          .stream()
+          .filter(u -> this.isSignMessageURI(u))
+          .map(u -> this.toBaseURI(u))
+          .collect(Collectors.toList());
+    }
+    if (possibleUris == null || possibleUris.isEmpty()) {
+      possibleUris = authnContextContext.getAuthnContextClassRefs()
+          .stream()
+          .filter(u -> !this.isSignMessageURI(u))
+          .collect(Collectors.toList());
+    }
+    
+    if (possibleUris.isEmpty()) {
+      final String msg = "No AuthnContext URI:s can be used to authenticate user";
+      log.info("{} - can not proceed [{}]", msg, this.getLogString(context));
+      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, msg);
+    }
+
+    return possibleUris;
+  }
+
+  /** {@inheritDoc} */
+  @Override
+  public String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
+      throws ExternalAutenticationErrorCodeException {
+    
+    AuthnContextClassContext authnContextContext = this.getAuthnContextClassContext(context);
+    
+    String uri = null;
+    
+    if (authnContextUri == null) {
+      if (displayedSignMessage) {
+        uri = authnContextContext.getAuthnContextClassRefs()
+          .stream()
+          .filter(u -> this.isSignMessageURI(u))
+          .findFirst()
+          .orElse(null);
+      }
+      if (uri == null) {
+        uri = !authnContextContext.getAuthnContextClassRefs().isEmpty() ? authnContextContext.getAuthnContextClassRefs().get(0) : null;
+      }  
+    }
+    else {
+      if (displayedSignMessage) {
+        String sigMessageUri = this.toSignMessageURI(authnContextUri);
+        uri = authnContextContext.getAuthnContextClassRefs().contains(sigMessageUri) ? sigMessageUri : null;
+      }
+      if (uri == null) {
+        uri = authnContextContext.getAuthnContextClassRefs().contains(authnContextUri) ? authnContextUri : null;
+      }
+    }
+    
+    if (uri == null) {
+      // This should never happen!
+      final String msg = "No AuthnContext URI:s can be used to authenticate user";
+      log.info("{} - can not proceed [{}]", msg, this.getLogString(context));
+      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, msg); 
+    }
+    
+    return uri;
+  }
+
   /**
    * Predicate that tells if the supplied URI is a URI indicating sign message display.
    * 
@@ -265,6 +361,26 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       return LoaEnum.minusSigMessage(loa).getUri();
     }
     return uri;
+  }
+
+  /**
+   * Predicate telling if the peer is a signature service.
+   * 
+   * @param context
+   *          the profile context
+   * @return {@code true} if the peer is a signature service and {@code false} otherwise
+   */
+  protected boolean isSignatureServicePeer(ProfileRequestContext<?, ?> context) {
+    EntityDescriptor peerMetadata = this.getPeerMetadata(context);
+    if (peerMetadata == null) {
+      log.error("No metadata available for connecting SP");
+      return false;
+    }
+    return EntityCategoryMetadataHelper.getEntityCategories(peerMetadata)
+      .stream()
+      .filter(c -> EntityCategoryConstants.SERVICE_TYPE_CATEGORY_SIGSERVICE.getUri().equals(c))
+      .findFirst()
+      .isPresent();
   }
 
   /**
