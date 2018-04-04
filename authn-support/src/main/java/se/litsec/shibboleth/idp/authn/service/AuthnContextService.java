@@ -79,8 +79,8 @@ public interface AuthnContextService extends AuthenticationBaseService {
    *          an indication whether this is a "authentication for signature" flow and the IdP will display a sign
    *          message
    * @return a list of possible URI:s
-   * @throws for
-   *           processing errors
+   * @throws ExternalAutenticationErrorCodeException
+   *           for processing errors
    */
   List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
       throws ExternalAutenticationErrorCodeException;
