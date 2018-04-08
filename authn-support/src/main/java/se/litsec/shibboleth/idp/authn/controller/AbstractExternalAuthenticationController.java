@@ -17,7 +17,9 @@ package se.litsec.shibboleth.idp.authn.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
@@ -27,6 +29,7 @@ import javax.servlet.http.HttpSession;
 
 import org.joda.time.DateTime;
 import org.opensaml.messaging.context.MessageContext;
+import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.messaging.context.navigate.ContextDataLookupFunction;
 import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -52,12 +55,16 @@ import com.google.common.base.Functions;
 
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
+import net.shibboleth.idp.authn.AuthenticationResult;
 import net.shibboleth.idp.authn.ExternalAuthentication;
 import net.shibboleth.idp.authn.ExternalAuthenticationException;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
 import net.shibboleth.idp.authn.principal.IdPAttributePrincipal;
 import net.shibboleth.idp.authn.principal.UsernamePrincipal;
 import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
+import net.shibboleth.idp.session.SessionException;
+import net.shibboleth.idp.session.SessionManager;
+import net.shibboleth.idp.session.context.SessionContext;
 import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
@@ -82,6 +89,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   /** Logging instance. */
   private final Logger logger = LoggerFactory.getLogger(AbstractExternalAuthenticationController.class);
 
+  /** The Shibboleth session manager. */
+  private SessionManager sessionManager;
+
   /** The service for handling AuthnContext class processing. */
   private AuthnContextService authnContextService;
 
@@ -95,22 +105,22 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   private String flowName;
 
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  @SuppressWarnings("rawtypes")
-  protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
     new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
 
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
-  @SuppressWarnings("rawtypes")
-  protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
     new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
 
-  @SuppressWarnings("rawtypes")
-  protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
     .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
 
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes")
-  protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
+
+  /** Lookup function for SessionContext. */
+  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SessionContext> sessionContextLookupStrategy = new ChildContextLookup<>(
+    SessionContext.class);
 
   /**
    * Main entry point for the external authentication controller. The implementation starts a Shibboleth external
@@ -245,6 +255,12 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
   /**
    * Method that should be invoked to exit the external authentication process with a successful result.
+   * <p>
+   * Note: The parameter {@code cacheForSSO} is used to determine whether the result should be cached for later SSO.
+   * This is something that we usually want, but never for signature services since their authentications should always
+   * be forced. So, if the parameter value is {@code null} the we will default the parameter to {@code FALSE} for
+   * signature services, and {@code FALSE} for other peers.
+   * </p>
    * 
    * @param httpRequest
    *          the HTTP request
@@ -255,7 +271,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param authnInstant
    *          the authentication instant - if {@code null} the current time will be used
    * @param cacheForSSO
-   *          should the result be cached for later SSO? If {@code null}, the result will be cached
+   *          should the result be cached for later SSO? If {@code null}, see the comment above
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    * @throws IOException
@@ -265,6 +281,14 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       DateTime authnInstant, Boolean cacheForSSO) throws ExternalAuthenticationException, IOException {
 
     final String key = this.getExternalAuthenticationKey(httpRequest);
+
+    {
+      Set<UsernamePrincipal> principalSet = subject.getPrincipals(UsernamePrincipal.class);
+      if (principalSet.isEmpty()) {
+        throw new ExternalAuthenticationException("Missing subject principal");
+      }
+      this.preventAttributeReuse(httpRequest, principalSet.iterator().next().getName());
+    }
 
     // Assign the authenticated subject.
     httpRequest.setAttribute(ExternalAuthentication.SUBJECT_KEY, subject);
@@ -276,7 +300,11 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     httpRequest.setAttribute(ExternalAuthentication.AUTHENTICATION_INSTANT_KEY, authnInstant);
 
     // Tell Shibboleth processing whether this result should be cached for SSO or not.
-    httpRequest.setAttribute(ExternalAuthentication.DONOTCACHE_KEY, cacheForSSO == null ? Boolean.FALSE : !cacheForSSO);
+    if (cacheForSSO == null) {
+      cacheForSSO = this.getSignSupportService().isSignatureServicePeer(this.getProfileRequestContext(httpRequest))
+          ? Boolean.FALSE : Boolean.TRUE;
+    }
+    httpRequest.setAttribute(ExternalAuthentication.DONOTCACHE_KEY, !cacheForSSO);
 
     // Finish the external authentication task and return to the flow.
     ExternalAuthentication.finishExternalAuthentication(key, httpRequest, httpResponse);
@@ -299,7 +327,8 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param authnInstant
    *          the authentication instant - if {@code null} the current time will be used
    * @param cacheForSSO
-   *          should the result be cached for later SSO? If {@code null}, the result will be cached
+   *          should the result be cached for later SSO? If {@code null}, see
+   *          {@link #success(HttpServletRequest, HttpServletResponse, Subject, DateTime, Boolean)}
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    * @throws IOException
@@ -313,7 +342,46 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       builder.attribute(a);
     }
     builder.authnContextClassRef(authnContextClassUri);
+
     this.success(httpRequest, httpResponse, builder.build(), authnInstant, cacheForSSO);
+  }
+
+  /**
+   * By default, Shibboleth will try to avoid doing attribute resolving if there is a previous active session for the
+   * current user. We never want that since we are an external authentication method that want to tell <b>exactly</b>
+   * which attributes that are to be released each time. This method will take care of this.
+   * 
+   * @param httpRequest
+   *          the HTTP request
+   * @param principal
+   *          the principal
+   */
+  private void preventAttributeReuse(HttpServletRequest httpRequest, String principal) {
+    try {
+      SessionContext sessionCtx = sessionContextLookupStrategy.apply(this.getProfileRequestContext(httpRequest));
+      if (sessionCtx == null || sessionCtx.getIdPSession() == null) {
+        return;
+      }
+      if (principal.equals(sessionCtx.getIdPSession().getPrincipalName())) {
+        logger.debug("Resetting IdP session '{}' in order to avoid re-use of attributes from previous session for user '{}'",
+          sessionCtx.getIdPSession().getId(), principal);
+
+        try {
+          sessionManager.destroySession(sessionCtx.getIdPSession().getId(), true);
+        }
+        catch (SessionException e) {
+          logger.error("Error destroying session {}", sessionCtx.getIdPSession().getId(), e);
+        }
+        sessionCtx.setIdPSession(null);
+
+        AuthenticationContext authenticationContext = authenticationContextLookupStrategy.apply(this.getProfileRequestContext(httpRequest));
+        authenticationContext.setActiveResults(Collections.<AuthenticationResult> emptyList());
+      }
+    }
+    catch (Exception e) {
+      logger.error("Exception while checking IdP session", e);
+      return;
+    }
   }
 
   /**
@@ -553,6 +621,16 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   }
 
   /**
+   * Assigns the Shibboleth session manager bean.
+   * 
+   * @param sessionManager
+   *          the session manager
+   */
+  public void setSessionManager(SessionManager sessionManager) {
+    this.sessionManager = sessionManager;
+  }
+
+  /**
    * Returns the service that handles processing of AuthnContext classes.
    * 
    * @return the authn context service
@@ -614,6 +692,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   /** {@inheritDoc} */
   @Override
   public void afterPropertiesSet() throws Exception {
+    Assert.notNull(this.sessionManager, "Property 'sessionManager' must be assigned");
     Assert.notNull(this.authnContextService, "Property 'authnContextService' must be assigned");
     Assert.notNull(this.signSupportService, "Property 'signSupportService' must be assigned");
     Assert.notNull(this.attributeToIdMapping, "Property 'attributeToIdMapping' must be assigned");
