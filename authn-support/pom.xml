@@ -8,7 +8,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.3.1-SNAPSHOT</version>
+    <version>1.3.1</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -34,8 +34,8 @@
   </developers>
 
   <properties>
-    <shibboleth-attribute-support.version>1.3.1-SNAPSHOT</shibboleth-attribute-support.version>
-    <shibboleth-sweid-extensions.version>1.3.1-SNAPSHOT</shibboleth-sweid-extensions.version>
+    <shibboleth-attribute-support.version>1.3.1</shibboleth-attribute-support.version>
+    <shibboleth-sweid-extensions.version>1.3.1</shibboleth-sweid-extensions.version>
   </properties>
 
   <dependencies>
