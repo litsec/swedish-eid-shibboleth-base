@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.opensaml.messaging.context.BaseContext;
+import org.opensaml.saml.saml2.core.AuthnContextComparisonTypeEnumeration;
 
 import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 
@@ -38,18 +39,23 @@ public class AuthnContextClassContext extends BaseContext {
 
   /** Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages. */
   private boolean proxiedIdPSupportsSignMessage = false;
-  
+
   /**
    * Holds information whether the a remote IdP supports the concept on non notified eID schemes, or if it treats
-   * notified and non notified eID schemes the same. (Applies to proxy IdP:s and certailn schemes).
+   * notified and non notified eID schemes the same. (Applies to proxy IdP:s and certain schemes).
    */
-  private boolean supportsNonNotifiedConcept = true;  
+  private boolean supportsNonNotifiedConcept = false;
 
   /**
    * A Proxy-IdP needs to remember which URI:s that were sent to the remote IdP so that it can perform a validation of
    * the received assertion. This property holds this or these URI:s.
    */
   protected List<String> proxiedAuthnContextClassRefs;
+
+  /**
+   * The comparison for AuthnContext URI:s.
+   */
+  protected AuthnContextComparisonTypeEnumeration authnContextComparison = AuthnContextComparisonTypeEnumeration.EXACT;
 
   /**
    * Constructor.
@@ -123,6 +129,25 @@ public class AuthnContextClassContext extends BaseContext {
   }
 
   /**
+   * Returns the comparison method for AuthnContext URI comparisons.
+   * 
+   * @return a {@code AuthnContextComparisonTypeEnumeration} enum
+   */
+  public AuthnContextComparisonTypeEnumeration getAuthnContextComparison() {
+    return this.authnContextComparison;
+  }
+
+  /**
+   * Assigns the comparison method for AuthnContext URI comparisons.
+   * 
+   * @param authnContextComparison
+   *          a {@code AuthnContextComparisonTypeEnumeration} enum
+   */
+  public void setAuthnContextComparison(AuthnContextComparisonTypeEnumeration authnContextComparison) {
+    this.authnContextComparison = authnContextComparison;
+  }
+
+  /**
    * A Proxy-IdP needs to remember which URI:s that were sent to the remote IdP so that it can perform a validation of
    * the received assertion. This method assigns these URI:s.
    * 
@@ -141,11 +166,11 @@ public class AuthnContextClassContext extends BaseContext {
   public boolean isEmpty() {
     return this.authnContextClassRefs.isEmpty();
   }
-  
+
   /**
    * Tells whether the remote IdP supports a non notified eID scheme concept.
    * <p>
-   * Default is {@code true}.
+   * Default is {@code false}.
    * </p>
    * 
    * @return if the IdP supports the non notified concept {@code true} is returned, otherwise {@code false}
@@ -163,5 +188,5 @@ public class AuthnContextClassContext extends BaseContext {
   public void setSupportsNonNotifiedConcept(boolean supportsNonNotifiedConcept) {
     this.supportsNonNotifiedConcept = supportsNonNotifiedConcept;
   }
-  
+
 }

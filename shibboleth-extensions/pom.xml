@@ -3,13 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>shibboleth-sweid-extensions</artifactId>
-  <packaging>jar</packaging>
-  <version>1.3.2</version>
+  <packaging>jar</packaging>  
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.3.1</version>
+    <version>1.4-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 

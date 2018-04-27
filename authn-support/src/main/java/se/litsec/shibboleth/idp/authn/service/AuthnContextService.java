@@ -41,19 +41,12 @@ public interface AuthnContextService extends AuthenticationBaseService {
   AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
 
   /**
-   * If a relying party does not specify an AuthnContext URI in the AuthnContext the IdP chooses a default one to use.
-   * The default implementation returns only one URI, but other implementations may return several (for example if the
-   * IdP is a ProxyIdP).
-   * 
-   * @param context
-   *          the request context
-   * @return a list of default AuthnContext URI(s)
-   */
-  List<String> getDefaultAuthnContextClassRefs(ProfileRequestContext<?, ?> context);
-
-  /**
    * Returns a list of AuthnContextClassRef URI:s (level of assurance URI:s) that is supported by the current
    * authentication method.
+   * 
+   * <p>
+   * The the most preferred URI:s (according to the Shibboleth configuration) are placed first in the list.
+   * </p>
    * 
    * @param context
    *          the profile context

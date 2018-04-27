@@ -16,7 +16,6 @@
 package se.litsec.shibboleth.idp.authn.service.impl;
 
 import java.security.Principal;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -76,12 +75,21 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
   @SuppressWarnings("rawtypes")
   protected static Function<ProfileRequestContext, AuthnContextClassContext> authnContextClassLookupStrategy = Functions
     .compose(new AuthnContextClassContextLookup(), authenticationContextLookupStrategy);
+  
+  /** Sorter to be used for finding the most preferred URI according to the Shibboleth weigth map. */
+  protected final Comparator<Principal> principalComparator = (p1, p2) -> {
+    Integer w1 = this.authnContextweightMap.get(p1);
+    Integer w2 = this.authnContextweightMap.get(p2);
+    return Integer.compare(w1 != null ? w1 : 0, w2 != null ? w2 : 0);
+  };
 
   /** {@inheritDoc} */
   @Override
   public void initializeContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException {
     final String logId = this.getLogString(context);
 
+    // Get the requested principals (from the AuthnRequest)
+    //
     RequestedPrincipalContext requestedPrincipalContext = requestedPrincipalLookupStrategy.apply(context);
     List<String> requstedPrincipals;
     if (requestedPrincipalContext == null) {
@@ -89,12 +97,8 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
       requstedPrincipals = Collections.emptyList();
     }
     else {
-      final Comparator<Principal> principalComparator = (p1, p2) -> {
-        Integer w1 = this.authnContextweightMap.get(p1);
-        Integer w2 = this.authnContextweightMap.get(p2);
-        return Integer.compare(w1 != null ? w1 : 0, w2 != null ? w2 : 0);
-      };
-
+      // Sort the URI:s so the ones most prefered by the IdP ends up first in the list.
+      //
       requstedPrincipals = requestedPrincipalContext.getRequestedPrincipals()
         .stream()
         .filter(AuthnContextClassRefPrincipal.class::isInstance)
@@ -154,7 +158,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     // If no URI is specified in the request, we add the IdP default choice(s)
     //
     if (authnContextContext.isEmpty()) {
-      List<String> defaultUris = this.getDefaultAuthnContextClassRefs(context);
+      List<String> defaultUris = this.getSupportedAuthnContextClassRefs(context);
       log.info("No AuthnContext URI:s given in AuthnRequest - using IdP default(s): {} [{}]", defaultUris, logId);
 
       // Replace current context with new one.
@@ -213,32 +217,12 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     List<String> uris = authenticationFlowDescriptor.getSupportedPrincipals()
       .stream()
       .filter(AuthnContextClassRefPrincipal.class::isInstance)
+      .sorted(principalComparator.reversed())
       .map(Principal::getName)
       .collect(Collectors.toList());
 
     log.debug("Supported AuthnContextClassRef URI:s by flow '{}': {}", this.flowName, uris);
-    return uris;
-  }
-
-  /**
-   * This implementation returns one element that is the IdP preferred choice.
-   */
-  @Override
-  public List<String> getDefaultAuthnContextClassRefs(ProfileRequestContext<?, ?> context) {
-
-    String uri = this.authnContextweightMap.entrySet()
-      .stream()
-      .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-      .map(Map.Entry::getKey)
-      .filter(AuthnContextClassRefPrincipal.class::isInstance)
-      .map(Principal::getName)
-      .findFirst()
-      .orElse(null);
-
-    if (uri == null) {
-      log.error("No default AuthnContext URI defined in Shibboleth for flow '{}'", this.flowName);
-    }
-    return Arrays.asList(uri);
+    return uris;    
   }
 
   /** {@inheritDoc} */
