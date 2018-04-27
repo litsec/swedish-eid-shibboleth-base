@@ -15,11 +15,8 @@
  */
 package se.litsec.shibboleth.idp.authn.service.impl;
 
-import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.opensaml.profile.context.ProfileRequestContext;
@@ -27,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
-import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 import se.litsec.shibboleth.idp.authn.service.ProxyIdpAuthnContextService;
@@ -45,8 +41,7 @@ public class ProxyIdpAuthnContextServiceImpl extends AuthnContextServiceImpl imp
   /** {@inheritDoc} */
   @Override
   public List<String> getSendAuthnContextClassRefs(ProfileRequestContext<?, ?> context, List<String> assuranceURIs,
-      boolean idpSupportsSignMessage)
-          throws ExternalAutenticationErrorCodeException {
+      boolean idpSupportsSignMessage) throws ExternalAutenticationErrorCodeException {
 
     final String logId = this.getLogString(context);
 
@@ -251,22 +246,6 @@ public class ProxyIdpAuthnContextServiceImpl extends AuthnContextServiceImpl imp
       // Will fail later
       return false;
     }
-  }
-
-  /**
-   * Overrides the default implementation so that more than one default URI is returned. The order of the list returned
-   * depends on the rank each method is given in the Shibboleth configuration. The most preferred method is placed first
-   * in the list.
-   */
-  @Override
-  public List<String> getDefaultAuthnContextClassRefs(ProfileRequestContext<?, ?> context) {
-    return this.authnContextweightMap.entrySet()
-      .stream()
-      .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-      .map(Map.Entry::getKey)
-      .filter(AuthnContextClassRefPrincipal.class::isInstance)
-      .map(Principal::getName)
-      .collect(Collectors.toList());
   }
 
 }
