@@ -37,6 +37,9 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
   /** The AuthnRequest sent by the SP-part of the Proxy-IdP. */
   private AuthnRequest authnRequest;
 
+  /** The RelayState sent from the SP-part of the Proxy-IdP. */
+  private String relayState;
+
   /** The assertion received from the proxied IdP. */
   private Assertion assertion;
 
@@ -48,9 +51,12 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    * 
    * @param authnRequest
    *          the AuthnRequest sent by the SP-part of the Proxy-IdP
+   * @param relayState
+   *          the relay state (may be {@code null})
    */
-  public ProxyIdpAuthenticationContext(AuthnRequest authnRequest) {
+  public ProxyIdpAuthenticationContext(AuthnRequest authnRequest, String relayState) {
     this.authnRequest = authnRequest;
+    this.relayState = relayState;
   }
 
   /**
@@ -60,6 +66,15 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    */
   public AuthnRequest getAuthnRequest() {
     return this.authnRequest;
+  }
+
+  /**
+   * Returns the relay state.
+   * 
+   * @return the relay state
+   */
+  public String getRelayState() {
+    return this.relayState;
   }
 
   /**
