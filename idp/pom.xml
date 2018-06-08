@@ -4,7 +4,7 @@
 
   <artifactId>shibboleth-base</artifactId>
   <packaging>pom</packaging>
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.4.2</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
@@ -46,7 +46,7 @@
   </organization>  
 
   <properties>
-    <shibboleth-base-bom.version>1.4.2-SNAPSHOT</shibboleth-base-bom.version>
+    <shibboleth-base-bom.version>1.4.2</shibboleth-base-bom.version>
   </properties>
 
   <dependencyManagement>

@@ -4,6 +4,7 @@
 
   <artifactId>shibboleth-authn-support</artifactId>
   <packaging>jar</packaging>
+  <version>1.4.2</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
@@ -35,7 +36,7 @@
 
   <properties>
     <shibboleth-attribute-support.version>1.4.1</shibboleth-attribute-support.version>
-    <shibboleth-sweid-extensions.version>1.4.1</shibboleth-sweid-extensions.version>
+    <shibboleth-sweid-extensions.version>1.4.2</shibboleth-sweid-extensions.version>
   </properties>
 
   <dependencies>
