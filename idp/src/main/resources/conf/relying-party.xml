@@ -66,6 +66,23 @@
 
     <util:list id="shibboleth.RelyingPartyOverrides">
     
+      <!--
+        For signature services we never allow SSO. So, trigger the prevent-sso interceptor flow. 
+       -->
+      <bean parent="RelyingPartyByTag">
+        <constructor-arg name="candidates">
+          <list>
+            <bean parent="TagCandidate" c:name="http://macedir.org/entity-category" p:values="http://id.elegnamnden.se/st/1.0/sigservice"/>
+          </list>
+        </constructor-arg>
+        <property name="profileConfigurations">
+          <list>
+            <bean parent="sweid.SAML2.SSO"
+              p:inboundInterceptorFlows="#{{ 'security-policy/saml2-sso', 'prevent-sso' }}" />          
+          </list>
+        </property>
+      </bean>    
+    
         <!--
         Override example that identifies a single RP by name and configures it
         for SAML 2 SSO without encryption. This is a common "vendor" scenario.

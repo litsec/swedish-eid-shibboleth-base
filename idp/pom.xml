@@ -4,6 +4,7 @@
 
   <artifactId>shibboleth-base</artifactId>
   <packaging>pom</packaging>
+  <version>1.4.2-SNAPSHOT</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
@@ -45,7 +46,7 @@
   </organization>  
 
   <properties>
-    <shibboleth-base-bom.version>1.4.1</shibboleth-base-bom.version>
+    <shibboleth-base-bom.version>1.4.2-SNAPSHOT</shibboleth-base-bom.version>
   </properties>
 
   <dependencyManagement>
@@ -218,7 +219,13 @@
                   </fileset>
                   <mapper type="glob" from="*" to="*.dist" />
                 </copy>
-                <!-- TODO: add flows and views later on -->
+                <copy todir="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/dist/flows" overwrite="true" force="true">
+                  <fileset dir="${basedir}/src/main/resources/flows" includes="**/*">
+                    <type type="file" />
+                  </fileset>
+                  <mapper type="glob" from="*" to="*.dist" />
+                </copy>
+                <!-- TODO: add views later on -->
               </target>
             </configuration>
             <goals>
