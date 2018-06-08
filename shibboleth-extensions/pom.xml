@@ -4,7 +4,7 @@
 
   <artifactId>shibboleth-sweid-extensions</artifactId>
   <packaging>jar</packaging>
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.4.2</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
