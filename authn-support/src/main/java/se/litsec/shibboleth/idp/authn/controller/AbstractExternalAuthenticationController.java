@@ -56,6 +56,7 @@ import com.google.common.base.Functions;
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
 import net.shibboleth.idp.authn.AuthenticationResult;
+import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.ExternalAuthentication;
 import net.shibboleth.idp.authn.ExternalAuthenticationException;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
@@ -105,21 +106,26 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   private String flowName;
 
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
     new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
 
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
     new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
 
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
     .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
 
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
 
   /** Lookup function for SessionContext. */
-  @SuppressWarnings("rawtypes") protected Function<ProfileRequestContext, SessionContext> sessionContextLookupStrategy = new ChildContextLookup<>(
+  @SuppressWarnings("rawtypes")
+  protected Function<ProfileRequestContext, SessionContext> sessionContextLookupStrategy = new ChildContextLookup<>(
     SessionContext.class);
 
   /**
@@ -155,6 +161,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
     // Initialize services and process the request
     try {
+      this.processIsPassive(profileRequestContext);
       this.initializeServices(profileRequestContext);
       this.servicesProcessRequest(profileRequestContext);
     }
@@ -166,6 +173,30 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     // Hand over to implementation ...
     //
     return this.doExternalAuthentication(httpRequest, httpResponse, key, profileRequestContext);
+  }
+
+  /**
+   * Checks if the IsPassive flag is set in the AuthnRequest and fails with a NO_PASSIVE error code if this is the case.
+   * <p>
+   * Implementations that do support passive authentication MUST override this method and handle the IsPassive
+   * processing themselves.
+   * </p>
+   * 
+   * @param profileRequestContext
+   *          the context
+   * @throws ExternalAutenticationErrorCodeException
+   *           if the IsPassive-flag is set
+   */
+  protected void processIsPassive(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
+    final AuthnRequest authnRequest = this.getAuthnRequest(profileRequestContext);
+    if (authnRequest != null && authnRequest.isPassive() != null && authnRequest.isPassive() == Boolean.TRUE) {
+      logger.info("AuthnRequest contains IsPassive=true, can not continue ...");
+      Status status = IdpErrorStatusException.getStatusBuilder(StatusCode.REQUESTER)
+        .subStatusCode(StatusCode.NO_PASSIVE)
+        .statusMessage("Can not perform passive authentication")
+        .build();
+      throw new IdpErrorStatusException(status, AuthnEventIds.NO_PASSIVE);
+    }
   }
 
   /**

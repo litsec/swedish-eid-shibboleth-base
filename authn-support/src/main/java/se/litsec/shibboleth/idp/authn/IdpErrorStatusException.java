@@ -107,12 +107,14 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
 
     public Status build() {
       Status status = ObjectUtils.createSamlObject(Status.class);
+      
       StatusCode sc = ObjectUtils.createSamlObject(StatusCode.class);
       sc.setValue(this.statusCode);
+      
       if (subStatusCode != null) {
         StatusCode ssc = ObjectUtils.createSamlObject(StatusCode.class);
         ssc.setValue(this.subStatusCode);
-        sc.setStatusCode(sc);
+        sc.setStatusCode(ssc);
       }
       status.setStatusCode(sc);
       if (statusMessage != null) {
