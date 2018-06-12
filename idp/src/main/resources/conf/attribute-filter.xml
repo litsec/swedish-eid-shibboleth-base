@@ -37,6 +37,9 @@
     <AttributeRule attributeID="personalIdentityNumber">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
+    <AttributeRule attributeID="dateOfBirth">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
   </AttributeFilterPolicy>
   
   <!--
@@ -97,6 +100,18 @@
     <AttributeRule attributeID="personalIdentityNumberBinding">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
+  </AttributeFilterPolicy>
+  
+  <!--
+    Attribute release for IdP:s delivering assertions to the Swedish eIDAS Proxy Service. 
+   -->
+  <AttributeFilterPolicy id="attribute-release-eidas-pnr-delivery">
+    <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
+                           attributeName="http://macedir.org/entity-category" 
+                           attributeValue="http://id.elegnamnden.se/ec/1.0/eidas-pnr-delivery" />
+    <AttributeRule attributeID="dateOfBirth">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
   </AttributeFilterPolicy>  
 
 </AttributeFilterPolicyGroup>
