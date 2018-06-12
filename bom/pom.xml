@@ -4,12 +4,11 @@
 
   <artifactId>shibboleth-base-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.4.2</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.3-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -47,7 +46,7 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>shibboleth-sweid-extensions</artifactId>
-        <version>1.4.2</version>
+        <version>1.4.3-SNAPSHOT</version>
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
@@ -55,7 +54,7 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>shibboleth-attribute-support</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.3-SNAPSHOT</version>
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
@@ -63,7 +62,7 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>shibboleth-metadata-support</artifactId>
-        <version>1.4.1</version>
+        <version>1.4.3-SNAPSHOT</version>
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
@@ -71,7 +70,7 @@
       <dependency>
         <groupId>${project.groupId}</groupId>
         <artifactId>shibboleth-authn-support</artifactId>
-        <version>1.4.2</version>
+        <version>1.4.3-SNAPSHOT</version>
         <type>jar</type>
         <scope>provided</scope>
       </dependency>

@@ -4,12 +4,11 @@
 
   <artifactId>shibboleth-sweid-extensions</artifactId>
   <packaging>jar</packaging>
-  <version>1.4.2</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.3-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
