@@ -5,7 +5,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>shibboleth-base-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.4.4</version>
+  <version>1.4.5</version>
 
   <name>Swedish eID :: Parent POM for Swedish eID :: Shibboleth IdP base</name>
   <description>Parent POM for base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -46,12 +46,12 @@
 
     <shibboleth.version>3.3.1</shibboleth.version>
     
-    <shibboleth-base-dependency-bom.version>1.3.4</shibboleth-base-dependency-bom.version>
+    <shibboleth-base-dependency-bom.version>1.4.5</shibboleth-base-dependency-bom.version>
     
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
     <opensaml.version>3.3.0</opensaml.version>
-    <opensaml-ext.version>1.0.3</opensaml-ext.version>
-    <opensaml.swedish-eid.version>1.0.1</opensaml.swedish-eid.version>
+    <opensaml-ext.version>1.1.0</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.1.0</opensaml.swedish-eid.version>
   </properties>
 
   <repositories>
@@ -218,26 +218,32 @@
               <windowtitle>Shibboleth extensions for the Swedish eID Framework - ${project.version}</windowtitle>
               <links>
                 <!-- 
-                <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/3.3.0/apidocs/</link> 
-                <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/7.3.0/apidocs/</link> 
-                <link>https://build.shibboleth.net/nexus/content/sites/site/spring-extensions/5.3.0/apidocs/</link>
-                -->    
+                  Doesn't work to use the Shib Wiki links for API docs since the Shib webserver sets X-Frame-Options 
+                  to SAMEORIGIN which makes it impossible to use frames. 
+                -->
+                <!--               
+                <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/3.2.0/apidocs/</link>
+                <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/7.2.0/apidocs/</link>
+                <link>https://build.shibboleth.net/nexus/content/sites/site/spring-extensions/5.2.0/apidocs/</link>
+                -->              
                 <link>https://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-core/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-messaging-api/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-messaging-impl/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-profile-api/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-profile-impl/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-saml-api/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-saml-impl/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-security-api/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-security-impl/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-soap-api/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-soap-impl/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-storage-api/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-storage-impl/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-xmlsec-api/${opensaml.version}/</link>
-                <link>http://www.atetric.com/atetric/javadoc/org.opensaml/opensaml-xmlsec-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-core/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-messaging-api/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-messaging-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-profile-api/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-profile-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-saml-api/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-saml-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-security-api/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-security-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-soap-api/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-soap-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-storage-api/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-storage-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-xmlsec-api/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-xmlsec-impl/${opensaml.version}/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/utilities/java-support/7.3.0/</link>                
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/ext/spring-extensions/5.3.0/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/opensaml3/${opensaml-ext.version}/</link>
                 <link>https://litsec.github.io/swedish-eid-opensaml/javadoc/${opensaml.swedish-eid.version}/</link>
               </links>

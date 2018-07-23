@@ -8,7 +8,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.4.4</version>
+    <version>1.4.5</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -45,7 +45,7 @@
   </organization>  
 
   <properties>
-    <shibboleth-base-bom.version>1.4.4</shibboleth-base-bom.version>
+    <shibboleth-base-bom.version>1.4.5</shibboleth-base-bom.version>
   </properties>
 
   <dependencyManagement>
