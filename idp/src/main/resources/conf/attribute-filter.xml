@@ -109,6 +109,9 @@
     <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
                            attributeName="http://macedir.org/entity-category" 
                            attributeValue="http://id.elegnamnden.se/ec/1.0/eidas-pnr-delivery" />
+    <AttributeRule attributeID="personalIdentityNumber">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
     <AttributeRule attributeID="dateOfBirth">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>    
