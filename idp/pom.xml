@@ -4,12 +4,11 @@
 
   <artifactId>shibboleth-base</artifactId>
   <packaging>pom</packaging>  
-  <version>1.4.6-SNAPSHOT</version>
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.4.5</version>
+    <version>1.5.0-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -46,7 +45,7 @@
   </organization>  
 
   <properties>
-    <shibboleth-base-bom.version>1.4.5</shibboleth-base-bom.version>
+    <shibboleth-base-bom.version>1.5.0-SNAPSHOT</shibboleth-base-bom.version>
   </properties>
 
   <dependencyManagement>
@@ -107,6 +106,31 @@
     <dependency>
       <groupId>org.springframework.mobile</groupId>
       <artifactId>spring-mobile-device</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
+    <!-- Make sure to copy valid Jackson dependencies -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-joda</artifactId>
       <scope>compile</scope>
     </dependency>
 
@@ -188,6 +212,24 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.8</version>
         <executions>
+          <!-- Remove Shibboleth dependencies that are too old (we have included versions with no vulnerabilities ourselves) -->
+          <execution>
+            <id>clean-shib-deps</id>
+            <phase>process-resources</phase>
+            <configuration>
+              <target name="clean-shib-deps">
+                <echo>Removed vulnerable Jackson dependencies ...</echo>
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-annotations-2.8.3.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-core-2.8.3.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-databind-2.8.3.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-datatype-joda-2.8.3.jar" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>            
+          </execution>
+        
           <!-- Copy the modifications we made to the files in the webapp directory -->
           <execution>
             <id>copy-webapp</id>
