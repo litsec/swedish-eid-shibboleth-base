@@ -15,6 +15,7 @@
     <action-state id="DoProfileWork">
         <evaluate expression="VerifyChannelBindings" />
         <evaluate expression="PopulateECPContext" />
+        <evaluate expression="ExtractProxiedRequesters" />
         <evaluate expression="'proceed'" />
         
         <transition on="proceed" to="PopulateClientStorageLoadContext" />
@@ -208,7 +209,5 @@
             <evaluate expression="WriteFTICKSLog" />
         </on-entry>
     </end-state>
-
-    <bean-import resource="sso-abstract-beans.xml" />
 
 </flow>
