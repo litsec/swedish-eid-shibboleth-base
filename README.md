@@ -4,13 +4,13 @@
 
 # swedish-eid-shibboleth-base
 
-Packaging of Shibboleth IdP 3.X prepared for the Swedish eID Framework
+Packaging of Shibboleth IdP 3.4.X prepared for the Swedish eID Framework
 
-The swedish-eid-shibboleth-base repository is a re-packaging of the [Shibboleth Identity Provider](https://wiki.shibboleth.net/confluence/display/IDP30/Home) to enable a quick setup for an Identity Provider wanting to be compliant with the [Swedish eID Framework](https://github.com/elegnamnden/technical-framework).
+The swedish-eid-shibboleth-base repository is a re-packaging of the [Shibboleth Identity Provider](https://wiki.shibboleth.net/confluence/display/IDP30/Home) to enable a quick setup for an Identity Provider wanting to be compliant with the [Swedish eID Framework](https://github.com/swedenconnect/technical-framework).
 
 The repository consists of the following components:
 
-* dependency-bom - BOM (Bill of Materials) of dependencies for users of the base packaging of Shibboleth IdP 3.X for the Swedish eID Framework.
+* dependency-bom - BOM (Bill of Materials) of dependencies for users of the base packaging of Shibboleth IdP 3.4.X for the Swedish eID Framework.
 
 * shibboleth-extensions - Implementations that extend the core Shibboleth functionality (contexts, extended sub-system support, ...).
 
@@ -30,6 +30,12 @@ The repository consists of the following components:
 	- MVC setup for external authentication that enables us to implement an external authentication component in a Spring MVC controller instead of in a "raw" servlet.
 	- The Shibboleth messages files in Swedish.
 	- Some extensions to the core Shibboleth beans and flows.
+	
+### Upgrade notice
+
+When upgrading to version 1.5.0 of the swedish-eid-shibboleth-base you should be aware that the version of the underlying Shibboleth version has been upgraded to v 3.4.0 (from 3.3.1).
+
+See the [Shibboleth 3.4.0 Release notes](https://wiki.shibboleth.net/confluence/display/IDP30/ReleaseNotes) for details.
 
 ------
 

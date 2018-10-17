@@ -8,7 +8,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.5.0-SNAPSHOT</version>
+    <version>1.5.0</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -32,6 +32,11 @@
       <organizationUrl>http://www.litsec.se</organizationUrl>
     </developer>
   </developers>
+  
+  <organization>
+    <name>Litsec AB</name>
+    <url>http://www.litsec.se</url>
+  </organization>
 
   <properties>
   </properties>
