@@ -17,7 +17,7 @@
     <!--
       Shibboleth default 
     <util:map id="shibboleth.AuditFormattingMap">
-        <entry key="Shibboleth-Audit" value="%T|%b|%I|%SP|%P|%IDP|%bb|%III|%u|%ac|%attr|%n|%i|" />
+        <entry key="Shibboleth-Audit" value="%T|%b|%I|%SP|%P|%IDP|%bb|%III|%u|%ac|%attr|%n|%i|%X" />
     </util:map>
     -->
     <util:map id="shibboleth.AuditFormattingMap">
@@ -34,6 +34,7 @@
     <!-- Allows auditing to be disabled selectively for particular profiles/flows. -->
     <util:list id="shibboleth.AuditSuppressedProfiles">
         <value>http://shibboleth.net/ns/profiles/status</value>
+        <value>http://shibboleth.net/ns/profiles/mdquery</value>
     </util:list>
 
 </beans>

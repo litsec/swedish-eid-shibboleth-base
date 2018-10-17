@@ -27,7 +27,7 @@
       <transition on="SignMessageTypeNotSupported" to="SignMessageTypeNotSupported" />
       <transition on="SwEidBadRequest" to="SwEidBadRequest" />
       <transition on="BadSadRequest" to="BadSadRequest" />
-      
+      <transition on="#{!'proceed'.equals(currentEvent.id)}" to="InvalidEvent" />
     </global-transitions>
 
 </flow>
