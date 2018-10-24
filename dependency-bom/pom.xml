@@ -224,8 +224,8 @@
         <scope>provided</scope>
         <exclusions>
           <exclusion>
-            <groupId>se.litsec.opensaml</groupId>
-            <artifactId>opensaml3-ext</artifactId>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
           </exclusion>
         </exclusions>        
       </dependency>
@@ -427,12 +427,14 @@
         <version>${shibboleth.version}</version>
         <type>jar</type>
         <scope>provided</scope>
+        <!-- 
         <exclusions>
           <exclusion>
             <groupId>org.springframework</groupId>
             <artifactId>spring-expression</artifactId>
           </exclusion>
         </exclusions>
+        -->
       </dependency>
 
       <dependency>
