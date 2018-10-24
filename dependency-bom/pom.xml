@@ -5,7 +5,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>shibboleth-base-dependency-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.5.1-SNAPSHOT</version>
+  <version>1.6.0-SNAPSHOT</version>
 
   <name>Swedish eID :: Dependency BOM :: Shibboleth IdP base dependencies</name>
   <description>BOM (Bill of Materials) for dependencies for users of the base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>

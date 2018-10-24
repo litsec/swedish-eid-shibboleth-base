@@ -8,7 +8,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.6.0-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -45,19 +45,10 @@
   </organization>  
 
   <properties>
-    <shibboleth-base-bom.version>1.5.1-SNAPSHOT</shibboleth-base-bom.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>shibboleth-base-bom</artifactId>
-        <version>${shibboleth-base-bom.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
 
     </dependencies>
   </dependencyManagement>
@@ -74,31 +65,10 @@
       <artifactId>swedish-eid-opensaml3</artifactId>
     </dependency>
     
-    <!-- 
-      The shibboleth-base-bom BOM is intended for users of the Shibboleth base package so all dependencies are scoped 
-      as 'provided'. Therefore we have to change to scopes for this build (to get the jar files included in the resulting zip). 
-      -->
     <dependency>
       <groupId>se.litsec.sweid.idp</groupId>
       <artifactId>shibboleth-sweid-extensions</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>se.litsec.sweid.idp</groupId>
-      <artifactId>shibboleth-attribute-support</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>se.litsec.sweid.idp</groupId>
-      <artifactId>shibboleth-metadata-support</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>se.litsec.sweid.idp</groupId>
-      <artifactId>shibboleth-authn-support</artifactId>
+      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
 
