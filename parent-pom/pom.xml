@@ -46,7 +46,7 @@
 
     <shibboleth.version>3.4.0</shibboleth.version>
     
-    <shibboleth-base-dependency-bom.version>1.5.1-SNAPSHOT</shibboleth-base-dependency-bom.version>
+    <shibboleth-base-dependency-bom.version>1.6.0-SNAPSHOT</shibboleth-base-dependency-bom.version>
     
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
     <opensaml.version>3.4.0</opensaml.version>
