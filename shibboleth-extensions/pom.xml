@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -8,7 +10,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.6.0-SNAPSHOT</version>
     <relativePath>../parent-pom</relativePath>
   </parent>
 
@@ -23,7 +25,7 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
+
   <developers>
     <developer>
       <name>Martin Lindström</name>
@@ -32,7 +34,7 @@
       <organizationUrl>http://www.litsec.se</organizationUrl>
     </developer>
   </developers>
-  
+
   <organization>
     <name>Litsec AB</name>
     <url>http://www.litsec.se</url>
@@ -67,7 +69,7 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.webflow</groupId>
       <artifactId>spring-webflow</artifactId>
@@ -77,7 +79,7 @@
       <groupId>se.litsec.opensaml</groupId>
       <artifactId>opensaml3-ext</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>se.litsec.opensaml.sweid</groupId>
       <artifactId>swedish-eid-opensaml3</artifactId>
@@ -92,26 +94,41 @@
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-saml-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-profile-api</artifactId>
-    </dependency>    
-    
+    </dependency>
+
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml-messaging-api</artifactId>
-    </dependency>    
+    </dependency>
+
+    <dependency>
+      <groupId>net.shibboleth.idp</groupId>
+      <artifactId>idp-saml-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>net.shibboleth.idp</groupId>
       <artifactId>idp-authn-api</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>net.shibboleth.idp</groupId>
       <artifactId>idp-profile-api</artifactId>
-    </dependency>    
+    </dependency>
+
+    <dependency>
+      <groupId>net.shibboleth.idp</groupId>
+      <artifactId>idp-attribute-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>net.shibboleth.idp</groupId>
+      <artifactId>idp-attribute-resolver-api</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>net.shibboleth.utilities</groupId>
@@ -121,6 +138,18 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
