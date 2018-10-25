@@ -45,13 +45,12 @@
     <java.version>1.8</java.version>
 
     <shibboleth.version>3.4.0</shibboleth.version>
-    
-    <shibboleth-base-dependency-bom.version>1.6.0-SNAPSHOT</shibboleth-base-dependency-bom.version>
-    
+        
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
     <opensaml.version>3.4.0</opensaml.version>
     <opensaml-ext.version>1.2.1</opensaml-ext.version>
     <opensaml.swedish-eid.version>1.2.1</opensaml.swedish-eid.version>
+    
   </properties>
 
   <repositories>
@@ -86,11 +85,11 @@
   <dependencyManagement>
 
     <dependencies>
-    
+      
       <dependency>
         <groupId>se.litsec.sweid.idp</groupId>
         <artifactId>shibboleth-base-dependency-bom</artifactId>
-        <version>${shibboleth-base-dependency-bom.version}</version>
+        <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -256,16 +255,6 @@
                   <goal>jar</goal>
                 </goals>
               </execution>
-              <!--
-              Doesn't work ... 
-              <execution>
-                <id>aggregate</id>
-                <goals>
-                  <goal>aggregate</goal>
-                </goals>
-                <phase>site</phase>
-              </execution>
-              -->
             </executions>                        
           </plugin>          
           

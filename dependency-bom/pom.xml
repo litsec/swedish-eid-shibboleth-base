@@ -49,6 +49,10 @@
     <shibboleth.spring-extensions.version>5.4.0</shibboleth.spring-extensions.version>
 
     <spring.version>4.3.19.RELEASE</spring.version>
+    
+    <!-- https://snyk.io/vuln/SNYK-JAVA-ORGSPRINGFRAMEWORK-72470 -->
+    <spring-web.version>4.3.20.RELEASE</spring-web.version>
+    
     <spring.webflow.version>2.4.8.RELEASE</spring.webflow.version>
     <spring.mobile.version>1.1.5.RELEASE</spring.mobile.version>
     
@@ -111,6 +115,41 @@
         <artifactId>taglibs-standard-impl</artifactId>
         <version>1.2.5</version>
       </dependency>
+      
+      <!-- Replacements of OpenSAML and Shibboleth transitive dependencies that have vulnerabilities -->
+      
+      <!-- dom4j:dom4j@1.6.1 - https://snyk.io/vuln/SNYK-JAVA-DOM4J-72444 -->
+      <dependency>
+        <groupId>dom4j</groupId>
+        <artifactId>dom4j</artifactId>
+        <version>2.1.1</version>
+        <type>jar</type>
+      </dependency>
+      
+      <!--
+        org.bouncycastle:bcprov-jdk15on@1.59
+        https://app.snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-32412
+        https://snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-32369 
+      --> 
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>1.60</version>        
+        <type>jar</type>
+        <scope>provided</scope>
+      </dependency>
+      
+      <!-- 
+        com.google.guava:guava@20.0 
+        https://snyk.io/vuln/SNYK-JAVA-COMGOOGLEGUAVA-32236 
+      -->
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>27.0-jre</version>
+        <type>jar</type>
+        <scope>provided</scope>
+      </dependency>
 
       <!-- OpenSAML extensions -->
       <dependency>
@@ -118,7 +157,7 @@
         <artifactId>opensaml3-ext</artifactId>
         <version>${opensaml-ext.version}</version>
         <type>jar</type>
-        <scope>compile</scope>
+        <scope>provided</scope>
       </dependency>
 
       <dependency>
@@ -126,7 +165,7 @@
         <artifactId>swedish-eid-opensaml3</artifactId>
         <version>${opensaml.swedish-eid.version}</version>
         <type>jar</type>
-        <scope>compile</scope>
+        <scope>provided</scope>
         <exclusions>
           <exclusion>
             <groupId>se.litsec.opensaml</groupId>
@@ -190,6 +229,12 @@
         <version>${opensaml.version}</version>
         <type>jar</type>
         <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+          </exclusion>
+        </exclusions>        
       </dependency>
 
       <dependency>
@@ -244,6 +289,13 @@
         <version>${opensaml.version}</version>
         <type>jar</type>
         <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <!-- https://snyk.io/vuln/SNYK-JAVA-DOM4J-72444 -->
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -310,7 +362,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-
+      
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-core</artifactId>
@@ -318,7 +370,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-
+      
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-schema</artifactId>
@@ -326,7 +378,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-
+      
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-admin-api</artifactId>
@@ -435,6 +487,13 @@
           </exclusion>
         </exclusions>
         -->
+        <exclusions>
+          <!-- https://snyk.io/vuln/SNYK-JAVA-COMMONSCOLLECTIONS-30078 -->
+          <exclusion>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>            
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -443,8 +502,15 @@
         <version>${shibboleth.version}</version>
         <type>jar</type>
         <scope>provided</scope>
+        <exclusions>
+          <!-- https://snyk.io/vuln/SNYK-JAVA-COMMONSCOLLECTIONS-30078 -->
+          <exclusion>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
-
+      
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-attribute-filter-impl</artifactId>
@@ -460,7 +526,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-
+      
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-profile-impl</artifactId>
@@ -566,16 +632,8 @@
 
       <dependency>
         <groupId>org.springframework</groupId>
-        <artifactId>spring-binding</artifactId>
-        <version>${spring.version}</version>
-        <type>jar</type>
-        <scope>provided</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-        <version>${spring.version}</version>
+        <version>${spring-web.version}</version>
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
@@ -603,6 +661,14 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
+      
+      <dependency>
+        <groupId>org.springframework.webflow</groupId>
+        <artifactId>spring-binding</artifactId>
+        <version>${spring.webflow.version}</version>
+        <type>jar</type>
+        <scope>provided</scope>
+      </dependency>      
 
       <dependency>
         <groupId>org.springframework.mobile</groupId>
