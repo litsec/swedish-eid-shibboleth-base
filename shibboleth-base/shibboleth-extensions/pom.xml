@@ -10,8 +10,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.6.0.RC1</version>
-    <relativePath>../parent-pom</relativePath>
+    <version>1.6.0-SNAPSHOT</version>
   </parent>
 
   <name>Swedish eID :: Shibboleth IdP Extension Library</name>

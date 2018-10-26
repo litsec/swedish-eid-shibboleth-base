@@ -12,7 +12,7 @@ The repository consists of the following components:
 
 * dependency-bom - BOM (Bill of Materials) of dependencies for users of the base packaging of Shibboleth IdP 3.4.X for the Swedish eID Framework.
 
-* shibboleth-extensions - Implementations that extend the core Shibboleth functionality with:
+* shibboleth-base/shibboleth-extensions - Implementations that extend the core Shibboleth functionality with:
 	* Contexts and extended sub-system support.
 	
 	* Extensions to Shibboleth's attribute support with converters and resolvers. The `SAML2AttributeNameToIdMapperService` is a service bean that maps between an SAML v2 attribute name and its corresponding Shibboleth attribute ID. This is useful for external authentication implementations that only knows about the actual SAML attribute name and not its Shibboleth ID.
@@ -22,7 +22,7 @@ The repository consists of the following components:
 	* A framework for building and deploying an "external authentication" component in Shibboleth. The component comprises of the `AbstractExternalAuthenticationController` MVC-controller which is sub-classed to implement your own authentication, service implementations conforming to the Swedish eID Framework (signature services support, authentication context handling, ...) and other required extensions to support the Swedish eID Framework.
 
 
-* idp - The actual re-packaging of the Shibboleth Identity Provider. It contains:
+* shibboleth-base/idp - The actual re-packaging of the Shibboleth Identity Provider. It contains:
 	- Definitions for all attributes defined in the Swedish eID Framework.
 	- Attribute release rules for the Swedish eID Framework.
 	- Extensions of the core SAML error codes with error codes defined within the Swedish eID Framework.
