@@ -5,7 +5,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>builder-pom</artifactId>
   <packaging>pom</packaging>
-  <version>1.6.0.RC1-SNAPSHOT</version>
+  <version>1.6.0.RC1</version>
 
   <name>Swedish eID :: Builder POM for Swedish eID :: Shibboleth IdP base</name>
   <description>Builder POM for base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
