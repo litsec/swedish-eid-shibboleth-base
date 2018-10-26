@@ -5,7 +5,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>shibboleth-base-dependency-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.6.0.RC1</version>
+  <version>1.6.0-SNAPSHOT</version>
 
   <name>Swedish eID :: Dependency BOM :: Shibboleth IdP base dependencies</name>
   <description>BOM (Bill of Materials) for dependencies for users of the base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -479,21 +479,22 @@
         <version>${shibboleth.version}</version>
         <type>jar</type>
         <scope>provided</scope>
-        <!-- 
-        <exclusions>
-          <exclusion>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-expression</artifactId>
-          </exclusion>
-        </exclusions>
-        -->
         <exclusions>
           <!-- https://snyk.io/vuln/SNYK-JAVA-COMMONSCOLLECTIONS-30078 -->
           <exclusion>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>            
+          </exclusion>        
+          <!-- 
+            DuoWeb is delivered in the Shibboleth lib package. But it seems like
+            it isn't published to any official Maven repos. We exclude it from the
+            dependencies so that everyone can build ... 
+          -->
+          <exclusion>
+            <groupId>com.duosecurity</groupId>
+            <artifactId>DuoWeb</artifactId>
           </exclusion>
-        </exclusions>
+        </exclusions>        
       </dependency>
 
       <dependency>
@@ -637,6 +638,14 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
+      
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${spring.version}</version>
+        <type>jar</type>
+        <scope>provided</scope>
+      </dependency>      
 
       <dependency>
         <groupId>org.springframework</groupId>
