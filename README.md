@@ -4,6 +4,8 @@
 
 # swedish-eid-shibboleth-base
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.litsec.sweid.idp/shibboleth-base/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.litsec.sweid.idp/shibboleth-base)
+
 Packaging of Shibboleth IdP 3.4.X prepared for the Swedish eID Framework
 
 The swedish-eid-shibboleth-base repository is a re-packaging of the [Shibboleth Identity Provider](https://wiki.shibboleth.net/confluence/display/IDP30/Home) to enable a quick setup for an Identity Provider wanting to be compliant with the [Swedish eID Framework](https://github.com/swedenconnect/technical-framework).
