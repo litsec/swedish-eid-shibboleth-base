@@ -124,6 +124,16 @@
       <groupId>org.springframework.mobile</groupId>
       <artifactId>spring-mobile-device</artifactId>
       <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-webmvc</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </exclusion>
+      </exclusions>      
     </dependency>    
 
   </dependencies>
