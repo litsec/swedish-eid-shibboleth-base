@@ -35,9 +35,9 @@ The repository consists of the following components:
 	
 ### Upgrade notice
 
-When upgrading to version 1.5.0 of the swedish-eid-shibboleth-base you should be aware that the version of the underlying Shibboleth version has been upgraded to v 3.4.0 (from 3.3.1).
+When upgrading to version 1.5.0 of the swedish-eid-shibboleth-base you should be aware that the version of the underlying Shibboleth version has been upgraded to v 3.4.1 (from 3.3.1).
 
-See the [Shibboleth 3.4.0 Release notes](https://wiki.shibboleth.net/confluence/display/IDP30/ReleaseNotes) for details.
+See the [Shibboleth 3.4 Release notes](https://wiki.shibboleth.net/confluence/display/IDP30/ReleaseNotes) for details.
 
 ------
 
