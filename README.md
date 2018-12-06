@@ -4,7 +4,7 @@
 
 # swedish-eid-shibboleth-base
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.litsec.sweid.idp/shibboleth-base/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.litsec.sweid.idp/shibboleth-base)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/se.litsec.sweid.idp/shibboleth-base/badge.svg)](https://maven-badges.herokuapp.com/maven-central/se.litsec.sweid.idp/shibboleth-base)
 
 Packaging of Shibboleth IdP 3.4.X prepared for the Swedish eID Framework
 
