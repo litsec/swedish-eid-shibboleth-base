@@ -40,13 +40,13 @@
   </organization>  
 
   <properties>
-    <opensaml.version>3.4.0</opensaml.version>
-    <opensaml-ext.version>1.2.3</opensaml-ext.version>
-    <opensaml.swedish-eid.version>1.2.2</opensaml.swedish-eid.version>
+    <opensaml.version>3.4.2</opensaml.version>
+    <opensaml-ext.version>1.2.4</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.2.3</opensaml.swedish-eid.version>
 
-    <shibboleth.version>3.4.1</shibboleth.version>
-    <shibboleth.java-support.version>7.4.1</shibboleth.java-support.version>
-    <shibboleth.spring-extensions.version>5.4.0</shibboleth.spring-extensions.version>
+    <shibboleth.version>3.4.3</shibboleth.version>
+    <shibboleth.java-support.version>7.4.2</shibboleth.java-support.version>
+    <shibboleth.spring-extensions.version>5.4.1</shibboleth.spring-extensions.version>
 
     <spring.version>4.3.19.RELEASE</spring.version>
     
