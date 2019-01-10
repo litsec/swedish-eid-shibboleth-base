@@ -44,12 +44,12 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
 
-    <shibboleth.version>3.4.1</shibboleth.version>
+    <shibboleth.version>3.4.3</shibboleth.version>
         
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
-    <opensaml.version>3.4.0</opensaml.version>
-    <opensaml-ext.version>1.2.3</opensaml-ext.version>
-    <opensaml.swedish-eid.version>1.2.2</opensaml.swedish-eid.version>
+    <opensaml.version>3.4.2</opensaml.version>
+    <opensaml-ext.version>1.2.4</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.2.3</opensaml.swedish-eid.version>
     
   </properties>
 
@@ -241,8 +241,8 @@
                 <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-storage-impl/${opensaml.version}/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-xmlsec-api/${opensaml.version}/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-xmlsec-impl/${opensaml.version}/</link>
-                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/utilities/java-support/7.4.1/</link>                
-                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/ext/spring-extensions/5.4.0/</link>
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/utilities/java-support/7.4.2/</link>                
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/ext/spring-extensions/5.4.1/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/opensaml3/${opensaml-ext.version}/</link>
                 <link>https://litsec.github.io/swedish-eid-opensaml/javadoc/${opensaml.swedish-eid.version}/</link>
               </links>
