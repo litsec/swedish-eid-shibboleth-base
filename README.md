@@ -41,4 +41,4 @@ See the [Shibboleth 3.4 Release notes](https://wiki.shibboleth.net/confluence/di
 
 ------
 
-Copyright &copy; 2017-2018, [Litsec AB](http://www.litsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2017-2019, [Litsec AB](http://www.litsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

@@ -5,7 +5,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>shibboleth-base-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.6.0</version>
+  <version>1.6.1-SNAPSHOT</version>
 
   <name>Swedish eID :: Parent POM for Swedish eID :: Shibboleth IdP base</name>
   <description>Parent POM for base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -48,8 +48,8 @@
         
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
     <opensaml.version>3.4.0</opensaml.version>
-    <opensaml-ext.version>1.2.2</opensaml-ext.version>
-    <opensaml.swedish-eid.version>1.2.1</opensaml.swedish-eid.version>
+    <opensaml-ext.version>1.2.3</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.2.2</opensaml.swedish-eid.version>
     
   </properties>
 
@@ -241,7 +241,7 @@
                 <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-storage-impl/${opensaml.version}/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-xmlsec-api/${opensaml.version}/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/ext/org/opensaml/opensaml-xmlsec-impl/${opensaml.version}/</link>
-                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/utilities/java-support/7.4.0/</link>                
+                <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/utilities/java-support/7.4.1/</link>                
                 <link>https://litsec.github.io/opensaml-ext/javadoc/ext/net/shibboleth/ext/spring-extensions/5.4.0/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/opensaml3/${opensaml-ext.version}/</link>
                 <link>https://litsec.github.io/swedish-eid-opensaml/javadoc/${opensaml.swedish-eid.version}/</link>
