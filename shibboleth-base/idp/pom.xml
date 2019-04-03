@@ -8,7 +8,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.6.1</version>
+    <version>1.6.2-SNAPSHOT</version>
   </parent>
 
   <name>Swedish eID :: Base packaging of Shibboleth IdP 3.X</name>
