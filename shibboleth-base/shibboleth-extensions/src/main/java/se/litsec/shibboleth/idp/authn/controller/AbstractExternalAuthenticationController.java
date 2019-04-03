@@ -76,6 +76,7 @@ import se.litsec.shibboleth.idp.authn.context.strategy.SAMLPeerEntityContextLook
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
 import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
+import se.litsec.swedisheid.opensaml.saml2.authentication.psc.PrincipalSelection;
 
 /**
  * Abstract base class for controllers implementing "external authentication".
@@ -333,7 +334,8 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     // Tell Shibboleth processing whether this result should be cached for SSO or not.
     if (cacheForSSO == null) {
       cacheForSSO = this.getSignSupportService().isSignatureServicePeer(this.getProfileRequestContext(httpRequest))
-          ? Boolean.FALSE : Boolean.TRUE;
+          ? Boolean.FALSE
+          : Boolean.TRUE;
     }
     httpRequest.setAttribute(ExternalAuthentication.DONOTCACHE_KEY, !cacheForSSO);
 
@@ -539,6 +541,43 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    */
   protected AuthnRequest getAuthnRequest(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getAuthnRequest(this.getProfileRequestContext(httpRequest));
+  }
+
+  /**
+   * Utility method that may be used to obtain the {@link PrincipalSelection} extension that may be received in an
+   * {@code AuthnRequest}.
+   * 
+   * @param context
+   *          the profile context
+   * @return the {@code PrincipalSelection} extension, or {@code null} if none is found in the current
+   *         {@code AuthnRequest}
+   */
+  protected PrincipalSelection getPrincipalSelection(ProfileRequestContext<?, ?> context) {
+    final AuthnRequest authnRequest = this.getAuthnRequest(context);
+    if (authnRequest != null && authnRequest.getExtensions() != null) {
+      return authnRequest.getExtensions()
+        .getUnknownXMLObjects()
+        .stream()
+        .filter(PrincipalSelection.class::isInstance)
+        .map(PrincipalSelection.class::cast)
+        .findFirst()
+        .orElse(null);
+    }
+    return null;
+  }
+
+  /**
+   * See {@link #getPrincipalSelection(ProfileRequestContext)}.
+   * 
+   * @param httpRequest
+   *          the HTTP request
+   * @return the {@code PrincipalSelection} extension, or {@code null} if none is found in the current
+   *         {@code AuthnRequest}
+   * @throws ExternalAuthenticationException
+   *           for Shibboleth session errors
+   */
+  protected PrincipalSelection getPrincipalSelection(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+    return this.getPrincipalSelection(this.getProfileRequestContext(httpRequest));
   }
 
   /**

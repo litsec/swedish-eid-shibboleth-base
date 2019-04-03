@@ -5,7 +5,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>shibboleth-base-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.6.1</version>
+  <version>1.6.2-SNAPSHOT</version>
 
   <name>Swedish eID :: Parent POM for Swedish eID :: Shibboleth IdP base</name>
   <description>Parent POM for base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -48,8 +48,8 @@
         
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
     <opensaml.version>3.4.2</opensaml.version>
-    <opensaml-ext.version>1.2.4</opensaml-ext.version>
-    <opensaml.swedish-eid.version>1.2.3</opensaml.swedish-eid.version>
+    <opensaml-ext.version>1.2.5</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.2.4</opensaml.swedish-eid.version>
     
   </properties>
 
