@@ -25,7 +25,8 @@
     <property name="whitelistedAlgorithms">
       <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" 
         p:targetObject-ref="sweid.DecryptionConfig" p:targetMethod="getWhitelistedAlgorithms" />
-    </property>    
+    </property>
+    <property name="pkcs11Workaround" value="%{idp.pkcs11.enabled:false}" />
   </bean>
 
   <bean id="sweid.KeyEncryptionKeyResolver" class="org.opensaml.xmlsec.keyinfo.impl.StaticKeyInfoCredentialResolver"
