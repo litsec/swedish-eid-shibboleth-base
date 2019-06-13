@@ -12,7 +12,7 @@
        default-init-method="initialize"
        default-destroy-method="destroy">
 
-  <!-- Includes Spring context files that extends the core Shibboleth -->
+  <!-- Includes Spring context files that extends the core Shibboleth -->  
   <import resource="services-extensions.xml" />
   <import resource="../../metadata/idp-metadata-config.xml" />
   
