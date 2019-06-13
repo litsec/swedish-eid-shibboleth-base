@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+                           
+       default-init-method="initialize"
+       default-destroy-method="destroy">
+
+
+  <!-- 
+    Updates the OpenSAML algorithm defaults that are set in the configuration service. 
+  -->
+  <bean id="sweid.SecurityConfigurationSetter" class="se.litsec.shibboleth.idp.config.DefaultSecurityConfigurationBean" 
+    depends-on="shibboleth.OpenSAMLConfig" scope="singleton">
+    <constructor-arg>
+      <ref bean="#{'%{idp.security.default-security-configuration-bean:sweid.SwedishEidSecurityConfiguration}'.trim()}" />      
+    </constructor-arg>
+  </bean>
+  
+  <bean id="sweid.SwedishEidSecurityConfiguration" class="se.litsec.swedisheid.opensaml.xmlsec.config.SwedishEidSecurityConfiguration" lazy-init="true" />  
+  <bean id="sweid.SAML2IntSecurityConfiguration" class="se.swedenconnect.opensaml.xmlsec.config.SAML2IntSecurityConfiguration" lazy-init="true" />
+  <bean id="sweid.DefaultSecurityConfiguration" class="se.swedenconnect.opensaml.xmlsec.config.DefaultSecurityConfiguration" lazy-init="true" />
+  <bean id="sweid.OpenSAMLSecurityConfiguration" class="se.litsec.shibboleth.idp.config.OpenSAMLSecurityConfiguration" lazy-init="true" />  
+
+  <bean id="systemSigningConfiguration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
+    scope="prototype"
+    depends-on="sweid.SecurityConfigurationSetter"
+    p:targetClass="org.opensaml.xmlsec.SecurityConfigurationSupport"
+    p:targetMethod="getGlobalSignatureSigningConfiguration" /> 
+      
+  <bean id="sweid.SigningConfiguration" parent="shibboleth.BasicSignatureSigningConfiguration"
+    p:signingCredentials-ref="shibboleth.DefaultSigningCredential" depends-on="sweid.SecurityConfigurationSetter">
+        
+    <property name="signatureAlgorithms">
+      <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"         
+        p:targetObject-ref="systemSigningConfiguration" 
+        p:targetMethod="getSignatureAlgorithms" />
+    </property>
+    <property name="signatureReferenceDigestMethods">
+      <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"         
+        p:targetObject-ref="systemSigningConfiguration" 
+        p:targetMethod="getSignatureReferenceDigestMethods" />    
+    </property>
+  </bean>
+    
+  <bean id="systemEncryptionConfiguration" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"
+    scope="prototype"
+    depends-on="sweid.SecurityConfigurationSetter"
+    p:targetClass="org.opensaml.xmlsec.SecurityConfigurationSupport"
+    p:targetMethod="getGlobalEncryptionConfiguration" />    
+
+  <bean id="sweid.EncryptionConfiguration" parent="shibboleth.BasicEncryptionConfiguration" depends-on="sweid.SecurityConfigurationSetter">
+    <property name="dataEncryptionAlgorithms">
+      <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"         
+        p:targetObject-ref="systemEncryptionConfiguration" 
+        p:targetMethod="getDataEncryptionAlgorithms" />
+    </property>
+    <property name="keyTransportEncryptionAlgorithms">
+      <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"         
+        p:targetObject-ref="systemEncryptionConfiguration" 
+        p:targetMethod="getKeyTransportEncryptionAlgorithms" />
+    </property>
+    <property name="rSAOAEPParameters">
+      <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"         
+        p:targetObject-ref="systemEncryptionConfiguration" 
+        p:targetMethod="getRSAOAEPParameters" />    
+    </property>
+  </bean>
+    
+</beans>
