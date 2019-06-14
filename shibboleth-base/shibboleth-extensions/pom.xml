@@ -73,6 +73,11 @@
       <groupId>org.springframework.webflow</groupId>
       <artifactId>spring-webflow</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>se.swedenconnect.opensaml</groupId>
+      <artifactId>opensaml-security-ext</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>se.litsec.opensaml</groupId>
