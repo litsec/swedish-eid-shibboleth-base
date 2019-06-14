@@ -35,9 +35,20 @@ The repository consists of the following components:
 	
 ### Upgrade notice
 
-When upgrading to version 1.5.0 of the swedish-eid-shibboleth-base you should be aware that the version of the underlying Shibboleth version has been upgraded to v 3.4.1 (from 3.3.1).
+When upgrading to version 1.7.0 of the swedish-eid-shibboleth-base you should be aware that the version of the underlying Shibboleth version has been upgraded to v 3.4.4.
 
 See the [Shibboleth 3.4 Release notes](https://wiki.shibboleth.net/confluence/display/IDP30/ReleaseNotes) for details.
+
+Also note that if you have modifications to `services.xml` in the `conf` directory, you need to make sure that the `%{idp.home}/conf/custom-security-configuration.xml` is added to the `shibboleth.RelyingPartyResolverResources` bean.
+
+```
+<util:list id="shibboleth.RelyingPartyResolverResources">
+  <value>%{idp.home}/conf/custom-security-configuration.xml</value>
+  <value>%{idp.home}/conf/relying-party.xml</value>
+  <value>%{idp.home}/conf/credentials.xml</value>
+  <value>%{idp.home}/system/conf/relying-party-system.xml</value>
+</util:list>
+```
 
 ------
 
