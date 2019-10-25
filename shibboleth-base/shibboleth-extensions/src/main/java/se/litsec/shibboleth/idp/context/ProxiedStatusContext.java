@@ -22,6 +22,9 @@ import org.opensaml.saml.saml2.core.Status;
  * When Shibboleth is running as a Proxy IdP the authentication process (i.e., the SP) may save the {@code Status}
  * received from the authenticating party in a context. This may later be used when compiling the {@code Response}
  * message.
+ * <p>
+ * The context is also used when an IdP is running in non-proxy mode wants to assign a detailed error status.
+ * </p>
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */

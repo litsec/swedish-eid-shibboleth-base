@@ -118,7 +118,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     AuthnContextClassContext authnContextClassContext = authnContextClassLookupStrategy.apply(context);
     if (authnContextClassContext == null) {
       log.error("No AuthnContextClassContext available [{}]", this.getLogString(context));
-      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthnContextClassContext");
+      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, "Missing AuthnContextClassContext");
     }
     return authnContextClassContext;
   }
@@ -138,7 +138,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     AuthenticationContext authnContext = authenticationContextLookupStrategy.apply(context);
     if (authnContext == null) {
       log.error("No AuthenticationContext available [{}]", this.getLogString(context));
-      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.INVALID_AUTHN_CTX, "Missing AuthenticationContext");
+      throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, "Missing AuthenticationContext");
     }
     authnContext.addSubcontext(authnContextClassContext, true);
   }
