@@ -76,6 +76,23 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
   }
 
   /**
+   * Constructor accepting an error event ID and the parts of a status object.
+   * 
+   * @param authnEventId
+   *          the error event ID
+   * @param statusCode
+   *          the main status code
+   * @param subStatusCode
+   *          the sub status code
+   * @param message
+   *          the textual error message
+   */
+  public IdpErrorStatusException(String authnEventId, String statusCode, String subStatusCode, String message) {
+    super(authnEventId, message);
+    this.status = getStatusBuilder(statusCode).subStatusCode(subStatusCode).statusMessage(message).build();
+  }
+
+  /**
    * Returns the error status object
    * 
    * @return the status object
@@ -107,10 +124,10 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
 
     public Status build() {
       Status status = ObjectUtils.createSamlObject(Status.class);
-      
+
       StatusCode sc = ObjectUtils.createSamlObject(StatusCode.class);
       sc.setValue(this.statusCode);
-      
+
       if (subStatusCode != null) {
         StatusCode ssc = ObjectUtils.createSamlObject(StatusCode.class);
         ssc.setValue(this.subStatusCode);
