@@ -79,6 +79,9 @@
     <AttributeRule attributeID="dateOfBirth">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
+    <AttributeRule attributeID="c">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
     <AttributeRule attributeID="transactionIdentifier">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
