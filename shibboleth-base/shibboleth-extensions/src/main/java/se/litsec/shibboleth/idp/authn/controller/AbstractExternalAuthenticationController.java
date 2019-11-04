@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2019 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -515,6 +516,44 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   protected void error(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Status errorStatus)
       throws ExternalAuthenticationException, IOException {
     this.error(httpRequest, httpResponse, new IdpErrorStatusException(errorStatus));
+  }
+
+  /**
+   * A utility method that may be used by IdP:s before attribute release (or before displaying a sign message) to check
+   * if an attribute value matches what was received in a {@code PrincipalSelection} extension.
+   * 
+   * @param attributeName
+   *          the attribute name
+   * @param attributeValue
+   *          the attribute value
+   * @param principalSelection
+   *          the principal selection extension (may be {@code null})
+   * @return if the supplied attribute name is present in the principal selection with a different value {@code false}
+   *         is returned, otherwise {@code true}
+   */
+  protected boolean checkAgainstPrincipalSelection(String attributeName, String attributeValue, PrincipalSelection principalSelection) {
+    if (principalSelection == null) {
+      // No principal selection available - check is ok
+      return true;
+    }
+    if (attributeName == null || attributeValue == null) {
+      // Nothing to check
+      return true;
+    }
+    Optional<String> expectedValue = principalSelection.getMatchValues()
+      .stream()
+      .filter(mv -> attributeName.equals(mv.getName()))
+      .map(mv -> mv.getValue())
+      .findFirst();
+
+    if (expectedValue.isPresent() && !expectedValue.get().equals(attributeValue)) {
+      logger.warn("Attribute '{}' with a value of '{}' did not match corresponding value from PrincipalSelection ({})",
+        attributeName, attributeValue, expectedValue.get());
+      return false;
+    }
+    else {
+      return true;
+    }
   }
 
   /**
