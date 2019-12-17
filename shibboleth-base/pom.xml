@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +19,7 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
+
   <scm>
     <connection>scm:git:https://github.com/litsec/swedish-eid-shibboleth-base.git</connection>
     <developerConnection>scm:git:https://github.com/litsec/swedish-eid-shibboleth-base.git</developerConnection>
@@ -33,7 +34,7 @@
       <organizationUrl>http://www.litsec.se</organizationUrl>
     </developer>
   </developers>
-  
+
   <organization>
     <name>Litsec AB</name>
     <url>http://www.litsec.se</url>
@@ -45,13 +46,13 @@
     <java.version>1.8</java.version>
 
     <shibboleth.version>3.4.6</shibboleth.version>
-        
+
     <!-- Needed only for the Javadoc plugin (we don't get the versions from the BOM). -->
     <opensaml.version>3.4.5</opensaml.version>
     <opensaml-security-ext.version>1.0.6</opensaml-security-ext.version>
     <opensaml-ext.version>1.4.4</opensaml-ext.version>
     <opensaml.swedish-eid.version>1.3.1</opensaml.swedish-eid.version>
-    
+
   </properties>
 
   <repositories>
@@ -78,15 +79,15 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
     <repository>
-    <id>ossrh</id>
-    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
-  
+
   <dependencyManagement>
 
     <dependencies>
-      
+
       <dependency>
         <groupId>se.litsec.sweid.idp</groupId>
         <artifactId>shibboleth-base-dependency-bom</artifactId>
@@ -133,13 +134,31 @@
             </filesets>
           </configuration>
         </plugin>
-        
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.1.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.8</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-project-info-reports-plugin</artifactId>
           <version>3.0.0</version>
-        </plugin> 
-        
+        </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
@@ -151,14 +170,14 @@
     </pluginManagement>
 
   </build>
-  
+
   <profiles>
     <profile>
       <id>release</id>
-      
+
       <build>
         <plugins>
-        
+
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -168,13 +187,11 @@
               <serverId>ossrh</serverId>
               <nexusUrl>https://oss.sonatype.org/</nexusUrl>
               <autoReleaseAfterClose>false</autoReleaseAfterClose>
-              <!-- 
-                Allows manual inspection of the staging repo before deploying it to the central repo. 
-                Use 'mvn nexus-staging:release -Prelease' to release and 'mvn nexus-staging:drop' to abort. 
-              -->
+              <!-- Allows manual inspection of the staging repo before deploying it to the central repo. Use 'mvn nexus-staging:release -Prelease' to release and 
+                'mvn nexus-staging:drop' to abort. -->
             </configuration>
-          </plugin>        
-        
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
@@ -206,10 +223,10 @@
                 <goals>
                   <goal>test-jar-no-fork</goal>
                 </goals>
-              </execution>              
+              </execution>
             </executions>
           </plugin>
-                    
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -217,15 +234,10 @@
               <doctitle>Shibboleth extensions for the Swedish eID Framework - ${project.version}</doctitle>
               <windowtitle>Shibboleth extensions for the Swedish eID Framework - ${project.version}</windowtitle>
               <links>
-                <!-- 
-                  Doesn't work to use the Shib Wiki links for API docs since the Shib webserver sets X-Frame-Options 
-                  to SAMEORIGIN which makes it impossible to use frames. 
-                -->
-                <!--               
-                <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/3.2.0/apidocs/</link>
-                <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/7.2.0/apidocs/</link>
-                <link>https://build.shibboleth.net/nexus/content/sites/site/spring-extensions/5.2.0/apidocs/</link>
-                -->              
+                <!-- Doesn't work to use the Shib Wiki links for API docs since the Shib webserver sets X-Frame-Options to SAMEORIGIN which makes it impossible to 
+                  use frames. -->
+                <!-- <link>https://build.shibboleth.net/nexus/content/sites/site/java-opensaml/3.2.0/apidocs/</link> <link>https://build.shibboleth.net/nexus/content/sites/site/java-support/7.2.0/apidocs/</link> 
+                  <link>https://build.shibboleth.net/nexus/content/sites/site/spring-extensions/5.2.0/apidocs/</link> -->
                 <link>https://docs.spring.io/spring/docs/4.3.2.RELEASE/javadoc-api/</link>
                 <link>https://litsec.github.io/opensaml-javadoc-mirror/org/opensaml/opensaml-core/${opensaml.version}/</link>
                 <link>https://litsec.github.io/opensaml-javadoc-mirror/org/opensaml/opensaml-messaging-api/${opensaml.version}/</link>
@@ -242,14 +254,14 @@
                 <link>https://litsec.github.io/opensaml-javadoc-mirror/org/opensaml/opensaml-storage-impl/${opensaml.version}/</link>
                 <link>https://litsec.github.io/opensaml-javadoc-mirror/org/opensaml/opensaml-xmlsec-api/${opensaml.version}/</link>
                 <link>https://litsec.github.io/opensaml-javadoc-mirror/org/opensaml/opensaml-xmlsec-impl/${opensaml.version}/</link>
-                <link>https://litsec.github.io/opensaml-javadoc-mirror/net/shibboleth/utilities/java-support/7.5.1/</link>                
+                <link>https://litsec.github.io/opensaml-javadoc-mirror/net/shibboleth/utilities/java-support/7.5.1/</link>
                 <link>https://litsec.github.io/opensaml-javadoc-mirror/net/shibboleth/ext/spring-extensions/5.4.1/</link>
                 <link>https://litsec.github.io/opensaml-ext/javadoc/opensaml3/${opensaml-ext.version}/</link>
                 <link>https://litsec.github.io/swedish-eid-opensaml/javadoc/${opensaml.swedish-eid.version}/</link>
                 <link>https://docs.swedenconnect.se/opensaml-security-ext/javadoc/${opensaml-security-ext.version}</link>
               </links>
               <detectJavaApiLink>true</detectJavaApiLink>
-            </configuration>            
+            </configuration>
             <executions>
               <execution>
                 <id>attach-javadoc</id>
@@ -257,14 +269,14 @@
                   <goal>jar</goal>
                 </goals>
               </execution>
-            </executions>                        
-          </plugin>          
-          
+            </executions>
+          </plugin>
+
         </plugins>
       </build>
-      
+
     </profile>
-  </profiles>  
+  </profiles>
 
   <modules>
     <module>shibboleth-extensions</module>

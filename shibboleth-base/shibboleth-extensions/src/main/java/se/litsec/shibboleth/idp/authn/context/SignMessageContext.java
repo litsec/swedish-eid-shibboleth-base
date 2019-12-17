@@ -60,10 +60,19 @@ public class SignMessageContext extends BaseContext {
   /**
    * Returns the {@code SignMessage}.
    * 
-   * @return the {@code SignMessage}
+   * @return the SignMessage
    */
   public SignMessage getSignMessage() {
     return this.signMessage;
+  }
+
+  /**
+   * Returns the cleartext message.
+   * 
+   * @return the Message
+   */
+  public Message getMessage() {
+    return this.clearTextMessage;
   }
 
   /**

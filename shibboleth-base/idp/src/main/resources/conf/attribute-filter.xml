@@ -33,6 +33,7 @@
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa2-pnr" />
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa3-pnr" />
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa4-pnr" />
+      <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/loa/1.0/uncertified-loa3" />      
     </PolicyRequirementRule>
     <AttributeRule attributeID="personalIdentityNumber">
       <PermitValueRule xsi:type="ANY" />
@@ -50,6 +51,9 @@
                            attributeName="http://macedir.org/entity-category" 
                            attributeValue="http://id.elegnamnden.se/st/1.0/sigservice" />
     <AttributeRule attributeID="sad">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="signMessageDigest">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
     <AttributeRule attributeID="userSignature">
