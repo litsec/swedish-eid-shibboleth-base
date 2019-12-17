@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2019 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -260,27 +260,8 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
               StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, "No sign message to show");
           }
         }
-        
-        // If the SignMessage element from the signature request includes a MustShow attribute with the value true, the
-        // Signature Service MUST require that the provided sign message is displayed by the Identity Provider, by
-        // including a sigmessage authentication context URI.
-        //
-        if (signMessageContext.mustShow()) {
-          AuthnContextClassContext authnContextClassContext = this.authnContextService.getAuthnContextClassContext(context);
-          for (String loa : authnContextClassContext.getAuthnContextClassRefs()) {
-            if (!this.isSignMessageURI(loa)) {
-              log.info("SP has requested the SignMessage must be displayed, removing '{}' ... [{}]", loa, logId);
-              authnContextClassContext.deleteAuthnContextClassRef(loa);
-            }
-          }
-          if (authnContextClassContext.isEmpty()) {
-            final String msg = "No valid sigmessage AuthnContext URI:s were specified in AuthnRequest";
-            log.info("{} - can not proceed [{}]", msg, logId);
-            throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED,
-              StatusCode.REQUESTER, StatusCode.NO_AUTHN_CONTEXT, msg);
-          }
-        }
-        // Else, if we can't display the sign message, we filter away all sigmessage URI:s.
+                
+        // If we can't display the sign message, we filter away all sigmessage URI:s.
         //
         if (!signMessageContext.isDoDisplayMessage()) {
           AuthnContextClassContext authnContextClassContext = this.authnContextService.getAuthnContextClassContext(context);

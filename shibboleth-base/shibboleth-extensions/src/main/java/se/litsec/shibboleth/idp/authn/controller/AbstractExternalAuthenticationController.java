@@ -78,6 +78,8 @@ import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
 import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
 import se.litsec.swedisheid.opensaml.saml2.authentication.psc.PrincipalSelection;
+import se.litsec.swedisheid.opensaml.saml2.signservice.SignMessageDigestIssuer;
+import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
 
 /**
  * Abstract base class for controllers implementing "external authentication".
@@ -106,6 +108,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
   /** The name of the Shibboleth flow that this controller supports. */
   private String flowName;
+
+  /** Issuer for the signMessageDigest attribute. */
+  private SignMessageDigestIssuer signMessageDigestIssuer = new SignMessageDigestIssuer();
 
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
   @SuppressWarnings("rawtypes")
@@ -292,7 +297,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * Note: The parameter {@code cacheForSSO} is used to determine whether the result should be cached for later SSO.
    * This is something that we usually want, but never for signature services since their authentications should always
    * be forced. So, if the parameter value is {@code null} the we will default the parameter to {@code FALSE} for
-   * signature services, and {@code FALSE} for other peers.
+   * signature services, and {@code TRUE} for other peers.
    * </p>
    * 
    * @param httpRequest
@@ -554,6 +559,20 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     else {
       return true;
     }
+  }
+
+  /**
+   * Creates a signMessageDigest attribute based on a sign message that has been displayed for the user.
+   * 
+   * @param context
+   *          the profile context
+   * @param signMessage
+   *          the cleartext sign message
+   * @return a signMessageDigest attribute
+   */
+  protected Attribute createSignMessageDigestAttribute(final ProfileRequestContext<?, ?> context, final Message signMessage) {
+    final EntityDescriptor peerMetadata = this.getPeerMetadata(context);
+    return this.signMessageDigestIssuer.create(signMessage, peerMetadata);
   }
 
   /**

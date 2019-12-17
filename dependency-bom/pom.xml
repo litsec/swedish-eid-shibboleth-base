@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -18,7 +19,7 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-  
+
   <scm>
     <connection>scm:git:https://github.com/litsec/swedish-eid-shibboleth-base.git</connection>
     <developerConnection>scm:git:https://github.com/litsec/swedish-eid-shibboleth-base.git</developerConnection>
@@ -33,31 +34,31 @@
       <organizationUrl>http://www.litsec.se</organizationUrl>
     </developer>
   </developers>
-  
+
   <organization>
     <name>Litsec AB</name>
     <url>http://www.litsec.se</url>
-  </organization>  
+  </organization>
 
   <properties>
-    <opensaml.version>3.4.3</opensaml.version>
-    <opensaml-security-ext.version>1.0.3</opensaml-security-ext.version>
-    <opensaml-ext.version>1.4.2</opensaml-ext.version>
-    <opensaml.swedish-eid.version>1.3.0</opensaml.swedish-eid.version>
+    <opensaml.version>3.4.5</opensaml.version>
+    <opensaml-security-ext.version>1.0.6</opensaml-security-ext.version>
+    <opensaml-ext.version>1.4.4</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.3.1</opensaml.swedish-eid.version>
 
-    <shibboleth.version>3.4.4</shibboleth.version>
-    <shibboleth.java-support.version>7.5.0</shibboleth.java-support.version>
+    <shibboleth.version>3.4.6</shibboleth.version>
+    <shibboleth.java-support.version>7.5.1</shibboleth.java-support.version>
     <shibboleth.spring-extensions.version>5.4.1</shibboleth.spring-extensions.version>
 
     <spring.version>4.3.19.RELEASE</spring.version>
-    
+
     <!-- https://snyk.io/vuln/SNYK-JAVA-ORGSPRINGFRAMEWORK-72470 -->
     <spring-web.version>4.3.20.RELEASE</spring-web.version>
-    
+
     <spring.webflow.version>2.4.8.RELEASE</spring.webflow.version>
     <spring.mobile.version>1.1.5.RELEASE</spring.mobile.version>
-    
-    <jackson.version>2.9.9</jackson.version>
+
+    <jackson.version>2.10.1</jackson.version>
 
     <slf4j.version>1.7.25</slf4j.version>
     <junit.version>4.12</junit.version>
@@ -87,14 +88,22 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
     <repository>
-    <id>ossrh</id>
-    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
-  
+
   <dependencyManagement>
 
     <dependencies>
+
+      <dependency>
+        <groupId>se.swedenconnect.opensaml</groupId>
+        <artifactId>opensaml-bom</artifactId>
+        <version>${opensaml.version}.R1</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
       <!-- Java EE -->
       <dependency>
@@ -110,46 +119,11 @@
         <artifactId>taglibs-standard-spec</artifactId>
         <version>1.2.5</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.apache.taglibs</groupId>
         <artifactId>taglibs-standard-impl</artifactId>
         <version>1.2.5</version>
-      </dependency>
-      
-      <!-- Replacements of OpenSAML and Shibboleth transitive dependencies that have vulnerabilities -->
-      
-      <!-- dom4j:dom4j@1.6.1 - https://snyk.io/vuln/SNYK-JAVA-DOM4J-72444 -->
-      <dependency>
-        <groupId>dom4j</groupId>
-        <artifactId>dom4j</artifactId>
-        <version>2.1.1</version>
-        <type>jar</type>
-      </dependency>
-      
-      <!--
-        org.bouncycastle:bcprov-jdk15on@1.59
-        https://app.snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-32412
-        https://snyk.io/vuln/SNYK-JAVA-ORGBOUNCYCASTLE-32369 
-      --> 
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>1.60</version>        
-        <type>jar</type>
-        <scope>provided</scope>
-      </dependency>
-      
-      <!-- 
-        com.google.guava:guava@20.0 
-        https://snyk.io/vuln/SNYK-JAVA-COMGOOGLEGUAVA-32236 
-      -->
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>27.0-jre</version>
-        <type>jar</type>
-        <scope>provided</scope>
       </dependency>
 
       <!-- OpenSAML extensions -->
@@ -160,7 +134,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-          
+
       <dependency>
         <groupId>se.litsec.opensaml</groupId>
         <artifactId>opensaml3-ext</artifactId>
@@ -193,15 +167,7 @@
         </exclusions>
       </dependency>
 
-      <!-- OpenSAML -->
-      <dependency>
-        <groupId>se.swedenconnect.opensaml</groupId>
-        <artifactId>opensaml-bom</artifactId>
-        <version>${opensaml.version}.R2</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      
+      <!-- Mark all OpenSAML dependencies as provided -->
       <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml-core</artifactId>
@@ -322,7 +288,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-core</artifactId>
@@ -330,7 +296,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-schema</artifactId>
@@ -338,7 +304,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-admin-api</artifactId>
@@ -443,18 +409,15 @@
           <!-- https://snyk.io/vuln/SNYK-JAVA-COMMONSCOLLECTIONS-30078 -->
           <exclusion>
             <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>            
-          </exclusion>        
-          <!-- 
-            DuoWeb is delivered in the Shibboleth lib package. But it seems like
-            it isn't published to any official Maven repos. We exclude it from the
-            dependencies so that everyone can build ... 
-          -->
+            <artifactId>velocity</artifactId>
+          </exclusion>
+          <!-- DuoWeb is delivered in the Shibboleth lib package. But it seems like it isn't published to any official Maven repos. We exclude it from the dependencies 
+            so that everyone can build ... -->
           <exclusion>
             <groupId>com.duosecurity</groupId>
             <artifactId>DuoWeb</artifactId>
           </exclusion>
-        </exclusions>        
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -471,7 +434,7 @@
           </exclusion>
         </exclusions>
       </dependency>
-      
+
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-attribute-filter-impl</artifactId>
@@ -487,7 +450,7 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
         <artifactId>idp-profile-impl</artifactId>
@@ -598,14 +561,14 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
         <version>${spring.version}</version>
         <type>jar</type>
         <scope>provided</scope>
-      </dependency>      
+      </dependency>
 
       <dependency>
         <groupId>org.springframework</groupId>
@@ -630,14 +593,14 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
-      
+
       <dependency>
         <groupId>org.springframework.webflow</groupId>
         <artifactId>spring-binding</artifactId>
         <version>${spring.webflow.version}</version>
         <type>jar</type>
         <scope>provided</scope>
-      </dependency>      
+      </dependency>
 
       <dependency>
         <groupId>org.springframework.mobile</groupId>
@@ -656,7 +619,7 @@
           </exclusion>
         </exclusions>
       </dependency>
-      
+
       <!-- Jackson -->
       <!-- Shibboleth uses Jackson 2.8.3. This version has reported vulnerabilities, so we change this ... -->
       <dependency>
@@ -666,7 +629,7 @@
         <scope>provided</scope>
         <type>jar</type>
       </dependency>
-    
+
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
@@ -674,7 +637,7 @@
         <scope>provided</scope>
         <type>jar</type>
       </dependency>
-    
+
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
@@ -682,14 +645,14 @@
         <scope>provided</scope>
         <type>jar</type>
       </dependency>
-    
+
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-joda</artifactId>
         <version>${jackson.version}</version>
         <scope>provided</scope>
         <type>jar</type>
-      </dependency>      
+      </dependency>
 
       <!-- Misc -->
       <dependency>
@@ -723,7 +686,7 @@
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
         <type>jar</type>
-        <scope>test</scope>        
+        <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -778,14 +741,14 @@
     </dependencies>
 
   </dependencyManagement>
-  
+
   <profiles>
     <profile>
       <id>release</id>
-      
+
       <build>
         <plugins>
-        
+
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -795,13 +758,11 @@
               <serverId>ossrh</serverId>
               <nexusUrl>https://oss.sonatype.org/</nexusUrl>
               <autoReleaseAfterClose>false</autoReleaseAfterClose>
-              <!-- 
-                Allows manual inspection of the staging repo before deploying it to the central repo. 
-                Use 'mvn nexus-staging:release -Prelease' to release and 'mvn nexus-staging:drop' to abort. 
-              -->
+              <!-- Allows manual inspection of the staging repo before deploying it to the central repo. Use 'mvn nexus-staging:release -Prelease' to release and 
+                'mvn nexus-staging:drop' to abort. -->
             </configuration>
-          </plugin>        
-        
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
@@ -816,11 +777,11 @@
               </execution>
             </executions>
           </plugin>
-          
+
         </plugins>
       </build>
-      
+
     </profile>
-  </profiles>      
-    
+  </profiles>
+
 </project>

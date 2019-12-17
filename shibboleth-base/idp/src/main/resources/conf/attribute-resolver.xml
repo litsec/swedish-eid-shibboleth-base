@@ -121,6 +121,10 @@
       <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.752.201.3.12" friendlyName="sad" />
     </AttributeDefinition>
     
+    <AttributeDefinition id="signMessageDigest" xsi:type="SubjectDerivedAttribute" principalAttributeName="signMessageDigest">
+      <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.752.201.3.14" friendlyName="signMessageDigest" />
+    </AttributeDefinition>    
+    
     <AttributeDefinition id="prid" xsi:type="SubjectDerivedAttribute" principalAttributeName="prid">
       <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.752.201.3.4" friendlyName="prid" />
     </AttributeDefinition>

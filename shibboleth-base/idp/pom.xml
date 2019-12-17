@@ -75,6 +75,12 @@
       <scope>compile</scope>
     </dependency>
     
+    <!-- We don't want to use dom4j:dom4j:jar:1.6.1 from opensaml-storage-impl. -->   
+    <dependency>
+      <groupId>org.dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+    </dependency>    
+    
     <!-- Make sure to copy valid Jackson dependencies -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -152,7 +158,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.0.0</version>
         <executions>
           <execution>
             <id>unpack</id>
@@ -218,7 +223,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
         <executions>
           <!-- Remove Shibboleth dependencies that are too old (we have included versions with no vulnerabilities ourselves) -->
           <execution>
@@ -234,6 +238,7 @@
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-databind-2.8.3.jar" />
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-datatype-joda-2.8.3.jar" />
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jsr305-3.0.1.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/dom4j-1.6.1.jar" />
               </target>
             </configuration>
             <goals>
@@ -294,7 +299,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.0.0</version>
         <configuration>
           <descriptors>
             <descriptor>${basedir}/src/assembly/shibboleth.xml</descriptor>
