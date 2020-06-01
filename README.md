@@ -52,4 +52,4 @@ Also note that if you have modifications to `services.xml` in the `conf` directo
 
 ------
 
-Copyright &copy; 2017-2019, [Litsec AB](http://www.litsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+Copyright &copy; 2017-2020, [Litsec AB](http://www.litsec.se). Licensed under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
