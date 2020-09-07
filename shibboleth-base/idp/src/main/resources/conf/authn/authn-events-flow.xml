@@ -19,6 +19,9 @@
     <end-state id="SwEidBadRequest" />
     <end-state id="BadSadRequest" />
     
+    <!-- Not declared by Shib -->
+    <end-state id="InvalidAuthenticationContext" />    
+    
     <global-transitions>
       <transition on="CancelAuthn" to="CancelAuthn" />
       <transition on="Fraud" to="Fraud" />
@@ -27,6 +30,9 @@
       <transition on="SignMessageTypeNotSupported" to="SignMessageTypeNotSupported" />
       <transition on="SwEidBadRequest" to="SwEidBadRequest" />
       <transition on="BadSadRequest" to="BadSadRequest" />
+      
+      <transition on="InvalidAuthenticationContext" to="InvalidAuthenticationContext" />
+      
       <transition on="#{!'proceed'.equals(currentEvent.id)}" to="InvalidEvent" />
     </global-transitions>
 
