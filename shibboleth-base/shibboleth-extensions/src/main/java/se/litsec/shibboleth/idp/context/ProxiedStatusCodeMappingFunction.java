@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class ProxiedStatusCodeMappingFunction extends AddStatusToResponse.Status
 
   /** {@inheritDoc} */
   @Override
-  public List<String> apply(@SuppressWarnings("rawtypes") final ProfileRequestContext input) {
+  public List<String> apply(final ProfileRequestContext input) {
     List<String> codes = null;
     if (input != null) {
       ProxiedStatusContext context = input.getSubcontext(ProxiedStatusContext.class, false);

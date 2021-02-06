@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,12 +29,12 @@ public class ProxiedStatusMessageLookupFunction extends ExtendedSpringStatusMess
 
   /** {@inheritDoc} */
   @Override
-  public String apply(@SuppressWarnings("rawtypes") final ProfileRequestContext input) {
+  public String apply(final ProfileRequestContext input) {
     String msg = null;
     if (input != null) {
       ProxiedStatusContext context = input.getSubcontext(ProxiedStatusContext.class, false);
       if (context != null && context.getStatus() != null && context.getStatus().getStatusMessage() != null) {
-        msg = context.getStatus().getStatusMessage().getMessage();
+        msg = context.getStatus().getStatusMessage().getValue();
       }
     }
     return msg != null ? msg : super.apply(input);

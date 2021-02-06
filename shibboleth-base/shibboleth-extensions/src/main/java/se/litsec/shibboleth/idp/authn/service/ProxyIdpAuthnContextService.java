@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,8 +62,8 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    * @throws ExternalAutenticationErrorCodeException
    *           if no AuthnContext URI:s matches
    */
-  List<String> getSendAuthnContextClassRefs(ProfileRequestContext<?, ?> context, List<String> assuranceURIs, boolean idpSupportsSignMessage)
-      throws ExternalAutenticationErrorCodeException;
+  List<String> getSendAuthnContextClassRefs(final ProfileRequestContext context, final List<String> assuranceURIs, 
+      final boolean idpSupportsSignMessage) throws ExternalAutenticationErrorCodeException;
 
   /**
    * When the Proxy-IdP receives an assertion it contains an {@code AuthnContextClassRef} holding the URI describing how
@@ -86,7 +86,7 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    *           if the issued URI can not be used in the Proxy-IdP assertion
    */
   @Override
-  String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
+  String getReturnAuthnContextClassRef(final ProfileRequestContext context, final String authnContextUri, final boolean displayedSignMessage)
       throws ExternalAutenticationErrorCodeException;
 
   /**
@@ -94,7 +94,7 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    * {@link #getSendAuthnContextClassRefs(ProfileRequestContext, List, boolean)} should be used.
    */
   @Override
-  default List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
+  default List<String> getPossibleAuthnContextClassRefs(final ProfileRequestContext context, final boolean signMessage)
       throws ExternalAutenticationErrorCodeException {
     throw new RuntimeException("Call to getPossibleAuthnContextClassRefs is not allowed for a Proxy-IdP");
   }

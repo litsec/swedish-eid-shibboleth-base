@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+                           
+       default-init-method="initialize"
+       default-destroy-method="destroy">
+       
+    <bean parent="shibboleth.TranscodingRuleLoader">
+    <constructor-arg>
+    <list>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">personalIdentityNumber</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.29.4.13</prop>
+                    <prop key="saml2.friendlyName">personalIdentityNumber</prop>
+                    <prop key="displayName.en">Personal identity number</prop>
+                    <prop key="displayName.sv">Personnummer</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">sn</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.4</prop>
+                    <prop key="saml2.friendlyName">sn</prop>
+                    <prop key="displayName.en">Surname</prop>
+                    <prop key="displayName.sv">Efternamn</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">givenName</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.42</prop>
+                    <prop key="saml2.friendlyName">givenName</prop>
+                    <prop key="displayName.en">Given name</prop>
+                    <prop key="displayName.sv">Förnamn</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">displayName</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.16.840.1.113730.3.1.241</prop>
+                    <prop key="saml2.friendlyName">displayName</prop>
+                    <prop key="displayName.en">Display name</prop>
+                    <prop key="displayName.sv">Visningsnamn</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">gender</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.3.6.1.5.5.7.9.3</prop>
+                    <prop key="saml2.friendlyName">gender</prop>
+                    <prop key="displayName.en">Gender</prop>
+                    <prop key="displayName.sv">Kön</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">dateOfBirth</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.3.6.1.5.5.7.9.1</prop>
+                    <prop key="saml2.friendlyName">dateOfBirth</prop>
+                    <prop key="displayName.en">Date of birth</prop>
+                    <prop key="displayName.sv">Födelsedatum</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">birthName</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.8</prop>
+                    <prop key="saml2.friendlyName">birthName</prop>
+                    <prop key="displayName.en">Birth name</prop>
+                    <prop key="displayName.sv">Födelsenamn</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">street</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.9</prop>
+                    <prop key="saml2.friendlyName">street</prop>
+                    <prop key="displayName.en">Street</prop>
+                    <prop key="displayName.sv">Gatuadress</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">postOfficeBox</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.18</prop>
+                    <prop key="saml2.friendlyName">postOfficeBox</prop>
+                    <prop key="displayName.en">Post office box</prop>
+                    <prop key="displayName.sv">Postbox</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">postalCode</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.17</prop>
+                    <prop key="saml2.friendlyName">postalCode</prop>
+                    <prop key="displayName.en">Postal code</prop>
+                    <prop key="displayName.sv">Postkod</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">l</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.7</prop>
+                    <prop key="saml2.friendlyName">l</prop>
+                    <prop key="displayName.en">Locality</prop>
+                    <prop key="displayName.sv">Lokalitet</prop>
+                </props>
+            </property>
+        </bean>
+    
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">c</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.6</prop>
+                    <prop key="saml2.friendlyName">c</prop>
+                    <prop key="displayName.en">Country</prop>
+                    <prop key="displayName.sv">Land</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">placeOfBirth</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.3.6.1.5.5.7.9.2</prop>
+                    <prop key="saml2.friendlyName">placeOfBirth</prop>
+                    <prop key="displayName.en">Place of birth</prop>
+                    <prop key="displayName.sv">Födelseplats</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">countryOfCitizenship</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.3.6.1.5.5.7.9.4</prop>
+                    <prop key="saml2.friendlyName">countryOfCitizenship</prop>
+                    <prop key="displayName.en">Country of citizenship</prop>
+                    <prop key="displayName.sv">Medborgarskap i land</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">countryOfResidence</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.3.6.1.5.5.7.9.5</prop>
+                    <prop key="saml2.friendlyName">countryOfResidence</prop>
+                    <prop key="displayName.en">Country of residence</prop>
+                    <prop key="displayName.sv">Bosättningsland</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">telephoneNumber</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.20</prop>
+                    <prop key="saml2.friendlyName">telephoneNumber</prop>
+                    <prop key="displayName.en">Telephone number</prop>
+                    <prop key="displayName.sv">Telefonnummer</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">mobile</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:0.9.2342.19200300.100.1.41</prop>
+                    <prop key="saml2.friendlyName">mobile</prop>
+                    <prop key="displayName.en">Mobile number</prop>
+                    <prop key="displayName.sv">Mobilnummer</prop>
+                </props>
+            </property>
+        </bean>
+    
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">mail</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:0.9.2342.19200300.100.1.3</prop>
+                    <prop key="saml2.friendlyName">mail</prop>
+                    <prop key="displayName.en">Email address</prop>
+                    <prop key="displayName.sv">Epostadress</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">o</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.10</prop>
+                    <prop key="saml2.friendlyName">o</prop>
+                    <prop key="displayName.en">Organization</prop>
+                    <prop key="displayName.sv">Organisation</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">ou</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.11</prop>
+                    <prop key="saml2.friendlyName">ou</prop>
+                    <prop key="displayName.en">Organizational unit</prop>
+                    <prop key="displayName.sv">Organisatorisk enhet</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">organizationIdentifier</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:2.5.4.97</prop>
+                    <prop key="saml2.friendlyName">organizationIdentifier</prop>
+                    <prop key="displayName.en">Organization identifier</prop>
+                    <prop key="displayName.sv">Organisationsnummer</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">orgAffiliation</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.1</prop>
+                    <prop key="saml2.friendlyName">orgAffiliation</prop>
+                    <prop key="displayName.en">Organizational affiliation</prop>
+                    <prop key="displayName.sv">Identitet hos organisation</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">transactionIdentifier</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.2</prop>
+                    <prop key="saml2.friendlyName">transactionIdentifier</prop>
+                    <prop key="displayName.en">Transaction identifier</prop>
+                    <prop key="displayName.sv">Transaktionsidentifierare</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">authContextParams</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.3</prop>
+                    <prop key="saml2.friendlyName">authContextParams</prop>
+                    <prop key="displayName.en">Authentication context parameters</prop>
+                    <prop key="displayName.sv">Autentiseringskontextparametrar</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">userCertificate</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.10</prop>
+                    <prop key="saml2.friendlyName">userCertificate</prop>
+                    <prop key="displayName.en">User certificate</prop>
+                    <prop key="displayName.sv">Användarcertifikat</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">userSignature</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.11</prop>
+                    <prop key="saml2.friendlyName">userSignature</prop>
+                    <prop key="displayName.en">User signature</prop>
+                    <prop key="displayName.sv">Användarsignatur</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">authServerSignature</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.13</prop>
+                    <prop key="saml2.friendlyName">authServerSignature</prop>
+                    <prop key="displayName.en">Authentication server signature</prop>
+                    <prop key="displayName.sv">Autentiseringsserversignatur</prop>
+                </props>
+            </property>
+        </bean>
+    
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">sad</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.12</prop>
+                    <prop key="saml2.friendlyName">sad</prop>
+                    <prop key="displayName.en">Signature activation data</prop>
+                    <prop key="displayName.sv">Signaturaktiveringsdata</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">signMessageDigest</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.14</prop>
+                    <prop key="saml2.friendlyName">signMessageDigest</prop>
+                    <prop key="displayName.en">Sign message digest</prop>
+                    <prop key="displayName.sv">Hash av signeringsmeddelande</prop>
+                </props>
+            </property>
+        </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">prid</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.4</prop>
+                    <prop key="saml2.friendlyName">prid</prop>
+                    <prop key="displayName.en">Provisional ID</prop>
+                    <prop key="displayName.sv">Provisionell identifierare</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">pridPersistence</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.5</prop>
+                    <prop key="saml2.friendlyName">pridPersistence</prop>
+                    <prop key="displayName.en">Provisional ID persistence</prop>
+                    <prop key="displayName.sv">Persistens av provisionell identifierare</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">personalIdentityNumberBinding</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.6</prop>
+                    <prop key="saml2.friendlyName">personalIdentityNumberBinding</prop>
+                    <prop key="displayName.en">Personal identity number binding</prop>
+                    <prop key="displayName.sv">Personnummerkoppling</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">eidasPersonIdentifier</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.7</prop>
+                    <prop key="saml2.friendlyName">eidasPersonIdentifier</prop>
+                    <prop key="displayName.en">eIDAS person identifier</prop>
+                    <prop key="displayName.sv">eIDAS personidentifierare</prop>
+                </props>
+            </property>
+        </bean>
+
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">eidasNaturalPersonAddress</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.201.3.9</prop>
+                    <prop key="saml2.friendlyName">eidasNaturalPersonAddress</prop>
+                    <prop key="displayName.en">Address for eIDAS natural person</prop>
+                    <prop key="displayName.sv">eIDAS adress för person</prop>
+                </props>
+            </property>
+        </bean>
+    
+    </list>
+    </constructor-arg>
+    </bean>
+    
+</beans>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package se.litsec.shibboleth.idp.authn.context.strategy;
 
+import java.util.Optional;
+
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.messaging.context.navigate.ContextDataLookupFunction;
 import org.opensaml.saml.common.messaging.context.SAMLPeerEntityContext;
@@ -24,13 +26,12 @@ import org.opensaml.saml.common.messaging.context.SAMLPeerEntityContext;
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-@SuppressWarnings("rawtypes")
 public class SAMLPeerEntityContextLookup implements ContextDataLookupFunction<MessageContext, SAMLPeerEntityContext> {
 
   /** {@inheritDoc} */
   @Override
-  public SAMLPeerEntityContext apply(MessageContext input) {
-    return input != null ? input.getSubcontext(SAMLPeerEntityContext.class, false) : null;
+  public SAMLPeerEntityContext apply(final MessageContext input) {
+    return Optional.ofNullable(input).map(c -> c.getSubcontext(SAMLPeerEntityContext.class, false)).orElse(null);
   }
 
 }

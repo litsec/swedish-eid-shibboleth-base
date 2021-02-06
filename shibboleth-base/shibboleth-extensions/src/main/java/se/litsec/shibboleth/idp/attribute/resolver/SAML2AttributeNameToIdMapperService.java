@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,21 @@
  */
 package se.litsec.shibboleth.idp.attribute.resolver;
 
-import java.util.HashMap;
+import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.shibboleth.idp.attribute.AttributeEncoder;
-import net.shibboleth.idp.attribute.resolver.AttributeDefinition;
 import net.shibboleth.idp.attribute.resolver.AttributeResolver;
-import net.shibboleth.idp.saml.attribute.encoding.SAML2AttributeEncoder;
+import net.shibboleth.idp.attribute.transcoding.AttributeTranscoderRegistry;
+import net.shibboleth.idp.attribute.transcoding.impl.AttributeRegistryServiceStrategy;
+//import net.shibboleth.idp.saml.attribute.encoding.SAML2AttributeEncoder;
 import net.shibboleth.utilities.java.support.logic.Constraint;
 import net.shibboleth.utilities.java.support.service.ReloadableService;
-import net.shibboleth.utilities.java.support.service.ServiceableComponent;
 
 /**
  * A service bean that maps between an SAML v2 attribute name and its corresponding Shibboleth attribute ID. This is
@@ -47,8 +44,10 @@ public class SAML2AttributeNameToIdMapperService {
   private final Logger logger = LoggerFactory.getLogger(SAML2AttributeNameToIdMapperService.class);
 
   /** Service used to get the resolver used to fetch attributes. */
-  private final ReloadableService<AttributeResolver> attributeResolverService;
-
+  private final ReloadableService<AttributeTranscoderRegistry> attributeRegistryService;
+  
+  //AttributeRegistryServiceStrategy j;
+  
   /**
    * Whether the last invocation of {@link ReloadableService#reload()} on {@link #attributeResolverService} failed. This
    * limits the noise in log file.
@@ -59,16 +58,16 @@ public class SAML2AttributeNameToIdMapperService {
   private Map<String, String> attributesMapping;
 
   /** Date when the cache was last refreshed. */
-  @Nullable private DateTime lastReload;
+  @Nullable private Instant lastReload;
 
   /**
    * Constructor.
    * 
-   * @param resolverService
-   *          the service for the attribute resolver we are to derive mapping info from
+   * @param attributeRegistryService
+   *          the service for the attribute registry we are to derive mapping info from
    */
-  public SAML2AttributeNameToIdMapperService(final ReloadableService<AttributeResolver> resolverService) {
-    attributeResolverService = Constraint.isNotNull(resolverService, "AttributeResolver cannot be null");
+  public SAML2AttributeNameToIdMapperService(final ReloadableService<AttributeTranscoderRegistry> attributeRegistryService) {
+    this.attributeRegistryService = Constraint.isNotNull(attributeRegistryService, "AttributRegistry cannot be null");
   }
 
   /**
@@ -89,60 +88,62 @@ public class SAML2AttributeNameToIdMapperService {
    * @return a mapping
    */
   private Map<String, String> getMapping() {
-    if (this.attributesMapping != null && this.lastReload != null && this.lastReload.equals(this.attributeResolverService
+    if (this.attributesMapping != null && this.lastReload != null && this.lastReload.equals(this.attributeRegistryService
       .getLastSuccessfulReloadInstant())) {
       return this.attributesMapping;
     }
-    // Reload.
-    ServiceableComponent<AttributeResolver> component = null;
-    Map<String, String> am = null;
-    try {
-      // Get date before we get the component. That way we'll not leak changes.
-      final DateTime when = this.attributeResolverService.getLastSuccessfulReloadInstant();
-      component = this.attributeResolverService.getServiceableComponent();
-      if (null == component) {
-        if (!captiveServiceReloadFailed) {
-          logger.error("Invalid AttributeResolver configuration");
-        }
-        captiveServiceReloadFailed = true;
-      }
-      else {
-        final AttributeResolver attributeResolver = component.getComponent();
-        am = new HashMap<>();
-
-        Map<String, AttributeDefinition> map = attributeResolver.getAttributeDefinitions();
-        for (Map.Entry<String, AttributeDefinition> entry : map.entrySet()) {
-          String name = null;
-          Set<AttributeEncoder<?>> encoders = entry.getValue().getAttributeEncoders();
-          for (AttributeEncoder<?> encoder : encoders) {
-            if (encoder instanceof SAML2AttributeEncoder) {
-              name = ((SAML2AttributeEncoder<?>) encoder).getName();
-              if (name != null) {
-                break;
-              }
-            }
-          }
-          if (name != null) {
-            logger.debug("Adding mapping between SAML2 attribute '{}' and id '{}'", name, entry.getKey());
-            am.put(name, entry.getKey());
-          }
-          else {
-            logger.debug("No mapping to SAML2 attribute for attribute id '{}'", entry.getKey());
-          }
-        }
-
-        captiveServiceReloadFailed = false;
-        lastReload = when;
-      }
-    }
-    finally {
-      if (null != component) {
-        component.unpinComponent();
-      }
-    }
-
-    this.attributesMapping = am;
-    return am;
+//    // Reload.
+//    ServiceableComponent<AttributeResolver> component = null;
+//    Map<String, String> am = null;
+//    try {
+//      // Get date before we get the component. That way we'll not leak changes.
+//      final Instant when = this.attributeResolverService.getLastSuccessfulReloadInstant();
+//      component = this.attributeResolverService.getServiceableComponent();
+//      if (null == component) {
+//        if (!captiveServiceReloadFailed) {
+//          logger.error("Invalid AttributeResolver configuration");
+//        }
+//        captiveServiceReloadFailed = true;
+//      }
+//      else {
+//        final AttributeResolver attributeResolver = component.getComponent();
+//        am = new HashMap<>();
+//
+//        Map<String, AttributeDefinition> map = attributeResolver.getAttributeDefinitions();
+//        for (Map.Entry<String, AttributeDefinition> entry : map.entrySet()) {
+//          String name = null;
+//          Set<AttributeEncoder<?>> encoders = entry.getValue().getAttributeEncoders();
+//          for (AttributeEncoder<?> encoder : encoders) {
+//            if (encoder instanceof SAML2AttributeEncoder) {
+//              name = ((SAML2AttributeEncoder<?>) encoder).getName();
+//              if (name != null) {
+//                break;
+//              }
+//            }
+//          }
+//          if (name != null) {
+//            logger.debug("Adding mapping between SAML2 attribute '{}' and id '{}'", name, entry.getKey());
+//            am.put(name, entry.getKey());
+//          }
+//          else {
+//            logger.debug("No mapping to SAML2 attribute for attribute id '{}'", entry.getKey());
+//          }
+//        }
+//
+//        this.captiveServiceReloadFailed = false;
+//        this.lastReload = when;
+//      }
+//    }
+//    finally {
+//      if (null != component) {
+//        component.unpinComponent();
+//      }
+//    }
+//
+//    this.attributesMapping = am;
+//    return am;
+    
+    return null;
   }
 
 }

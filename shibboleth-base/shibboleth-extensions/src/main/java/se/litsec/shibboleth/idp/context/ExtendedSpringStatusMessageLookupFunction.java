@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ import net.shibboleth.idp.profile.context.navigate.SpringStatusMessageLookupFunc
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  * @see SpringStatusMessageLookupFunction
  */
-@SuppressWarnings("rawtypes")
 public class ExtendedSpringStatusMessageLookupFunction implements Function<ProfileRequestContext, String>, MessageSourceAware {
 
   /** The message source. */

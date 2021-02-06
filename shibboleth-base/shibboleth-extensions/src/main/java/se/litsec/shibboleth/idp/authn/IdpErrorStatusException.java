@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package se.litsec.shibboleth.idp.authn;
 
+import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.saml.saml2.core.Status;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.core.StatusMessage;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
-import se.litsec.opensaml.utils.ObjectUtils;
 
 /**
  * Exception that Proxy IdP:s may use to signal errors received from the SP-part, or by "ordinary" IdP:s to signal a
@@ -42,7 +42,7 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
    * @param status
    *          the error status
    */
-  public IdpErrorStatusException(Status status) {
+  public IdpErrorStatusException(final Status status) {
     super(AuthnEventIds.AUTHN_EXCEPTION);
     this.status = status;
   }
@@ -55,7 +55,7 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
    * @param authnEventId
    *          the error event ID
    */
-  public IdpErrorStatusException(Status status, String authnEventId) {
+  public IdpErrorStatusException(final Status status, final String authnEventId) {
     super(authnEventId);
     this.status = status;
   }
@@ -70,7 +70,7 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
    * @param message
    *          the textual error message
    */
-  public IdpErrorStatusException(Status status, String authnEventId, String message) {
+  public IdpErrorStatusException(final Status status, final String authnEventId, final String message) {
     super(authnEventId, message);
     this.status = status;
   }
@@ -87,7 +87,7 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
    * @param message
    *          the textual error message
    */
-  public IdpErrorStatusException(String authnEventId, String statusCode, String subStatusCode, String message) {
+  public IdpErrorStatusException(final String authnEventId, final String statusCode, final String subStatusCode, final String message) {
     super(authnEventId, message);
     this.status = getStatusBuilder(statusCode).subStatusCode(subStatusCode).statusMessage(message).build();
   }
@@ -108,46 +108,45 @@ public class IdpErrorStatusException extends ExternalAutenticationErrorCodeExcep
    *          the main status code
    * @return a status builder
    */
-  public static StatusBuilder getStatusBuilder(String code) {
+  public static StatusBuilder getStatusBuilder(final String code) {
     return new StatusBuilder(code);
   }
 
   public static class StatusBuilder {
 
-    private String statusCode;
+    private final String statusCode;
     private String subStatusCode;
     private String statusMessage;
 
-    public StatusBuilder(String statusCode) {
+    public StatusBuilder(final String statusCode) {
       this.statusCode = statusCode;
     }
 
     public Status build() {
-      Status status = ObjectUtils.createSamlObject(Status.class);
-
-      StatusCode sc = ObjectUtils.createSamlObject(StatusCode.class);
+      final Status status = (Status) XMLObjectSupport.buildXMLObject(Status.DEFAULT_ELEMENT_NAME); 
+      final StatusCode sc = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
       sc.setValue(this.statusCode);
 
       if (subStatusCode != null) {
-        StatusCode ssc = ObjectUtils.createSamlObject(StatusCode.class);
+        final StatusCode ssc = (StatusCode) XMLObjectSupport.buildXMLObject(StatusCode.DEFAULT_ELEMENT_NAME);
         ssc.setValue(this.subStatusCode);
         sc.setStatusCode(ssc);
       }
       status.setStatusCode(sc);
       if (statusMessage != null) {
-        StatusMessage sm = ObjectUtils.createSamlObject(StatusMessage.class);
-        sm.setMessage(this.statusMessage);
+        final StatusMessage sm = (StatusMessage) XMLObjectSupport.buildXMLObject(StatusMessage.DEFAULT_ELEMENT_NAME);
+        sm.setValue(this.statusMessage);
         status.setStatusMessage(sm);
       }
       return status;
     }
 
-    public StatusBuilder subStatusCode(String code) {
+    public StatusBuilder subStatusCode(final String code) {
       this.subStatusCode = code;
       return this;
     }
 
-    public StatusBuilder statusMessage(String message) {
+    public StatusBuilder statusMessage(final String message) {
       this.statusMessage = message;
       return this;
     }

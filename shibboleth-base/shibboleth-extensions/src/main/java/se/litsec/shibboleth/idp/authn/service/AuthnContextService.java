@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * @throws ExternalAutenticationErrorCodeException
    *           if no context exists
    */
-  AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
+  AuthnContextClassContext getAuthnContextClassContext(final ProfileRequestContext context) throws ExternalAutenticationErrorCodeException;
 
   /**
    * Returns a list of AuthnContextClassRef URI:s (level of assurance URI:s) that is supported by the current
@@ -52,7 +52,7 @@ public interface AuthnContextService extends AuthenticationBaseService {
    *          the profile context
    * @return a list of supported AuthnContextClassRef URI:s
    */
-  List<String> getSupportedAuthnContextClassRefs(ProfileRequestContext<?, ?> context);
+  List<String> getSupportedAuthnContextClassRefs(final ProfileRequestContext context);
 
   /**
    * An IdP may support several authentication context URI:s within the same authenticator (authentication method), and
@@ -75,7 +75,7 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * @throws ExternalAutenticationErrorCodeException
    *           for processing errors
    */
-  List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
+  List<String> getPossibleAuthnContextClassRefs(final ProfileRequestContext context, final boolean signMessage)
       throws ExternalAutenticationErrorCodeException;
 
   /**
@@ -92,7 +92,7 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * @throws ExternalAutenticationErrorCodeException
    *           for errors in processing
    */
-  String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
+  String getReturnAuthnContextClassRef(final ProfileRequestContext context, final String authnContextUri, final boolean displayedSignMessage)
       throws ExternalAutenticationErrorCodeException;
 
 }
