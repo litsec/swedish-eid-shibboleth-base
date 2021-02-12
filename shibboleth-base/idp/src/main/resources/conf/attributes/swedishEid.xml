@@ -457,6 +457,19 @@
                 </props>
             </property>
         </bean>
+        
+        <bean parent="shibboleth.TranscodingProperties">
+            <property name="properties">
+                <props merge="true">
+                    <prop key="id">employeeHsaId</prop>
+                    <prop key="transcoder">SAML2StringTranscoder</prop>
+                    <prop key="saml2.name">urn:oid:1.2.752.29.6.2.1</prop>
+                    <prop key="saml2.friendlyName">employeeHsaId</prop>
+                    <prop key="displayName.en">HSA ID for natural person</prop>
+                    <prop key="displayName.sv">HSA ID för person</prop>
+                </props>
+            </property>
+        </bean>
     
     </list>
     </constructor-arg>

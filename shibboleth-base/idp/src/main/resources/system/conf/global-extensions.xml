@@ -17,8 +17,7 @@
   <import resource="../../metadata/idp-metadata-config.xml" />
   
   <bean id="sweid.SAML2AttributeNameToIdMapperService" class="se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService" 
-    scope="singleton" lazy-init="true"
-    c:resolverService-ref="shibboleth.AttributeResolverService" />
+    scope="singleton" lazy-init="true" />
     
     
 </beans>
