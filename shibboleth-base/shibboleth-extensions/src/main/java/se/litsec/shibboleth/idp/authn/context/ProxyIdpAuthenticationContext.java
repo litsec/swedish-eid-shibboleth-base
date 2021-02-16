@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,9 +52,9 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    * @param authnRequest
    *          the AuthnRequest sent by the SP-part of the Proxy-IdP
    * @param relayState
-   *          the relay state (may be {@code null})
+   *          the relay state (may be null)
    */
-  public ProxyIdpAuthenticationContext(AuthnRequest authnRequest, String relayState) {
+  public ProxyIdpAuthenticationContext(final AuthnRequest authnRequest, final String relayState) {
     this.authnRequest = authnRequest;
     this.relayState = relayState;
   }
@@ -80,7 +80,7 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
   /**
    * Returns the assertion.
    * 
-   * @return the assertion or {@code null} if it is not set
+   * @return the assertion or null if it is not set
    */
   public Assertion getAssertion() {
     return this.assertion;
@@ -92,7 +92,7 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    * @param assertion
    *          the assertion to add
    */
-  public void setAssertion(Assertion assertion) {
+  public void setAssertion(final Assertion assertion) {
     this.assertion = assertion;
   }
 
@@ -104,7 +104,7 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    * @param data
    *          the data object
    */
-  public void addAdditionalData(String key, Object data) {
+  public void addAdditionalData(final String key, final Object data) {
     this.additionalDataMap.put(key, data);
   }
 
@@ -113,9 +113,9 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    * 
    * @param key
    *          the data key
-   * @return the data object, or {@code null}
+   * @return the data object, or null
    */
-  public Object getAdditionalData(String key) {
+  public Object getAdditionalData(final String key) {
     return this.additionalDataMap.get(key);
   }
 
@@ -134,7 +134,7 @@ public class ProxyIdpAuthenticationContext extends BaseContext {
    * @param additionalDataMap
    *          the additional data map
    */
-  public void setAdditionalDataMap(Map<String, Object> additionalDataMap) {
+  public void setAdditionalDataMap(final Map<String, Object> additionalDataMap) {
     this.additionalDataMap = additionalDataMap;
   }
 

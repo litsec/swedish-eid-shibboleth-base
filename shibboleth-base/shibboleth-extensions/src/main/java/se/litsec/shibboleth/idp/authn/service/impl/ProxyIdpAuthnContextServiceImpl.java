@@ -40,13 +40,12 @@ public class ProxyIdpAuthnContextServiceImpl extends AuthnContextServiceImpl imp
 
   /** {@inheritDoc} */
   @Override
-  public List<String> getSendAuthnContextClassRefs(final ProfileRequestContext context, final List<String> assuranceURIs,
-      final boolean idpSupportsSignMessage) throws ExternalAutenticationErrorCodeException {
+  public List<String> getSendAuthnContextClassRefs(final ProfileRequestContext context, final List<String> assuranceURIs)
+      throws ExternalAutenticationErrorCodeException {
 
     final String logId = this.getLogString(context);
 
     final AuthnContextClassContext authnContextClassContext = this.getAuthnContextClassContext(context);
-    authnContextClassContext.setProxiedIdPSupportsSignMessage(idpSupportsSignMessage);
 
     // Intermediate list holding the URI:s that should be sent in the AuthnRequest to the IdP.
     //
@@ -59,34 +58,14 @@ public class ProxyIdpAuthnContextServiceImpl extends AuthnContextServiceImpl imp
       urisToSend.addAll(authnContextClassContext.getAuthnContextClassRefs());
     }
     else {
-      // If the IdP understands sign message, we simply delete the requested URI:s that are not supported
-      // by the IdP.
-      //
-      if (idpSupportsSignMessage) {
-        for (final String uri : authnContextClassContext.getAuthnContextClassRefs()) {
-          if (this.isSupported(context, uri, assuranceURIs)) {
-            urisToSend.add(uri);
-          }
-          else {
-            ProxyIdpAuthnContextServiceImpl.log.info("Requested AuthnContext URI '{}' is not supported by receiving IdP - will remove [{}]",
-              uri, logId);
-            authnContextClassContext.deleteAuthnContextClassRef(uri);
-          }
+      for (final String uri : authnContextClassContext.getAuthnContextClassRefs()) {
+        if (this.isSupported(context, uri, assuranceURIs)) {
+          urisToSend.add(uri);
         }
-      }
-      // Otherwise it is a bit trickier, we have to remove requested sigmessage URI:s based on their base URI:s
-      // if the base URI is not supported by the IdP.
-      else {
-        for (final String uri : authnContextClassContext.getAuthnContextClassRefs()) {
-          final String baseUri = this.toBaseURI(uri);
-          if (this.isSupported(context, baseUri, assuranceURIs)) {
-            urisToSend.add(baseUri);
-          }
-          else {
-            ProxyIdpAuthnContextServiceImpl.log.info("Requested AuthnContext URI '{}' is not supported by receiving IdP - will remove [{}]",
-              uri, logId);
-            authnContextClassContext.deleteAuthnContextClassRef(uri);
-          }
+        else {
+          ProxyIdpAuthnContextServiceImpl.log.info("Requested AuthnContext URI '{}' is not supported by receiving IdP - will remove [{}]",
+            uri, logId);
+          authnContextClassContext.deleteAuthnContextClassRef(uri);
         }
       }
     }
@@ -130,7 +109,7 @@ public class ProxyIdpAuthnContextServiceImpl extends AuthnContextServiceImpl imp
    *          the URI to test
    * @param assuranceURIs
    *          IdP assurance certification URI:s
-   * @return {@code true} if there is a match, and {@code false} otherwise
+   * @return true if there is a match, and false otherwise
    */
   protected boolean isSupported(final ProfileRequestContext context, final String uri, final List<String> assuranceURIs) {
     return assuranceURIs.contains(uri);
@@ -177,8 +156,8 @@ public class ProxyIdpAuthnContextServiceImpl extends AuthnContextServiceImpl imp
 
   /** {@inheritDoc} */
   @Override
-  public String getReturnAuthnContextClassRef(final ProfileRequestContext context, final String authnContextUri,
-      final boolean displayedSignMessage) throws ExternalAutenticationErrorCodeException {
+  public String getReturnAuthnContextClassRef(final ProfileRequestContext context, final String authnContextUri) 
+      throws ExternalAutenticationErrorCodeException {
 
     final String logId = this.getLogString(context);
 
@@ -194,33 +173,15 @@ public class ProxyIdpAuthnContextServiceImpl extends AuthnContextServiceImpl imp
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.AUTHN_EXCEPTION, msg);
     }
 
-    // OK, that seems OK. Next, we will have to cover up for signing and for transformation.
+    // OK, that seems OK. Next, we transform the URI.
     //
-    String authnContextUriForSp = this.transformForSp(context, authnContextUri);
+    final String authnContextUriForSp = this.transformForSp(context, authnContextUri);
     if (authnContextUriForSp == null) {
       // Should never happen since we matched everything before sending the request.
       final String msg = String.format("AuthnContextClassRef received from IdP '{}' cannot be transformed", authnContextUri);
       ProxyIdpAuthnContextServiceImpl.log.info("{} [{}]", msg, logId);
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.AUTHN_EXCEPTION, msg);
     }
-
-    // OK, now we have the URI in a format that the SP understands. Let's check if we need to add
-    // a sigmessage extension to it.
-    //
-    if (!authnContextClassContext.isProxiedIdPSupportsSignMessage() && displayedSignMessage) {
-
-      // The remote IdP does not support sign messages, but the Proxy IdP has displayed the
-      // sign message. See if a sigmessage URI corresponding to the one we got back from the
-      // remote IdP was requested by the SP. If so, use that.
-      //
-      final String sigmessageUri = this.toSignMessageURI(authnContextUriForSp);
-      if (sigmessageUri != null) {
-        if (authnContextClassContext.getAuthnContextClassRefs().contains(sigmessageUri)) {
-          authnContextUriForSp = sigmessageUri;
-        }
-      }
-    }
-
     return authnContextUriForSp;
   }
 
