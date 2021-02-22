@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2018 Litsec AB
+ * Copyright 2016-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package se.litsec.shibboleth.idp.profile.interceptor;
 
+import java.util.function.Function;
+
 import org.opensaml.messaging.context.navigate.MessageLookup;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.opensaml.profile.context.navigate.InboundMessageContextLookup;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 
 import net.shibboleth.idp.profile.context.ProfileInterceptorContext;
 import net.shibboleth.idp.profile.interceptor.AbstractProfileInterceptorAction;
@@ -33,21 +32,20 @@ import net.shibboleth.idp.profile.interceptor.AbstractProfileInterceptorAction;
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-@SuppressWarnings("rawtypes")
 public class SsoPreventionInterceptorAction extends AbstractProfileInterceptorAction {
 
   /** Class logger. */
   private final Logger log = LoggerFactory.getLogger(SsoPreventionInterceptorAction.class);
   
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  protected static Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
-    new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
+  protected static Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = 
+      (new InboundMessageContextLookup()).andThen(new MessageLookup<>(AuthnRequest.class));
 
   /** {@inheritDoc} */
   @Override
   protected void doExecute(final ProfileRequestContext profileRequestContext, final ProfileInterceptorContext interceptorContext) {
     
-    AuthnRequest authnRequest = requestLookupStrategy.apply(profileRequestContext);
+    final AuthnRequest authnRequest = requestLookupStrategy.apply(profileRequestContext);
     if (authnRequest != null) {
       if (authnRequest.isForceAuthn() == null || authnRequest.isForceAuthn() == Boolean.FALSE) {
         log.info("{} AuthnRequest '{}' from '{}' has does not require forced authentication - enforcing it", 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public interface SignSupportService extends AuthenticationBaseService {
    *          the profile context
    * @return the {@code SignMessageContext}, or {@code null} if none is available
    */
-  SignMessageContext getSignMessageContext(ProfileRequestContext<?, ?> context);
+  SignMessageContext getSignMessageContext(final ProfileRequestContext context);
 
   /**
    * Returns the {@link SignatureActivationDataContext} for the current authentication.
@@ -48,7 +48,7 @@ public interface SignSupportService extends AuthenticationBaseService {
    *          the profile context
    * @return the {@code SignatureActivationDataContext}, or {@code null} if none is available
    */
-  SignatureActivationDataContext getSadContext(ProfileRequestContext<?, ?> context);
+  SignatureActivationDataContext getSadContext(final ProfileRequestContext context);
 
   /**
    * Utility method that finds out whether the request that we are processing was sent by a "signature service".
@@ -57,7 +57,7 @@ public interface SignSupportService extends AuthenticationBaseService {
    *          the profile context
    * @return if the peer is a signature service {@code true} is returned, otherwise {@code false}
    */
-  boolean isSignatureServicePeer(ProfileRequestContext<?, ?> context);
+  boolean isSignatureServicePeer(final ProfileRequestContext context);
 
   /**
    * Predicate that tells whether the current IdP supports displaying a message of the supplied MIME type.
@@ -66,13 +66,13 @@ public interface SignSupportService extends AuthenticationBaseService {
    *          the type
    * @return {@code true} if the IdP can display messages of the supplied type, and {@code false} otherwise
    */
-  boolean supportsMimeType(SignMessageMimeTypeEnum mimeType);
+  boolean supportsMimeType(final SignMessageMimeTypeEnum mimeType);
 
   /**
    * Returns the instance of the {@link SignMessagePreProcessor} that this instance has been configured with. A sign
    * message pre-processor may not be required. In these cases {@code null} will be returned.
    * 
-   * @return the pre-processor or {@code null} if none is installed
+   * @return the pre-processor or null if none is installed
    */
   SignMessagePreProcessor getSignMessagePreProcessor();
 
@@ -99,7 +99,7 @@ public interface SignSupportService extends AuthenticationBaseService {
    * @throws ExternalAutenticationErrorCodeException
    *           for errors
    */
-  String issueSAD(ProfileRequestContext<?, ?> context, List<Attribute> attributes, String subjectAttributeName, String loa)
+  String issueSAD(final ProfileRequestContext context, final List<Attribute> attributes, final String subjectAttributeName, final String loa)
       throws ExternalAutenticationErrorCodeException;
 
 }

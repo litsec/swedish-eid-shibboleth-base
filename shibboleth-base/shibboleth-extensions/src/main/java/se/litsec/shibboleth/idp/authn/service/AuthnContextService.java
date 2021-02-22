@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,11 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * 
    * @param context
    *          the request context
-   * @return the current {@link AuthnContextClassContext}, or {@code null} if none is available
+   * @return the current {@link AuthnContextClassContext}, or null if none is available
    * @throws ExternalAutenticationErrorCodeException
    *           if no context exists
    */
-  AuthnContextClassContext getAuthnContextClassContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
+  AuthnContextClassContext getAuthnContextClassContext(final ProfileRequestContext context) throws ExternalAutenticationErrorCodeException;
 
   /**
    * Returns a list of AuthnContextClassRef URI:s (level of assurance URI:s) that is supported by the current
@@ -52,7 +52,7 @@ public interface AuthnContextService extends AuthenticationBaseService {
    *          the profile context
    * @return a list of supported AuthnContextClassRef URI:s
    */
-  List<String> getSupportedAuthnContextClassRefs(ProfileRequestContext<?, ?> context);
+  List<String> getSupportedAuthnContextClassRefs(final ProfileRequestContext context);
 
   /**
    * An IdP may support several authentication context URI:s within the same authenticator (authentication method), and
@@ -61,21 +61,14 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * IdP supports and remove those not relevant. When it is time to authenticate the user the IdP will need to know
    * under which authentication context the authentication should be performed. This method will return a list of
    * possible authentication context URI:s to use where the most preferred IdP choice is placed first in the list.
-   * <p>
-   * Note that the method will only return actual authentication context URI:s describing an authentication type, and
-   * not their corresponding sig-message versions.
-   * </p>
    * 
    * @param context
    *          the profile context
-   * @param signMessage
-   *          an indication whether this is a "authentication for signature" flow and the IdP will display a sign
-   *          message
    * @return a list of possible URI:s
    * @throws ExternalAutenticationErrorCodeException
    *           for processing errors
    */
-  List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
+  List<String> getPossibleAuthnContextClassRefs(final ProfileRequestContext context)
       throws ExternalAutenticationErrorCodeException;
 
   /**
@@ -85,14 +78,12 @@ public interface AuthnContextService extends AuthenticationBaseService {
    * @param context
    *          the profile context
    * @param authnContextUri
-   *          the URI under which the IdP authenticated the user (may be {@code null})
-   * @param displayedSignMessage
-   *          flag telling if the IdP displayed a sign message
+   *          the URI under which the IdP authenticated the user (may be null)
    * @return the LoA URI to include in the assertion back to the SP
    * @throws ExternalAutenticationErrorCodeException
    *           for errors in processing
    */
-  String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
+  String getReturnAuthnContextClassRef(final ProfileRequestContext context, final String authnContextUri)
       throws ExternalAutenticationErrorCodeException;
 
 }

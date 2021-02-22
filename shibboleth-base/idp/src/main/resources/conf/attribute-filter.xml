@@ -4,12 +4,103 @@
         xmlns="urn:mace:shibboleth:2.0:afp"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp/shibboleth-afp.xsd">
+        
+  <!-- 
+    Default release policy: Nothing is released unless explicitly requested in metadata.
+   -->
+  <AttributeFilterPolicy id="attribute-release-default">
+    <PolicyRequirementRule xsi:type="ANY" />
+    <AttributeRule attributeID="personalIdentityNumber">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="sn">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="givenName">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="displayName">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="gender">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="dateOfBirth">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="birthName">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="street">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="postOfficeBox">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="postalCode">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="l">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="c">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="placeOfBirth">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="countryOfCitizenship">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="countryOfResidence">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="telephoneNumber">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="mobile">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="mail">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="o">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="ou">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="organizationIdentifier">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>    
+    <AttributeRule attributeID="orgAffiliation">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="transactionIdentifier">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="authContextParams">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="userCertificate">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="authServerSignature">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+    <AttributeRule attributeID="employeeHsaId">
+      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+    </AttributeRule>
+  </AttributeFilterPolicy>   
 
   <!--
-    Attribute release of basic attributes that are part of all release policies below. 
+    Attribute release according to "http://id.elegnamnden.se/ap/1.0/natural-person-01"  
+    Natural Personal Identity without Civic Registration Number 
    -->
-  <AttributeFilterPolicy id="attribute-release-basic">
-    <PolicyRequirementRule xsi:type="ANY" />
+  <AttributeFilterPolicy id="attribute-release-natural-person-01">
+    <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
+                           attributeName="http://macedir.org/entity-category" 
+                           attributeValue="http://id.swedenconnect.se/ec/1.0/loa3-name" />
     <AttributeRule attributeID="sn">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
@@ -18,9 +109,6 @@
     </AttributeRule>
     <AttributeRule attributeID="displayName">
       <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="mail">
-      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
     </AttributeRule>
   </AttributeFilterPolicy>
 
@@ -33,16 +121,73 @@
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa2-pnr" />
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa3-pnr" />
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa4-pnr" />
-      <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/loa/1.0/uncertified-loa3" />      
+      <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/ec/sc/uncertified-loa3-pnr" />
+      <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/eidas-pnr-delivery" />      
     </PolicyRequirementRule>
     <AttributeRule attributeID="personalIdentityNumber">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
+    <AttributeRule attributeID="sn">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="givenName">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="displayName">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
     <AttributeRule attributeID="dateOfBirth">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>    
   </AttributeFilterPolicy>
   
+  <!--
+    Attribute release according to "http://id.elegnamnden.se/ap/1.0/org-person-01"
+    Organizational Identity for Natural Persons   
+  -->  
+  <AttributeFilterPolicy id="attribute-release-org-person-01">
+    <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
+                           attributeName="http://macedir.org/entity-category" 
+                           attributeValue="http://id.swedenconnect.se/ec/1.0/loa3-orgid" />
+    <AttributeRule attributeID="orgAffiliation">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="o">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="displayName">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
+    <AttributeRule attributeID="organizationIdentifier">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
+  </AttributeFilterPolicy>
+  
+  <!--
+    Attribute release according to "http://id.swedenconnect.se/ap/1.0/hsaid-01"
+    Natural Person Identity with HSA-ID
+  -->  
+  <AttributeFilterPolicy id="attribute-release-hsaid-01">
+    <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
+                           attributeName="http://macedir.org/entity-category" 
+                           attributeValue="http://id.swedenconnect.se/ec/1.0/loa3-hsaid" />
+    <AttributeRule attributeID="employeeHsaId">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="sn">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="givenName">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="displayName">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
+    <AttributeRule attributeID="dateOfBirth">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
+  </AttributeFilterPolicy>
+
   <!--
     Attribute release for signature services.   
   -->  
@@ -71,6 +216,15 @@
       <!-- For supporting previous versions of the Swedish eID Framework -->
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa3-int" />
     </PolicyRequirementRule>
+    <AttributeRule attributeID="sn">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="givenName">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>
+    <AttributeRule attributeID="displayName">
+      <PermitValueRule xsi:type="ANY" />
+    </AttributeRule>    
     <AttributeRule attributeID="prid">
       <PermitValueRule xsi:type="ANY" />
     </AttributeRule>
@@ -109,19 +263,4 @@
     </AttributeRule>
   </AttributeFilterPolicy>
   
-  <!--
-    Attribute release for IdP:s delivering assertions to the Swedish eIDAS Proxy Service. 
-   -->
-  <AttributeFilterPolicy id="attribute-release-eidas-pnr-delivery">
-    <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
-                           attributeName="http://macedir.org/entity-category" 
-                           attributeValue="http://id.elegnamnden.se/ec/1.0/eidas-pnr-delivery" />
-    <AttributeRule attributeID="personalIdentityNumber">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="dateOfBirth">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>    
-  </AttributeFilterPolicy>  
-
 </AttributeFilterPolicyGroup>

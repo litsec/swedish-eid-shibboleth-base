@@ -11,19 +11,18 @@
     default-destroy-method="destroy">
 
     <!--
-    This bean defines a mapping between audit log categories and formatting strings. The default entry is
-    for compatibility with V2 audit logging.
-    -->    
-    <!--
-      Shibboleth default 
+    This bean defines a mapping between audit log categories and formatting strings.
+    -->
+    <!-- 
+    Shibboleth default
     <util:map id="shibboleth.AuditFormattingMap">
-        <entry key="Shibboleth-Audit" value="%T|%b|%I|%SP|%P|%IDP|%bb|%III|%u|%ac|%attr|%n|%i|%X" />
+        <entry key="Shibboleth-Audit" value="%a|%ST|%T|%u|%SP|%i|%ac|%t|%attr|%n|%f|%SSO|%XX|%XA|%b|%bb|%e|%S|%SS|%s|%UA" />
     </util:map>
     -->
+    
     <util:map id="shibboleth.AuditFormattingMap">
-        <entry key="Shibboleth-Audit" value="%T|RequestID:%I|SP:%SP|IdP:%IDP|ResponseID:%III|%u|%ac|%attr|%n|%i|" />
+        <entry key="Shibboleth-Audit" value="%T|%a|RequestID:%I|SP:%SP|ResponseID:%III|%u|%ac|%attr|%n|%i|%S|%SS" />
     </util:map>
-    <!-- TODO: finalize -->
 
     <!-- Override the format of date/time fields in the log and/or convert to default time zone. -->
     <!--
@@ -36,5 +35,24 @@
         <value>http://shibboleth.net/ns/profiles/status</value>
         <value>http://shibboleth.net/ns/profiles/mdquery</value>
     </util:list>
+
+    <util:map id="shibboleth.AuditFieldReplacementMap">
+        <entry key="urn:oasis:names:tc:SAML:1.0:am:password" value="password" />
+        <entry key="urn:oasis:names:tc:SAML:2.0:ac:classes:Password" value="password" />
+        <entry key="urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport" value="password" />
+        <entry key="urn:mace:shibboleth:1.0:nameIdentifier" value="transient" />
+        <entry key="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" value="transient" />
+        <entry key="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" value="persistent" />
+        <entry key="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" value="emailAddress" />
+        <entry key="urn:oasis:names:tc:SAML:2.0:status:Success" value="Success" />
+        <entry key="urn:oasis:names:tc:SAML:2.0:status:Requester" value="Requester" />
+        <entry key="urn:oasis:names:tc:SAML:2.0:status:Responder" value="Responder" />
+        <entry key="http://www.w3.org/2009/xmlenc11#aes128-gcm" value="AES128-GCM" />
+        <entry key="http://www.w3.org/2009/xmlenc11#aes192-gcm" value="AES192-GCM" />
+        <entry key="http://www.w3.org/2009/xmlenc11#aes256-gcm" value="AES256-GCM" />
+        <entry key="http://www.w3.org/2001/04/xmlenc#aes128-cbc" value="AES128-CBC" />
+        <entry key="http://www.w3.org/2001/04/xmlenc#aes192-cbc" value="AES192-CBC" />
+        <entry key="http://www.w3.org/2001/04/xmlenc#aes256-cbc" value="AES256-CBC" />
+    </util:map>
 
 </beans>

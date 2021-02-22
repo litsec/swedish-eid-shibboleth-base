@@ -29,18 +29,18 @@
                 p:defaultIdentifierGenerationStrategy-ref="shibboleth.DefaultIdentifierGenerationStrategy" />
         </property>
     </bean>
-    
+
     <bean id="AddAuthnStatementToAssertion"
             class="net.shibboleth.idp.saml.saml2.profile.impl.AddAuthnStatementToAssertion" scope="prototype"
-            p:httpServletRequest-ref="shibboleth.HttpServletRequest">
+            p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+            p:addressLookupStrategy="#{getObject('shibboleth.SubjectLocalityAddressStrategy')}">
         <property name="identifierGeneratorLookupStrategy">
             <bean class="net.shibboleth.idp.profile.config.navigate.IdentifierGenerationStrategyLookupFunction"
                 p:defaultIdentifierGenerationStrategy-ref="shibboleth.DefaultIdentifierGenerationStrategy" />
         </property>
         <property name="classRefLookupStrategy">
             <bean class="net.shibboleth.idp.authn.principal.DefaultPrincipalDeterminationStrategy"
-                    c:type="net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal"
-                    p:weightMap="#{getObject('shibboleth.AuthenticationPrincipalWeightMap')}">
+                    c:type="net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal">
                 <constructor-arg name="principal">
                     <bean class="net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal"
                         c:classRef="#{T(org.opensaml.saml.saml2.core.AuthnContext).UNSPECIFIED_AUTHN_CTX}" />
@@ -63,7 +63,8 @@
     </bean>
 
     <bean id="AddAttributeStatementToAssertion"
-            class="net.shibboleth.idp.saml.saml2.profile.impl.AddAttributeStatementToAssertion" scope="prototype">
+            class="net.shibboleth.idp.saml.saml2.profile.impl.AddAttributeStatementToAssertion" scope="prototype"
+            p:transcoderRegistry-ref="shibboleth.AttributeRegistryService">
         <property name="activationCondition">
             <bean class="net.shibboleth.idp.saml.profile.config.logic.IncludeAttributeStatementPredicate" />
         </property>
@@ -77,14 +78,11 @@
     <bean id="UpdateAssertionForProxyIdp" 
       class="se.litsec.shibboleth.idp.authn.actions.UpdateAssertionForProxyIdpAction" scope="prototype"
       p:httpServletRequest-ref="shibboleth.HttpServletRequest">
-    </bean>    
+    </bean>
 
     <bean id="InitializeOutboundMessageContextForError"
-            class="net.shibboleth.idp.saml.profile.impl.InitializeOutboundMessageContextForError" scope="prototype">
-        <property name="outboundBinding">
-            <util:constant static-field="org.opensaml.saml.common.xml.SAMLConstants.SAML2_SOAP11_BINDING_URI"/>
-        </property>
-    </bean>
+            class="net.shibboleth.idp.saml.profile.impl.InitializeOutboundMessageContextForError" scope="prototype"
+            p:outboundBinding-ref="shibboleth.Binding.SAML2SOAP" />
 
     <bean id="AddStatusToResponse"
             class="org.opensaml.saml.saml2.profile.impl.AddStatusToResponse" scope="prototype"
@@ -98,30 +96,18 @@
             </list>
         </property>
         <property name="statusCodesLookupStrategy">
-          <!--
-            LITSEC           
+            <!-- Litsec -->
+            <!-- 
             <bean class="org.opensaml.saml.saml2.profile.impl.AddStatusToResponse.StatusCodeMappingFunction"
                     c:mappings-ref="shibboleth.SAML2StatusMappings" />
-           -->
-          <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusCodeMappingFunction"
+            -->
+            <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusCodeMappingFunction"
                     c:mappings-ref="shibboleth.SAML2StatusMappings" />
-        </property>                  
-        <property name="statusMessageLookupStrategy">
-          <!--
-            LITSEC
-            <bean class="net.shibboleth.idp.profile.context.navigate.SpringStatusMessageLookupFunction" />
-           -->
-           <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusMessageLookupFunction" p:locale="en" />
         </property>
-    </bean>
-
-    <bean id="AddPartialLogoutStatusToResponse"
-            class="org.opensaml.saml.saml2.profile.impl.AddStatusToResponse" scope="prototype">
-        <property name="statusCodes">
-            <list>
-                <util:constant static-field="org.opensaml.saml.saml2.core.StatusCode.SUCCESS" />
-                <util:constant static-field="org.opensaml.saml.saml2.core.StatusCode.PARTIAL_LOGOUT" />
-            </list>
+        <property name="statusMessageLookupStrategy">
+            <!-- Litsec -->
+            <!-- <bean class="net.shibboleth.idp.profile.context.navigate.SpringStatusMessageLookupFunction" /> -->
+            <bean class="se.litsec.shibboleth.idp.context.ProxiedStatusMessageLookupFunction" p:locale="en" />
         </property>
     </bean>
     
@@ -143,7 +129,7 @@
             p:encryptToSelfParametersStrategy-ref="EncryptToSelfParametersStrategy"
             p:selfRecipientLookupStrategy-ref="shibboleth.ResponderIdLookup.Simple" >
         <property name="encryptionContextLookupStrategy">
-            <bean class="com.google.common.base.Functions" factory-method="compose"
+            <bean parent="shibboleth.Functions.Compose"
                 c:g-ref="shibboleth.ChildLookup.EncryptionParameters"
                 c:f-ref="shibboleth.ChildLookup.RelyingParty" />
         </property>
@@ -153,7 +139,7 @@
             class="org.opensaml.saml.saml2.profile.impl.EncryptAttributes" scope="prototype"
             p:recipientLookupStrategy-ref="shibboleth.RelyingPartyIdLookup.Simple">
         <property name="encryptionContextLookupStrategy">
-            <bean class="com.google.common.base.Functions" factory-method="compose"
+            <bean parent="shibboleth.Functions.Compose"
                 c:g-ref="shibboleth.ChildLookup.EncryptionParameters"
                 c:f-ref="shibboleth.ChildLookup.RelyingParty" />
         </property>
@@ -163,7 +149,7 @@
             class="org.opensaml.saml.saml2.profile.impl.EncryptAssertions" scope="prototype"
             p:recipientLookupStrategy-ref="shibboleth.RelyingPartyIdLookup.Simple">
         <property name="encryptionContextLookupStrategy">
-            <bean class="com.google.common.base.Functions" factory-method="compose"
+            <bean parent="shibboleth.Functions.Compose"
                 c:g-ref="shibboleth.ChildLookup.EncryptionParameters"
                 c:f-ref="shibboleth.ChildLookup.RelyingParty" />
         </property>

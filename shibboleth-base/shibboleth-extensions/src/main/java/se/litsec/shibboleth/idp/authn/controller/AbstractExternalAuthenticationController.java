@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.security.auth.Subject;
@@ -28,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.joda.time.DateTime;
+import org.joda.time.Instant;
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.messaging.context.navigate.ChildContextLookup;
 import org.opensaml.messaging.context.navigate.ContextDataLookupFunction;
@@ -50,9 +51,6 @@ import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 
 import net.shibboleth.idp.attribute.IdPAttribute;
 import net.shibboleth.idp.attribute.StringAttributeValue;
@@ -113,25 +111,20 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   private SignMessageDigestIssuer signMessageDigestIssuer = new SignMessageDigestIssuer();
 
   /** Strategy used to locate the {@link AuthnRequest} to operate on. */
-  @SuppressWarnings("rawtypes")
-  protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = Functions.compose(
-    new MessageLookup<>(AuthnRequest.class), new InboundMessageContextLookup());
+  protected Function<ProfileRequestContext, AuthnRequest> requestLookupStrategy = (new InboundMessageContextLookup()).andThen(
+    new MessageLookup<>(AuthnRequest.class));
 
   /** Strategy used to locate the SP {@link EntityDescriptor} (metadata). */
-  @SuppressWarnings("rawtypes")
-  protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = Functions.compose(
-    new PeerMetadataContextLookup(), Functions.compose(new SAMLPeerEntityContextLookup(), new InboundMessageContextLookup()));
+  protected Function<ProfileRequestContext, EntityDescriptor> peerMetadataLookupStrategy = (new InboundMessageContextLookup()).andThen(
+    new SAMLPeerEntityContextLookup()).andThen(new PeerMetadataContextLookup());
 
-  @SuppressWarnings("rawtypes")
-  protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = Functions
-    .compose(new SAMLBindingContextLookup(), new InboundMessageContextLookup());
+  protected Function<ProfileRequestContext, SAMLBindingContext> samlBindingContextLookupStrategy = (new InboundMessageContextLookup())
+    .andThen(new SAMLBindingContextLookup());
 
   /** Strategy that gives us the AuthenticationContext. */
-  @SuppressWarnings("rawtypes")
   protected Function<ProfileRequestContext, AuthenticationContext> authenticationContextLookupStrategy = new AuthenticationContextLookup();
 
   /** Lookup function for SessionContext. */
-  @SuppressWarnings("rawtypes")
   protected Function<ProfileRequestContext, SessionContext> sessionContextLookupStrategy = new ChildContextLookup<>(
     SessionContext.class);
 
@@ -151,7 +144,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    *           for IO errors
    */
   @RequestMapping(method = RequestMethod.GET)
-  public final ModelAndView processExternalAuthentication(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
+  public final ModelAndView processExternalAuthentication(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
       throws ExternalAuthenticationException, IOException {
 
     // Start the external authentication process ...
@@ -159,11 +152,11 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     final String key = ExternalAuthentication.startExternalAuthentication(httpRequest);
     logger.debug("External authentication started. [key='{}',client-ip-address='{}']", key, httpRequest.getRemoteAddr());
 
-    final ProfileRequestContext<?, ?> profileRequestContext = ExternalAuthentication.getProfileRequestContext(key, httpRequest);
+    final ProfileRequestContext profileRequestContext = ExternalAuthentication.getProfileRequestContext(key, httpRequest);
 
     // Store the authentication key in the HTTP session.
     //
-    HttpSession session = httpRequest.getSession();
+    final HttpSession session = httpRequest.getSession();
     session.setAttribute(EXTAUTHN_KEY_ATTRIBUTE_NAME, key);
 
     // Initialize services and process the request
@@ -194,11 +187,11 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAutenticationErrorCodeException
    *           if the IsPassive-flag is set
    */
-  protected void processIsPassive(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
+  protected void processIsPassive(final ProfileRequestContext profileRequestContext) throws ExternalAutenticationErrorCodeException {
     final AuthnRequest authnRequest = this.getAuthnRequest(profileRequestContext);
     if (authnRequest != null && authnRequest.isPassive() != null && authnRequest.isPassive() == Boolean.TRUE) {
       logger.info("AuthnRequest contains IsPassive=true, can not continue ...");
-      Status status = IdpErrorStatusException.getStatusBuilder(StatusCode.REQUESTER)
+      final Status status = IdpErrorStatusException.getStatusBuilder(StatusCode.REQUESTER)
         .subStatusCode(StatusCode.NO_PASSIVE)
         .statusMessage("Can not perform passive authentication")
         .build();
@@ -215,7 +208,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAutenticationErrorCodeException
    *           for errors during initialization
    */
-  protected void initializeServices(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
+  protected void initializeServices(final ProfileRequestContext profileRequestContext) throws ExternalAutenticationErrorCodeException {
     this.authnContextService.initializeContext(profileRequestContext);
     this.signSupportService.initializeContext(profileRequestContext);
   }
@@ -229,7 +222,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAutenticationErrorCodeException
    *           for errors during processing
    */
-  protected void servicesProcessRequest(ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAutenticationErrorCodeException {
+  protected void servicesProcessRequest(final ProfileRequestContext profileRequestContext) throws ExternalAutenticationErrorCodeException {
     this.authnContextService.processRequest(profileRequestContext);
     this.signSupportService.processRequest(profileRequestContext);
   }
@@ -251,8 +244,8 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws IOException
    *           for IO errors
    */
-  protected abstract ModelAndView doExternalAuthentication(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String key,
-      ProfileRequestContext<?, ?> profileRequestContext) throws ExternalAuthenticationException, IOException;
+  protected abstract ModelAndView doExternalAuthentication(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse,
+      final String key, final ProfileRequestContext profileRequestContext) throws ExternalAuthenticationException, IOException;
 
   /**
    * Returns the name that this authenticator has. Mainly used for logging.
@@ -270,7 +263,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAuthenticationException
    *           if no active session exists
    */
-  protected String getExternalAuthenticationKey(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+  protected String getExternalAuthenticationKey(final HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     String key = (String) httpRequest.getSession().getAttribute(EXTAUTHN_KEY_ATTRIBUTE_NAME);
     if (key == null) {
       throw new ExternalAuthenticationException("No external authentication process is active");
@@ -287,7 +280,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAuthenticationException
    *           if no active session exists
    */
-  protected ProfileRequestContext<?, ?> getProfileRequestContext(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+  protected ProfileRequestContext getProfileRequestContext(final HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return ExternalAuthentication.getProfileRequestContext(this.getExternalAuthenticationKey(httpRequest), httpRequest);
   }
 
@@ -315,13 +308,12 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws IOException
    *           for IO errors
    */
-  protected void success(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Subject subject,
-      DateTime authnInstant, Boolean cacheForSSO) throws ExternalAuthenticationException, IOException {
+  protected void success(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse, final Subject subject,
+      final Instant authnInstant, final Boolean cacheForSSO) throws ExternalAuthenticationException, IOException {
 
     final String key = this.getExternalAuthenticationKey(httpRequest);
-
     {
-      Set<UsernamePrincipal> principalSet = subject.getPrincipals(UsernamePrincipal.class);
+      final Set<UsernamePrincipal> principalSet = subject.getPrincipals(UsernamePrincipal.class);
       if (principalSet.isEmpty()) {
         throw new ExternalAuthenticationException("Missing subject principal");
       }
@@ -329,23 +321,22 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     }
 
     // Assign the authenticated subject.
+    //
     httpRequest.setAttribute(ExternalAuthentication.SUBJECT_KEY, subject);
 
     // Assign the authentication instant.
-    if (authnInstant == null) {
-      authnInstant = new DateTime();
-    }
-    httpRequest.setAttribute(ExternalAuthentication.AUTHENTICATION_INSTANT_KEY, authnInstant);
+    //
+    httpRequest.setAttribute(ExternalAuthentication.AUTHENTICATION_INSTANT_KEY, Optional.ofNullable(authnInstant).orElse(Instant.now()));
 
     // Tell Shibboleth processing whether this result should be cached for SSO or not.
-    if (cacheForSSO == null) {
-      cacheForSSO = this.getSignSupportService().isSignatureServicePeer(this.getProfileRequestContext(httpRequest))
-          ? Boolean.FALSE
-          : Boolean.TRUE;
-    }
-    httpRequest.setAttribute(ExternalAuthentication.DONOTCACHE_KEY, !cacheForSSO);
+    //
+    final Boolean doNotCacheKey = Optional.ofNullable(cacheForSSO)
+      .orElse(this.getSignSupportService().isSignatureServicePeer(this.getProfileRequestContext(httpRequest)));
+
+    httpRequest.setAttribute(ExternalAuthentication.DONOTCACHE_KEY, doNotCacheKey);
 
     // Finish the external authentication task and return to the flow.
+    //
     ExternalAuthentication.finishExternalAuthentication(key, httpRequest, httpResponse);
     httpRequest.getSession().removeAttribute(EXTAUTHN_KEY_ATTRIBUTE_NAME);
   }
@@ -367,17 +358,18 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    *          the authentication instant - if {@code null} the current time will be used
    * @param cacheForSSO
    *          should the result be cached for later SSO? If {@code null}, see
-   *          {@link #success(HttpServletRequest, HttpServletResponse, Subject, DateTime, Boolean)}
+   *          {@link #success(HttpServletRequest, HttpServletResponse, Subject, Instant, Boolean)}
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    * @throws IOException
    *           for IO errors
    */
-  protected void success(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String principal, List<Attribute> attributes,
-      String authnContextClassUri, DateTime authnInstant, Boolean cacheForSSO) throws ExternalAuthenticationException, IOException {
+  protected void success(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse, final String principal,
+      final List<Attribute> attributes, final String authnContextClassUri, final Instant authnInstant, final Boolean cacheForSSO)
+      throws ExternalAuthenticationException, IOException {
 
-    SubjectBuilder builder = this.getSubjectBuilder(principal);
-    for (Attribute a : attributes) {
+    final SubjectBuilder builder = this.getSubjectBuilder(principal);
+    for (final Attribute a : attributes) {
       builder.attribute(a);
     }
     builder.authnContextClassRef(authnContextClassUri);
@@ -395,9 +387,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param principal
    *          the principal
    */
-  private void preventAttributeReuse(HttpServletRequest httpRequest, String principal) {
+  private void preventAttributeReuse(final HttpServletRequest httpRequest, final String principal) {
     try {
-      SessionContext sessionCtx = sessionContextLookupStrategy.apply(this.getProfileRequestContext(httpRequest));
+      final SessionContext sessionCtx = sessionContextLookupStrategy.apply(this.getProfileRequestContext(httpRequest));
       if (sessionCtx == null || sessionCtx.getIdPSession() == null) {
         return;
       }
@@ -413,7 +405,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
         }
         sessionCtx.setIdPSession(null);
 
-        AuthenticationContext authenticationContext = authenticationContextLookupStrategy.apply(this.getProfileRequestContext(httpRequest));
+        final AuthenticationContext authenticationContext = authenticationContextLookupStrategy.apply(this.getProfileRequestContext(httpRequest));
         authenticationContext.setActiveResults(Collections.<AuthenticationResult> emptyList());
       }
     }
@@ -436,7 +428,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws IOException
    *           for IO errors
    */
-  protected void cancel(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
+  protected void cancel(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse)
       throws ExternalAuthenticationException, IOException {
     this.error(httpRequest, httpResponse, ExtAuthnEventIds.CANCEL_AUTHN);
   }
@@ -457,7 +449,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @see #error(HttpServletRequest, HttpServletResponse, Exception)
    * @see #error(HttpServletRequest, HttpServletResponse, Status)
    */
-  protected void error(HttpServletRequest httpRequest, HttpServletResponse httpResponse, String authnEventId)
+  protected void error(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse, final String authnEventId)
       throws ExternalAuthenticationException, IOException {
 
     final String key = this.getExternalAuthenticationKey(httpRequest);
@@ -482,7 +474,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @see #error(HttpServletRequest, HttpServletResponse, String)
    * @see #error(HttpServletRequest, HttpServletResponse, Status)
    */
-  protected void error(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Exception error)
+  protected void error(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse, final Exception error)
       throws ExternalAuthenticationException, IOException {
 
     final String key = this.getExternalAuthenticationKey(httpRequest);
@@ -492,7 +484,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       if (s.getStatusCode() == null || StatusCode.SUCCESS.equals(s.getStatusCode().getValue())) {
         throw new IllegalArgumentException("Bad call to error - Status is successful");
       }
-      ProfileRequestContext<?, ?> profileRequestContext = this.getProfileRequestContext(httpRequest);
+      final ProfileRequestContext profileRequestContext = this.getProfileRequestContext(httpRequest);
       profileRequestContext.addSubcontext(new ProxiedStatusContext(s), true);
     }
 
@@ -518,7 +510,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @see #error(HttpServletRequest, HttpServletResponse, String)
    * @see #error(HttpServletRequest, HttpServletResponse, Exception)
    */
-  protected void error(HttpServletRequest httpRequest, HttpServletResponse httpResponse, Status errorStatus)
+  protected void error(final HttpServletRequest httpRequest, final HttpServletResponse httpResponse, final Status errorStatus)
       throws ExternalAuthenticationException, IOException {
     this.error(httpRequest, httpResponse, new IdpErrorStatusException(errorStatus));
   }
@@ -536,7 +528,9 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @return if the supplied attribute name is present in the principal selection with a different value {@code false}
    *         is returned, otherwise {@code true}
    */
-  protected boolean checkAgainstPrincipalSelection(String attributeName, String attributeValue, PrincipalSelection principalSelection) {
+  protected boolean checkAgainstPrincipalSelection(final String attributeName, final String attributeValue,
+      final PrincipalSelection principalSelection) {
+    
     if (principalSelection == null) {
       // No principal selection available - check is ok
       return true;
@@ -570,9 +564,8 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    *          the cleartext sign message
    * @return a signMessageDigest attribute
    */
-  protected Attribute createSignMessageDigestAttribute(final ProfileRequestContext<?, ?> context, final Message signMessage) {
-    final EntityDescriptor peerMetadata = this.getPeerMetadata(context);
-    return this.signMessageDigestIssuer.create(signMessage, peerMetadata);
+  protected Attribute createSignMessageDigestAttribute(final ProfileRequestContext context, final Message signMessage) {
+    return this.signMessageDigestIssuer.create(signMessage, this.getPeerMetadata(context));
   }
 
   /**
@@ -584,7 +577,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @return the authentication request message
    * @see #getAuthnRequest(HttpServletRequest)
    */
-  protected AuthnRequest getAuthnRequest(ProfileRequestContext<?, ?> context) {
+  protected AuthnRequest getAuthnRequest(final ProfileRequestContext context) {
     return this.requestLookupStrategy.apply(context);
   }
 
@@ -597,7 +590,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    */
-  protected AuthnRequest getAuthnRequest(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+  protected AuthnRequest getAuthnRequest(final HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getAuthnRequest(this.getProfileRequestContext(httpRequest));
   }
 
@@ -610,7 +603,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @return the {@code PrincipalSelection} extension, or {@code null} if none is found in the current
    *         {@code AuthnRequest}
    */
-  protected PrincipalSelection getPrincipalSelection(ProfileRequestContext<?, ?> context) {
+  protected PrincipalSelection getPrincipalSelection(final ProfileRequestContext context) {
     final AuthnRequest authnRequest = this.getAuthnRequest(context);
     if (authnRequest != null && authnRequest.getExtensions() != null) {
       return authnRequest.getExtensions()
@@ -629,12 +622,11 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * 
    * @param httpRequest
    *          the HTTP request
-   * @return the {@code PrincipalSelection} extension, or {@code null} if none is found in the current
-   *         {@code AuthnRequest}
+   * @return the {@code PrincipalSelection} extension, or null if none is found in the current AuthnRequest
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    */
-  protected PrincipalSelection getPrincipalSelection(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+  protected PrincipalSelection getPrincipalSelection(final HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getPrincipalSelection(this.getProfileRequestContext(httpRequest));
   }
 
@@ -647,7 +639,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @return the entity descriptor
    * @see #getPeerMetadata(HttpServletRequest)
    */
-  protected EntityDescriptor getPeerMetadata(ProfileRequestContext<?, ?> context) {
+  protected EntityDescriptor getPeerMetadata(final ProfileRequestContext context) {
     return this.peerMetadataLookupStrategy.apply(context);
   }
 
@@ -660,7 +652,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    */
-  protected EntityDescriptor getPeerMetadata(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+  protected EntityDescriptor getPeerMetadata(final HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getPeerMetadata(this.getProfileRequestContext(httpRequest));
   }
 
@@ -672,9 +664,10 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @return the binding URI
    * @see #getBinding(HttpServletRequest)
    */
-  protected String getBinding(ProfileRequestContext<?, ?> context) {
-    SAMLBindingContext samlBinding = this.samlBindingContextLookupStrategy.apply(context);
-    return samlBinding != null ? samlBinding.getBindingUri() : null;
+  protected String getBinding(final ProfileRequestContext context) {
+    return Optional.ofNullable(this.samlBindingContextLookupStrategy.apply(context))
+        .map(SAMLBindingContext::getBindingUri)
+        .orElse(null);
   }
 
   /**
@@ -686,7 +679,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    */
-  protected String getBinding(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+  protected String getBinding(final HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getBinding(this.getProfileRequestContext(httpRequest));
   }
 
@@ -698,9 +691,10 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @return the relay state
    * @see #getRelayState(HttpServletRequest)
    */
-  protected String getRelayState(ProfileRequestContext<?, ?> context) {
-    SAMLBindingContext samlBinding = this.samlBindingContextLookupStrategy.apply(context);
-    return samlBinding != null ? samlBinding.getRelayState() : null;
+  protected String getRelayState(final ProfileRequestContext context) {
+    return Optional.ofNullable(this.samlBindingContextLookupStrategy.apply(context))
+        .map(SAMLBindingContext::getRelayState)
+        .orElse(null);
   }
 
   /**
@@ -712,7 +706,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @throws ExternalAuthenticationException
    *           for Shibboleth session errors
    */
-  protected String getRelayState(HttpServletRequest httpRequest) throws ExternalAuthenticationException {
+  protected String getRelayState(final HttpServletRequest httpRequest) throws ExternalAuthenticationException {
     return this.getRelayState(this.getProfileRequestContext(httpRequest));
   }
 
@@ -722,29 +716,24 @@ public abstract class AbstractExternalAuthenticationController implements Initia
   public static class PeerMetadataContextLookup implements ContextDataLookupFunction<SAMLPeerEntityContext, EntityDescriptor> {
 
     @Override
-    public EntityDescriptor apply(SAMLPeerEntityContext input) {
-      if (input != null) {
-        SAMLMetadataContext metadataContext = input.getSubcontext(SAMLMetadataContext.class, false);
-        if (metadataContext != null) {
-          return metadataContext.getEntityDescriptor();
-        }
-      }
-      return null;
+    public EntityDescriptor apply(final SAMLPeerEntityContext input) {
+      return Optional.ofNullable(input)
+          .map(c -> c.getSubcontext(SAMLMetadataContext.class, false))
+          .map(SAMLMetadataContext::getEntityDescriptor)
+          .orElse(null);
     }
   }
 
   /**
    * Lookup function for finding a {@link SAMLBindingContext}.
    */
-  @SuppressWarnings("rawtypes")
   public static class SAMLBindingContextLookup implements ContextDataLookupFunction<MessageContext, SAMLBindingContext> {
 
     @Override
-    public SAMLBindingContext apply(MessageContext input) {
-      if (input != null) {
-        return input.getSubcontext(SAMLBindingContext.class, false);
-      }
-      return null;
+    public SAMLBindingContext apply(final MessageContext input) {
+      return Optional.ofNullable(input)
+          .map(c -> c.getSubcontext(SAMLBindingContext.class, false))
+          .orElse(null);
     }
   }
 
@@ -754,7 +743,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param sessionManager
    *          the session manager
    */
-  public void setSessionManager(SessionManager sessionManager) {
+  public void setSessionManager(final SessionManager sessionManager) {
     this.sessionManager = sessionManager;
   }
 
@@ -773,7 +762,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param authnContextService
    *          service
    */
-  public void setAuthnContextService(AuthnContextService authnContextService) {
+  public void setAuthnContextService(final AuthnContextService authnContextService) {
     this.authnContextService = authnContextService;
   }
 
@@ -792,7 +781,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param signSupportService
    *          the signature service support service
    */
-  public void setSignSupportService(SignSupportService signSupportService) {
+  public void setSignSupportService(final SignSupportService signSupportService) {
     this.signSupportService = signSupportService;
   }
 
@@ -803,7 +792,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param attributeToIdMapping
    *          mapper service
    */
-  public void setAttributeToIdMapping(SAML2AttributeNameToIdMapperService attributeToIdMapping) {
+  public void setAttributeToIdMapping(final SAML2AttributeNameToIdMapperService attributeToIdMapping) {
     this.attributeToIdMapping = attributeToIdMapping;
   }
 
@@ -813,7 +802,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
    * @param flowName
    *          the flow name
    */
-  public void setFlowName(String flowName) {
+  public void setFlowName(final String flowName) {
     this.flowName = flowName;
   }
 
@@ -827,7 +816,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
     Assert.notNull(this.flowName, "Property 'flowName' must be assigned");
   }
 
-  protected SubjectBuilder getSubjectBuilder(String principal) {
+  protected SubjectBuilder getSubjectBuilder(final String principal) {
     return new SubjectBuilder(principal, this.attributeToIdMapping);
   }
 
@@ -853,7 +842,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
      * @param attributeToIdMapping
      *          the attribute mapper
      */
-    private SubjectBuilder(String principal, SAML2AttributeNameToIdMapperService attributeToIdMapping) {
+    private SubjectBuilder(final String principal, final SAML2AttributeNameToIdMapperService attributeToIdMapping) {
       this.attributeToIdMapping = attributeToIdMapping;
       this.subject = new Subject();
       subject.getPrincipals().add(new UsernamePrincipal(principal));
@@ -877,11 +866,11 @@ public abstract class AbstractExternalAuthenticationController implements Initia
      *          the value(s)
      * @return the builder
      */
-    public SubjectBuilder shibbolethAttribute(String attributeId, String... values) {
+    public SubjectBuilder shibbolethAttribute(final String attributeId, final String... values) {
       if (values == null) {
         return this;
       }
-      IdPAttribute attr = new IdPAttribute(attributeId);
+      final IdPAttribute attr = new IdPAttribute(attributeId);
       attr.setValues(Arrays.asList(values).stream().map(v -> new StringAttributeValue(v)).collect(Collectors.toList()));
       this.subject.getPrincipals().add(new IdPAttributePrincipal(attr));
       return this;
@@ -898,8 +887,8 @@ public abstract class AbstractExternalAuthenticationController implements Initia
      * @throws IllegalArgumentException
      *           if no mapping exists between the supplied attribute name and a Shibboleth attribute ID
      */
-    public SubjectBuilder attribute(String name, String... values) throws IllegalArgumentException {
-      String attributeId = this.attributeToIdMapping.getAttributeID(name);
+    public SubjectBuilder attribute(final String name, final String... values) throws IllegalArgumentException {
+      final String attributeId = this.attributeToIdMapping.getAttributeID(name);
       if (attributeId == null) {
         logger.error("No mapping exists for attribute '{}'", name);
         return this;
@@ -916,8 +905,13 @@ public abstract class AbstractExternalAuthenticationController implements Initia
      * @throws IllegalArgumentException
      *           if no mapping exists between the supplied attribute name and a Shibboleth attribute ID
      */
-    public SubjectBuilder attribute(Attribute attribute) throws IllegalArgumentException {
-      return this.attribute(attribute.getName(), AttributeUtils.getAttributeStringValues(attribute).toArray(new String[] {}));
+    public SubjectBuilder attribute(final Attribute attribute) throws IllegalArgumentException {
+      final String attributeId = this.attributeToIdMapping.getAttributeID(attribute);
+      if (attributeId == null) {
+        logger.error("No mapping exists for attribute '{}'", attribute.getName());
+        return this;
+      }
+      return this.shibbolethAttribute(attributeId, AttributeUtils.getAttributeStringValues(attribute).toArray(new String[] {}));
     }
 
     /**
@@ -927,7 +921,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
      *          the AuthnContext class reference URI
      * @return the builder
      */
-    public SubjectBuilder authnContextClassRef(String uri) {
+    public SubjectBuilder authnContextClassRef(final String uri) {
       this.subject.getPrincipals().add(new AuthnContextClassRefPrincipal(uri));
       return this;
     }

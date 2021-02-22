@@ -20,18 +20,4 @@
   <bean id="sweid.SignatureServiceSupportService" class="se.litsec.shibboleth.idp.subsystem.signservice.DelegatingSignatureSupportKeyService"
     c:service-ref="sweid.ReloadableSignatureServiceSupportService" />
 
-<!-- 
-  <bean id="sweid.ReloadableSignMessageDecryptionService" class="net.shibboleth.ext.spring.service.ReloadableSpringService"
-    p:serviceConfigurations-ref="#{'%{idp.service.signmessage-decrypt-service.resources:sweid.SignMessageDecryptionResources}'.trim()}"
-    p:failFast="%{idp.service.signmessage-decrypt-service.failFast:%{idp.service.failFast:true}}" 
-    p:reloadCheckDelay="%{idp.service.signmessage-decrypt-service.checkInterval:PT0S}"
-    p:beanPostProcessors-ref="shibboleth.IdentifiableBeanPostProcessor" 
-    p:beanFactoryPostProcessors-ref="shibboleth.PropertySourcesPlaceholderConfigurer">
-    <constructor-arg name="claz" value="se.litsec.shibboleth.idp.subsystem.signservice.SignMessageDecryptionService" />
-  </bean>
-
-  <bean id="sweid.SignMessageDecryptionService" class="se.litsec.shibboleth.idp.subsystem.signservice.DelegatingSignMessageDecryptionService"
-    c:service-ref="sweid.ReloadableSignMessageDecryptionService" />
--->
-
 </beans>

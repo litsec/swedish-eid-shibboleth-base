@@ -4,16 +4,15 @@
 
   <artifactId>shibboleth-base</artifactId>
   <packaging>pom</packaging>
-  <version>1.7.3-SNAPSHOT</version>  
 
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.7.2</version>
+    <version>2.0.0-SNAPSHOT</version>
   </parent>
 
   <name>Swedish eID :: Base packaging of Shibboleth IdP 3.X</name>
-  <description>Base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
+  <description>Base packaging of Shibboleth IdP 4.X for the Swedish eID Framework</description>
   <url>https://github.com/litsec/swedish-eid-shibboleth-base</url>
 
   <licenses>
@@ -54,59 +53,53 @@
   </dependencyManagement>
 
   <dependencies>
-  
-    <!-- Include newer version of Guava -->
+    
+    <!-- Include newer versions ... -->
+    <dependency>
+      <groupId>org.apache.santuario</groupId>
+      <artifactId>xmlsec</artifactId>
+      <scope>compile</scope>
+    </dependency>
+      
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <scope>compile</scope>
+    </dependency>
+      
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpkix-jdk15on</artifactId>
+      <scope>compile</scope>
+    </dependency>
+      
+    <dependency>
+      <groupId>org.cryptacular</groupId>
+      <artifactId>cryptacular</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
       <scope>compile</scope>
     </dependency>
     
-    <!-- Include spring-web 4.3.20 -->
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <scope>compile</scope>    
-    </dependency>
-    
-    <!-- Include newer version of Bouncy Castle --> 
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>        
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
       <scope>compile</scope>
     </dependency>
     
-    <!-- We don't want to use dom4j:dom4j:jar:1.6.1 from opensaml-storage-impl. -->   
+    <!-- 
     <dependency>
-      <groupId>org.dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-    </dependency>    
-    
-    <!-- Make sure to copy valid Jackson dependencies -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
       <scope>compile</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-joda</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    
+    -->    
+
+    <!-- And then add our libs ... -->    
     <dependency>
       <groupId>se.swedenconnect.opensaml</groupId>
       <artifactId>opensaml-security-ext</artifactId>
@@ -115,13 +108,13 @@
  
     <dependency>
       <groupId>se.litsec.opensaml</groupId>
-      <artifactId>opensaml3-ext</artifactId>
+      <artifactId>opensaml4-ext</artifactId>
       <scope>compile</scope>
     </dependency>
      
     <dependency>
       <groupId>se.litsec.opensaml.sweid</groupId>
-      <artifactId>swedish-eid-opensaml3</artifactId>
+      <artifactId>swedish-eid-opensaml4</artifactId>
       <scope>compile</scope>
     </dependency>    
     
@@ -146,7 +139,7 @@
           <groupId>org.springframework</groupId>
           <artifactId>spring-web</artifactId>
         </exclusion>
-      </exclusions>      
+      </exclusions>
     </dependency>    
 
   </dependencies>
@@ -197,7 +190,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>copy-resources</id>
@@ -230,16 +223,15 @@
             <id>clean-shib-deps</id>
             <phase>process-resources</phase>
             <configuration>
-              <target name="clean-shib-deps">              
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/guava-20.0.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcprov-jdk15on-1.59.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/spring-web-4.3.19.RELEASE.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-annotations-2.8.3.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-core-2.8.3.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-databind-2.8.3.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-datatype-joda-2.8.3.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jsr305-3.0.1.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/dom4j-1.6.1.jar" />
+              <target name="clean-shib-deps">
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/xmlsec-2.1.4.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcprov-jdk15on-1.64.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcpkix-jdk15on-1.64.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/guava-28.2-jre.jar" />       
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/commons-lang3-3.9.jar" />
+                <!-- <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/commons-codec-1.14.jar" /> -->
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/checker-qual-2.10.0.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/stax2-api-3.1.4.jar" />                
               </target>
             </configuration>
             <goals>
@@ -262,6 +254,7 @@
               <goal>run</goal>
             </goals>
           </execution>
+
           <!-- Copy the changed files into the dist directory (so that Shib install works correctly). -->
           <execution>
             <id>copy-to-dist</id>
@@ -286,7 +279,6 @@
                   </fileset>
                   <mapper type="glob" from="*" to="*.dist" />
                 </copy>
-                <!-- TODO: add views later on -->
               </target>
             </configuration>
             <goals>
@@ -322,7 +314,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>attach-artifacts</id>

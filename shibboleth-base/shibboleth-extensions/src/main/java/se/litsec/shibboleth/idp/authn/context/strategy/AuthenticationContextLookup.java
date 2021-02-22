@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@ import net.shibboleth.idp.authn.context.AuthenticationContext;
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-@SuppressWarnings("rawtypes")
 public class AuthenticationContextLookup implements ContextDataLookupFunction<ProfileRequestContext, AuthenticationContext> {
 
   @Override
-  public AuthenticationContext apply(ProfileRequestContext input) {
+  public AuthenticationContext apply(final ProfileRequestContext input) {
     return input != null ? input.getSubcontext(AuthenticationContext.class, false) : null;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,13 +41,6 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    * If the supplied IdP assurance certification list is empty, no matching is performed.
    * </p>
    * <p>
-   * We are running as a Proxy-IdP supporting the Swedish eID Signature Service concept, but we don't know if the
-   * receiving IdP supports the concept of signature message, and it will be up to us to display the sign message and
-   * just perform an ordinary authentication at the remote IdP. In that case we can't filter out 'sigmessage' URI:s.
-   * Therefore, the method must be told whether the receiving IdP supports sign message (and understands the
-   * sigmessage-URI:s).
-   * </p>
-   * <p>
    * Finally, a list of URI:s to include in the AuthnRequest to be sent to the IdP is returned. These are also saved in
    * the current {@link AuthnContextClassContext}.
    * </p>
@@ -56,45 +49,36 @@ public interface ProxyIdpAuthnContextService extends AuthnContextService {
    *          the request context
    * @param assuranceURIs
    *          IdP assurance certification URI:s
-   * @param idpSupportsSignMessage
-   *          does not receiving IdP support the sign message-concept?
    * @return a list of URI:s to include in the AuthnRequest to be sent to the IdP
    * @throws ExternalAutenticationErrorCodeException
    *           if no AuthnContext URI:s matches
    */
-  List<String> getSendAuthnContextClassRefs(ProfileRequestContext<?, ?> context, List<String> assuranceURIs, boolean idpSupportsSignMessage)
+  List<String> getSendAuthnContextClassRefs(final ProfileRequestContext context, final List<String> assuranceURIs) 
       throws ExternalAutenticationErrorCodeException;
 
   /**
    * When the Proxy-IdP receives an assertion it contains an {@code AuthnContextClassRef} holding the URI describing how
    * the IdP authenticated the user. This method verifies that this URI matches any of the URI:s the IdP-Proxy SP
    * included in the AuthnRequest, and throws an exception otherwise.
-   * <p>
-   * If the above is successful BUT the external IdP did not support sign messages, we may have to return another URI
-   * depending on whether the Proxy-IdP display an sign message. So, after the check, this method calculates which LoA
-   * URI to use in the resulting assertion.
-   * </p>
    * 
    * @param context
    *          the profile context
    * @param authnContextUri
-   *          the URI from the {@code AuthnContextClassRef} element of the assertion
-   * @param displayedSignMessage
-   *          flag telling if the connector displayed a sign message
+   *          the URI from the AuthnContextClassRef element of the assertion
    * @return the LoA URI to include in the assertion back to the SP
    * @throws ExternalAutenticationErrorCodeException
    *           if the issued URI can not be used in the Proxy-IdP assertion
    */
   @Override
-  String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
+  String getReturnAuthnContextClassRef(final ProfileRequestContext context, final String authnContextUri)
       throws ExternalAutenticationErrorCodeException;
 
   /**
    * A Proxy-IdP does not perform the authentication itself. Instead the
-   * {@link #getSendAuthnContextClassRefs(ProfileRequestContext, List, boolean)} should be used.
+   * {@link #getSendAuthnContextClassRefs(ProfileRequestContext, List)} should be used.
    */
   @Override
-  default List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
+  default List<String> getPossibleAuthnContextClassRefs(final ProfileRequestContext context)
       throws ExternalAutenticationErrorCodeException {
     throw new RuntimeException("Call to getPossibleAuthnContextClassRefs is not allowed for a Proxy-IdP");
   }

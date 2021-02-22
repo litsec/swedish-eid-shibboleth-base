@@ -12,14 +12,20 @@
        default-init-method="initialize"
        default-destroy-method="destroy">
 
-  <!-- Includes Spring context files that extends the core Shibboleth -->  
-  <import resource="services-extensions.xml" />
-  <import resource="../../metadata/idp-metadata-config.xml" />
-  
-  <bean id="sweid.SAML2AttributeNameToIdMapperService" class="se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService" 
-    scope="singleton">
-    <constructor-arg ref="shibboleth.AttributeRegistryService" />
-  </bean>
+    <!-- Default Attribute transcoding rules. -->
     
+    <!--
+    Many if not most of these attributes are not suited or may even be actively discouraged
+    from use in federated protocols, but this is merely a set of well-known definitions, not
+    a recommended set to support or use.
+    -->
     
+    <import resource="swedishEid.xml" />
+    <!-- 
+    <import resource="inetOrgPerson.xml" />
+    <import resource="eduPerson.xml" />
+    <import resource="eduCourse.xml" />
+    -->
+    <import resource="samlSubject.xml" />
+
 </beans>

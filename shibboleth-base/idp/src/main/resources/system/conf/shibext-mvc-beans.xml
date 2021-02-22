@@ -14,6 +14,8 @@
   <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer"
     p:placeholderPrefix="%{" p:placeholderSuffix="}" />  
 
+  <!-- <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" p:order="1" /> -->
+  
   <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" p:order="1" />
 
   <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" p:order="2">
@@ -36,34 +38,27 @@
   <bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
     <property name="order" value="1" />
   </bean>
-
-  <bean id="shibboleth.VelocityViewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
+            
+  <bean id="shibboleth.VelocityViewResolver" class="net.shibboleth.ext.spring.velocity.VelocityViewResolver">
     <property name="order" value="2" />
-    <property name="cache" value="true" />
-    <property name="prefix" value="" />
-    <property name="suffix" value=".vm" />
+    <property name="cache" value="true"/>
+    <property name="prefix" value=""/>
+    <property name="suffix" value=".vm"/>
     <property name="contentType" value="text/html;charset=utf-8" />
   </bean>
 
   <bean id="shibboleth.InternalViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="order" value="3" />
-    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
-    <property name="prefix" value="/WEB-INF/jsp/" />
-    <property name="suffix" value=".jsp" />
+    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+    <property name="prefix" value="/WEB-INF/jsp/"/>
+    <property name="suffix" value=".jsp"/>
     <property name="contentType" value="text/html;charset=utf-8" />
   </bean>
 
-  <bean class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
+  <bean class="net.shibboleth.ext.spring.velocity.VelocityConfigurer">
     <property name="resourceLoaderPath" value="#{'%{idp.views:%{idp.home}/views}'.trim()},%{idp.home}/system/views" />
-    <property name="velocityProperties">
-      <props>
-        <prop key="runtime.log.logsystem.class">net.shibboleth.utilities.java.support.velocity.SLF4JLogChute</prop>
-        <prop key="input.encoding">UTF-8</prop>
-        <prop key="output.encoding">UTF-8</prop>
-      </props>
-    </property>
   </bean>
-
+    
   <mvc:interceptors>
 
     <bean class="org.springframework.web.servlet.mvc.WebContentInterceptor" p:cacheSeconds="0" p:useExpiresHeader="true"
@@ -71,16 +66,18 @@
 
   </mvc:interceptors>
   
-  <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
-    <property name="converters">
-      <set>
-        <bean class="net.shibboleth.ext.spring.config.DurationToLongConverter" />
-        <bean class="net.shibboleth.ext.spring.config.StringToIPRangeConverter" />
-        <bean class="net.shibboleth.ext.spring.config.BooleanToPredicateConverter" />
-        <bean class="net.shibboleth.ext.spring.config.StringBooleanToPredicateConverter" />
-        <bean class="net.shibboleth.ext.spring.config.StringToResourceConverter" />
-      </set>
-    </property>
-  </bean>
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="net.shibboleth.ext.spring.config.StringToIPRangeConverter" />
+                <bean class="net.shibboleth.ext.spring.config.BooleanToPredicateConverter" />
+                <bean class="net.shibboleth.ext.spring.config.StringBooleanToPredicateConverter" />
+                <bean class="net.shibboleth.ext.spring.config.StringToResourceConverter" />
+                <bean class="net.shibboleth.ext.spring.config.FunctionToFunctionConverter" />
+                <bean class="net.shibboleth.ext.spring.config.PredicateToPredicateConverter" />
+                <bean class="net.shibboleth.ext.spring.config.StringToDurationConverter" />
+            </set>
+        </property>
+    </bean>
   
 </beans>

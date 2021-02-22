@@ -16,7 +16,7 @@
     <util:map id="shibboleth.EventViewMap">
         <!-- <entry key="EventToChange" value="viewname" /> -->
     </util:map>
-
+    
     <!--
     Map of events to trap and handle with local views, without returning to SPs.
     The map values are flags indicating whether to write an audit log record.
@@ -28,11 +28,12 @@
         <entry key="TermsRejected" value="true" />
         <entry key="RuntimeException" value="false" />
         <entry key="InvalidEvent" value="false" />
+        <entry key="InvalidCSRFToken" value="false" />
         <!--
         <entry key="IdentitySwitch" value="false" />
         <entry key="NoPotentialFlow" value="false" />
         -->
-    </util:map>
+    </util:map>    
     
     <!-- ==================== Swedish eID extensions - BEGIN ==================== -->
     
@@ -91,6 +92,7 @@
         
         <entry key="UnableToEncode" value-ref="shibboleth.SAML2Status.UnsupportedBinding" />
 
+        <entry key="AccessDenied" value-ref="shibboleth.SAML2Status.RequestDenied" />
         <entry key="MessageReplay" value-ref="shibboleth.SAML2Status.RequestDenied" />
         <entry key="MessageExpired" value-ref="shibboleth.SAML2Status.RequestDenied" />
         <entry key="MessageAuthenticationError" value-ref="shibboleth.SAML2Status.RequestDenied" />
@@ -111,6 +113,7 @@
         <entry key="SessionNotFound" value-ref="shibboleth.SAML2Status.UnknownPrincipal" />
         
         <entry key="InvalidNameIDPolicy" value-ref="shibboleth.SAML2Status.InvalidNameIDPolicy" />
+        <entry key="ProxyCountExceeded" value-ref="shibboleth.SAML2Status.ProxyCountExceeded" />
         
         <entry key="ChannelBindingsError" value-ref="shibboleth.SAML2Status.ChannelBindingsError" />
         

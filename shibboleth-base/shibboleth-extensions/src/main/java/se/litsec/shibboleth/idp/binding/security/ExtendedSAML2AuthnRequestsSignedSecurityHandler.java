@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ package se.litsec.shibboleth.idp.binding.security;
 
 import org.opensaml.messaging.context.MessageContext;
 import org.opensaml.messaging.handler.MessageHandlerException;
-import org.opensaml.saml.common.SAMLObject;
 import org.opensaml.saml.saml2.binding.security.impl.SAML2AuthnRequestsSignedSecurityHandler;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.slf4j.Logger;
@@ -39,10 +38,9 @@ public class ExtendedSAML2AuthnRequestsSignedSecurityHandler extends SAML2AuthnR
 
   /** {@inheritDoc} */
   @Override
-  public void doInvoke(MessageContext<SAMLObject> messageContext) throws MessageHandlerException {
+  public void doInvoke(final MessageContext messageContext) throws MessageHandlerException {
     if (this.wantAuthnRequestsSigned) {
-
-      SAMLObject samlMessage = messageContext.getMessage();
+      final Object samlMessage = messageContext.getMessage();
       if (!(samlMessage instanceof AuthnRequest)) {
         log.debug("Inbound message is not an instance of AuthnRequest, skipping evaluation...");
         return;

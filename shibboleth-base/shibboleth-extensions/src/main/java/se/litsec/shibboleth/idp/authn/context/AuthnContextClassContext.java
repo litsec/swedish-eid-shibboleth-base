@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,8 @@ import net.shibboleth.idp.authn.context.RequestedPrincipalContext;
 /**
  * Context class for holding the requested AuthnContextClassRef URI:s for a relying party. OpenSAML offers a similar
  * context, {@link RequestedPrincipalContext}, but this class contains very little logic. It merely holds a list of the
- * URI:s found in the request. The {@code RequestedAuthnContextClassContext} class contains only the
- * AuthnContextClassRef URI:s that can be used after filtering against the IdP:a declared assurance certifications, and
- * also filtering based on sign support.
+ * URI:s found in the request. The {@code AuthnContextClassContext} class contains only the
+ * AuthnContextClassRef URI:s that can be used after filtering against the IdP:a declared assurance certifications.
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
@@ -36,9 +35,6 @@ public class AuthnContextClassContext extends BaseContext {
 
   /** AuthnContextClassRef URI:s requested by the SP. May be filtered along the process. */
   protected List<String> authnContextClassRefs;
-
-  /** Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages. */
-  private boolean proxiedIdPSupportsSignMessage = false;
 
   /**
    * Holds information whether the a remote IdP supports the concept on non notified eID schemes, or if it treats
@@ -63,7 +59,7 @@ public class AuthnContextClassContext extends BaseContext {
    * @param authnContextClassRefs
    *          the AuthnContextClassRef URI:s received in the SP AuthnRequest
    */
-  public AuthnContextClassContext(List<String> authnContextClassRefs) {
+  public AuthnContextClassContext(final List<String> authnContextClassRefs) {
     this.authnContextClassRefs = authnContextClassRefs != null ? new ArrayList<>(authnContextClassRefs) : new ArrayList<>();
   }
 
@@ -73,10 +69,9 @@ public class AuthnContextClassContext extends BaseContext {
    * @param context
    *          the context to copy
    */
-  protected AuthnContextClassContext(AuthnContextClassContext context) {
+  protected AuthnContextClassContext(final AuthnContextClassContext context) {
     this.authnContextClassRefs = context.authnContextClassRefs;
     this.proxiedAuthnContextClassRefs = context.proxiedAuthnContextClassRefs;
-    this.proxiedIdPSupportsSignMessage = context.proxiedIdPSupportsSignMessage;
   }
 
   /**
@@ -95,27 +90,8 @@ public class AuthnContextClassContext extends BaseContext {
    * @param uri
    *          the URI to delete
    */
-  public void deleteAuthnContextClassRef(String uri) {
+  public void deleteAuthnContextClassRef(final String uri) {
     this.authnContextClassRefs.remove(uri);
-  }
-
-  /**
-   * Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages.
-   * 
-   * @return {@code true} if the peer IdP supports sign messages and {@code false} otherwise
-   */
-  public boolean isProxiedIdPSupportsSignMessage() {
-    return this.proxiedIdPSupportsSignMessage;
-  }
-
-  /**
-   * Assigns whether the peer IdP supports sign messages.
-   * 
-   * @param proxiedIdPSupportsSignMessage
-   *          flag
-   */
-  public void setProxiedIdPSupportsSignMessage(boolean proxiedIdPSupportsSignMessage) {
-    this.proxiedIdPSupportsSignMessage = proxiedIdPSupportsSignMessage;
   }
 
   /**
@@ -143,7 +119,7 @@ public class AuthnContextClassContext extends BaseContext {
    * @param authnContextComparison
    *          a {@code AuthnContextComparisonTypeEnumeration} enum
    */
-  public void setAuthnContextComparison(AuthnContextComparisonTypeEnumeration authnContextComparison) {
+  public void setAuthnContextComparison(final AuthnContextComparisonTypeEnumeration authnContextComparison) {
     this.authnContextComparison = authnContextComparison;
   }
 
@@ -154,14 +130,14 @@ public class AuthnContextClassContext extends BaseContext {
    * @param proxiedAuthnContextClassRefs
    *          a list of {@code AuthnContextClassRef} URI:s
    */
-  public void setProxiedAuthnContextClassRefs(List<String> proxiedAuthnContextClassRefs) {
+  public void setProxiedAuthnContextClassRefs(final List<String> proxiedAuthnContextClassRefs) {
     this.proxiedAuthnContextClassRefs = proxiedAuthnContextClassRefs;
   }
 
   /**
    * Predicate that returns {@code true} if the context does not hold any valid URI:s.
    * 
-   * @return if no URI:s are stored {@code true} is returned, otherwise {@code false}
+   * @return if no URI:s are stored true is returned, otherwise false
    */
   public boolean isEmpty() {
     return this.authnContextClassRefs.isEmpty();
@@ -173,7 +149,7 @@ public class AuthnContextClassContext extends BaseContext {
    * Default is {@code false}.
    * </p>
    * 
-   * @return if the IdP supports the non notified concept {@code true} is returned, otherwise {@code false}
+   * @return if the IdP supports the non notified concept true is returned, otherwise false
    */
   public boolean isSupportsNonNotifiedConcept() {
     return this.supportsNonNotifiedConcept;
@@ -185,7 +161,7 @@ public class AuthnContextClassContext extends BaseContext {
    * @param supportsNonNotifiedConcept
    *          whether the IdP supports the non notified concept
    */
-  public void setSupportsNonNotifiedConcept(boolean supportsNonNotifiedConcept) {
+  public void setSupportsNonNotifiedConcept(final boolean supportsNonNotifiedConcept) {
     this.supportsNonNotifiedConcept = supportsNonNotifiedConcept;
   }
 

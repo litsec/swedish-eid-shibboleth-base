@@ -27,11 +27,17 @@
                 <!-- For preventing SSO (used for signature services) -->
                 <bean id="intercept/prevent-sso" parent="shibboleth.InterceptFlow" />
                                 
-                <bean id="intercept/context-check" parent="shibboleth.InterceptFlow" />                
-                <bean id="intercept/expiring-password" parent="shibboleth.InterceptFlow" />        
-                <bean id="intercept/terms-of-use" parent="shibboleth.consent.TermsOfUseFlow" />        
+                <bean id="intercept/context-check" parent="shibboleth.InterceptFlow" />
+                
+                <bean id="intercept/expiring-password" parent="shibboleth.InterceptFlow" />
+        
+                <bean id="intercept/terms-of-use" parent="shibboleth.consent.TermsOfUseFlow" />
+        
                 <bean id="intercept/attribute-release" parent="shibboleth.consent.AttributeReleaseFlow" />
+                
                 <bean id="intercept/impersonate" parent="shibboleth.InterceptFlow" />
+                
+                <bean id="intercept/external" parent="shibboleth.InterceptFlow" />
             </list>
         </property>
     </bean>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ public interface AuthenticationBaseService {
    * @throws ExternalAutenticationErrorCodeException
    *           if the context cannot be initialized
    */
-  void initializeContext(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
+  void initializeContext(final ProfileRequestContext context) throws ExternalAutenticationErrorCodeException;
 
   /**
    * Performs processing of the recived request.
@@ -44,5 +44,5 @@ public interface AuthenticationBaseService {
    * @throws ExternalAutenticationErrorCodeException
    *           if the requested AuthnContextClass URI:s are invalid in the context they are applied
    */
-  void processRequest(ProfileRequestContext<?, ?> context) throws ExternalAutenticationErrorCodeException;
+  void processRequest(final ProfileRequestContext context) throws ExternalAutenticationErrorCodeException;
 }
