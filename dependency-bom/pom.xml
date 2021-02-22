@@ -92,20 +92,10 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
-
+  
   <dependencyManagement>
 
     <dependencies>
-
-<!-- 
-      <dependency>
-        <groupId>se.swedenconnect.opensaml</groupId>
-        <artifactId>opensaml-bom</artifactId>
-        <version>${opensaml.version}.R1-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
--->
 
       <!-- 
         Replacements of OpenSAML (and Shibboleth) transitive dependencies that 
@@ -376,6 +366,14 @@
         <type>jar</type>
         <scope>provided</scope>
       </dependency>
+      
+      <dependency>
+        <groupId>net.shibboleth.idp</groupId>
+        <artifactId>idp-attribute-impl</artifactId>
+        <version>${shibboleth.version}</version>
+        <type>jar</type>
+        <scope>provided</scope>
+      </dependency>      
 
       <dependency>
         <groupId>net.shibboleth.idp</groupId>
@@ -679,7 +677,8 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.15</version>
+        <version>1.14</version>
+        <!-- 1.15 doesn't seem to work for Shibboleth -->
         <type>jar</type>
         <scope>compile</scope>
       </dependency>
@@ -737,7 +736,7 @@
     </dependencies>
 
   </dependencyManagement>
-
+  
   <profiles>
     <profile>
       <id>release</id>

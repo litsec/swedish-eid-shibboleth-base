@@ -1,8 +1,7 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 declare LOCATION
 
-LOCATION=$0
-LOCATION=${LOCATION%/*}
+LOCATION=$(dirname $0)
 
 $LOCATION/ant.sh "$@" install-nocopy

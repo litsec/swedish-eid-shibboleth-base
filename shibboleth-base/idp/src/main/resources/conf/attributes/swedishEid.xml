@@ -12,11 +12,20 @@
        default-init-method="initialize"
        default-destroy-method="destroy">
        
+    <bean id="shibboleth.TranscodingProperties2" lazy-init="true"
+            class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="properties">
+            <props>
+                <prop key="saml2.encodeType">true</prop>
+            </props>
+        </property>
+    </bean>
+       
     <bean parent="shibboleth.TranscodingRuleLoader">
     <constructor-arg>
     <list>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">personalIdentityNumber</prop>
@@ -29,7 +38,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">sn</prop>
@@ -42,7 +51,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">givenName</prop>
@@ -55,7 +64,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">displayName</prop>
@@ -68,7 +77,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">gender</prop>
@@ -81,7 +90,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">dateOfBirth</prop>
@@ -94,7 +103,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">birthName</prop>
@@ -107,7 +116,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">street</prop>
@@ -120,7 +129,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">postOfficeBox</prop>
@@ -133,7 +142,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">postalCode</prop>
@@ -146,7 +155,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">l</prop>
@@ -159,7 +168,7 @@
             </property>
         </bean>
     
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">c</prop>
@@ -172,7 +181,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">placeOfBirth</prop>
@@ -185,7 +194,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">countryOfCitizenship</prop>
@@ -198,7 +207,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">countryOfResidence</prop>
@@ -211,7 +220,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">telephoneNumber</prop>
@@ -224,7 +233,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">mobile</prop>
@@ -237,7 +246,7 @@
             </property>
         </bean>
     
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">mail</prop>
@@ -250,7 +259,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">o</prop>
@@ -263,7 +272,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">ou</prop>
@@ -276,7 +285,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">organizationIdentifier</prop>
@@ -289,7 +298,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">orgAffiliation</prop>
@@ -302,7 +311,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">transactionIdentifier</prop>
@@ -315,7 +324,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">authContextParams</prop>
@@ -328,7 +337,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">userCertificate</prop>
@@ -341,7 +350,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">userSignature</prop>
@@ -354,7 +363,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">authServerSignature</prop>
@@ -367,7 +376,7 @@
             </property>
         </bean>
     
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">sad</prop>
@@ -380,7 +389,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">signMessageDigest</prop>
@@ -393,7 +402,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">prid</prop>
@@ -406,7 +415,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">pridPersistence</prop>
@@ -419,7 +428,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">personalIdentityNumberBinding</prop>
@@ -432,7 +441,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">eidasPersonIdentifier</prop>
@@ -445,7 +454,7 @@
             </property>
         </bean>
 
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">eidasNaturalPersonAddress</prop>
@@ -458,7 +467,7 @@
             </property>
         </bean>
         
-        <bean parent="shibboleth.TranscodingProperties">
+        <bean parent="shibboleth.TranscodingProperties2">
             <property name="properties">
                 <props merge="true">
                     <prop key="id">employeeHsaId</prop>

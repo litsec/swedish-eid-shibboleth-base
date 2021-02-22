@@ -91,11 +91,13 @@
       <scope>compile</scope>
     </dependency>
     
+    <!-- 
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
       <scope>compile</scope>
-    </dependency>    
+    </dependency>
+    -->    
 
     <!-- And then add our libs ... -->    
     <dependency>
@@ -227,7 +229,7 @@
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcpkix-jdk15on-1.64.jar" />
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/guava-28.2-jre.jar" />       
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/commons-lang3-3.9.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/commons-codec-1.14.jar" />
+                <!-- <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/commons-codec-1.14.jar" /> -->
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/checker-qual-2.10.0.jar" />
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/stax2-api-3.1.4.jar" />                
               </target>

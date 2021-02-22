@@ -15,19 +15,19 @@
  */
 package se.litsec.shibboleth.idp.attribute.resolver;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import net.shibboleth.idp.attribute.transcoding.AttributeTranscoderRegistry;
 import net.shibboleth.idp.attribute.transcoding.TranscodingRule;
-import net.shibboleth.idp.attribute.transcoding.impl.TranscodingRuleLoader;
-import net.shibboleth.idp.saml.attribute.transcoding.SAML2AttributeTranscoder;
+import net.shibboleth.utilities.java.support.service.ReloadableService;
+import net.shibboleth.utilities.java.support.service.ServiceableComponent;
+import se.litsec.opensaml.saml2.attribute.AttributeBuilder;
 
 /**
  * A service bean that maps between an SAML v2 attribute name and its corresponding Shibboleth attribute ID. This is
@@ -36,62 +36,65 @@ import net.shibboleth.idp.saml.attribute.transcoding.SAML2AttributeTranscoder;
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-public class SAML2AttributeNameToIdMapperService implements ApplicationContextAware {
+public class SAML2AttributeNameToIdMapperService {
+  
+  /** Class logger. */
+  private final Logger logger = LoggerFactory.getLogger(SAML2AttributeNameToIdMapperService.class);  
 
-  /** The application context. */
-  private ApplicationContext applicationContext;
-
+  /** Service used to get the mappings from. */
+  private final ReloadableService<AttributeTranscoderRegistry> attributeRegistryService;
+  
   /** Cached attribute name to id mapping. */
-  private Map<String, String> attributesMapping;
-
+  private Map<String, String> attributesMapping = new HashMap<>();
+  
   /**
-   * Returns the Shibboleth attribute ID that corresponds to the supplied SAML2 attribute name.
+   * Constructor.
    * 
-   * @param name
-   *          the attribute name
-   * @return the Shibboleth attribute ID or null if no mapping exists
+   * @param attributeRegistryService service used to get the mappings from
    */
-  public synchronized String getAttributeID(final String name) {    
-    if (this.attributesMapping == null) {
-      this.loadMappings();
+  public SAML2AttributeNameToIdMapperService(final ReloadableService<AttributeTranscoderRegistry> attributeRegistryService) {
+    this.attributeRegistryService = attributeRegistryService;
+  }  
+  
+  public synchronized String getAttributeID(final Attribute attribute) {
+    if (this.attributesMapping.containsKey(attribute.getName())) {
+      return this.attributesMapping.get(attribute.getName());
     }
-    return this.attributesMapping.get(name);
+    final String mapping = this.getMapping(attribute);
+    this.attributesMapping.put(attribute.getName(), mapping);    
+    return mapping;
   }
   
-  /** {@inheritDoc} */
-  @Override
-  public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
-    this.applicationContext = applicationContext;
+  public synchronized String getAttributeID(final String attributeName) {
+    return this.getAttributeID(AttributeBuilder.builder(attributeName).value("dummy").build());
   }
+  
+  
+  private String getMapping(final Attribute attribute) {
 
-  /**
-   * Loads all attribute mappings for the system.
-   */
-  private void loadMappings() {
-    if (this.attributesMapping != null) {
-      // Already loaded ...
-      return;
+    ServiceableComponent<AttributeTranscoderRegistry> component = null;
+    try {
+      // Get date before we get the component. That way we'll not leak changes.
+      component = this.attributeRegistryService.getServiceableComponent();
+      if (null == component) {
+        logger.error("Invalid AttributeRegistry configuration");
+        return null;
+      }
+      else {
+        final AttributeTranscoderRegistry attributeRegistry = component.getComponent();
+        
+        Collection<TranscodingRule> rules = attributeRegistry.getTranscodingRules(attribute);
+        if (rules.isEmpty()) {
+          logger.debug("No mapping to IdP attribute for attribute name '{}'", attribute.getName());
+          return null;
+        }
+        
+        return rules.iterator().next().get(AttributeTranscoderRegistry.PROP_ID, String.class);
+      }
     }
-    this.attributesMapping = new HashMap<>();
-    
-    final Collection<TranscodingRule> mappingBeans =
-        this.applicationContext.getBeansOfType(TranscodingRule.class).values();
-    final Collection<TranscodingRuleLoader> loaderBeans =
-        this.applicationContext.getBeansOfType(TranscodingRuleLoader.class).values();
-
-    final Collection<TranscodingRule> holder = new ArrayList<>();
-    if (mappingBeans != null) {
-      holder.addAll(mappingBeans);
-    }
-    if (loaderBeans != null) {
-      loaderBeans.forEach(loader -> holder.addAll(loader.getRules()));
-    }
-    
-    for (final TranscodingRule rule : holder) {
-      final String samlName = rule.get(SAML2AttributeTranscoder.PROP_NAME, String.class);
-      if (samlName != null) {
-        final String id = rule.get(AttributeTranscoderRegistry.PROP_ID, String.class);
-        this.attributesMapping.put(samlName, id);
+    finally {
+      if (null != component) {
+        component.unpinComponent();
       }
     }
   }

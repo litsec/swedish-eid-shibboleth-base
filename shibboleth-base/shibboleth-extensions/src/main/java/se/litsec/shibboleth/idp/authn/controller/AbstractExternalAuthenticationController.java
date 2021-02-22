@@ -906,7 +906,12 @@ public abstract class AbstractExternalAuthenticationController implements Initia
      *           if no mapping exists between the supplied attribute name and a Shibboleth attribute ID
      */
     public SubjectBuilder attribute(final Attribute attribute) throws IllegalArgumentException {
-      return this.attribute(attribute.getName(), AttributeUtils.getAttributeStringValues(attribute).toArray(new String[] {}));
+      final String attributeId = this.attributeToIdMapping.getAttributeID(attribute);
+      if (attributeId == null) {
+        logger.error("No mapping exists for attribute '{}'", attribute.getName());
+        return this;
+      }
+      return this.shibbolethAttribute(attributeId, AttributeUtils.getAttributeStringValues(attribute).toArray(new String[] {}));
     }
 
     /**
