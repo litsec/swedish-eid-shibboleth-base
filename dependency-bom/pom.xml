@@ -55,7 +55,7 @@
     <spring.webflow.version>2.5.1.RELEASE</spring.webflow.version>
     <spring.mobile.version>2.0.0.M3</spring.mobile.version>
 
-    <jackson.version>2.10.3</jackson.version>
+    <jackson.version>2.12.1</jackson.version>
 
     <slf4j.version>1.7.30</slf4j.version>
     <junit.version>4.13.1</junit.version>
