@@ -39,7 +39,6 @@ import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
-import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 import se.litsec.shibboleth.idp.authn.context.SignMessageContext;
 import se.litsec.shibboleth.idp.authn.context.SignatureActivationDataContext;
 import se.litsec.shibboleth.idp.authn.context.strategy.SignMessageContextLookup;
@@ -49,7 +48,6 @@ import se.litsec.shibboleth.idp.authn.service.SignMessageContentException;
 import se.litsec.shibboleth.idp.authn.service.SignMessagePreProcessor;
 import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.subsystem.signservice.SignatureSupportKeyService;
-import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthenticationContextURI.LoaEnum;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
 import se.litsec.swedisheid.opensaml.saml2.signservice.SADFactory;
@@ -68,7 +66,7 @@ import se.litsec.swedisheid.opensaml.saml2.signservice.sap.SADVersion;
 public class SignSupportServiceImpl extends AbstractAuthenticationBaseService implements SignSupportService, InitializingBean {
 
   /** Logging instance. */
-  private final Logger log = LoggerFactory.getLogger(SignSupportServiceImpl.class);
+  private final static Logger log = LoggerFactory.getLogger(SignSupportServiceImpl.class);
 
   /** Strategy used to locate the SignMessageContext. */
   protected static Function<ProfileRequestContext, SignMessageContext> signMessageContextLookupStrategy = 
@@ -111,7 +109,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
 
     final AuthnRequest authnRequest = this.getAuthnRequest(context);
     if (authnRequest == null) {
-      this.log.error("No AuthnRequest available [{}]", logId);
+      log.error("No AuthnRequest available [{}]", logId);
       throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED,
         StatusCode.REQUESTER, StatusCode.NO_AUTHN_CONTEXT, "Missing AuthnRequest");
     }
@@ -125,7 +123,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
         .orElse(null);
 
       if (signMessage != null) {
-        this.log.debug("AuthnContext contains SignMessage extension, creating SignMessageContext ... [{}]", logId);
+        log.debug("AuthnContext contains SignMessage extension, creating SignMessageContext ... [{}]", logId);
         this.getAuthenticationContext(context).addSubcontext(new SignMessageContext(signMessage), true);
       }
 
@@ -139,11 +137,11 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
 
       if (sadRequest != null) {
         if (this.supportsScal2()) {
-          this.log.debug("AuthnContext contains SADRequest extension, creating SignatureActivationDataContext ... [{}]", logId);
+          log.debug("AuthnContext contains SADRequest extension, creating SignatureActivationDataContext ... [{}]", logId);
           this.getAuthenticationContext(context).addSubcontext(new SignatureActivationDataContext(sadRequest), true);
         }
         else {
-          this.log.info("AuthnContext contains SADRequest extension, but SCAL2 (SAD generation) is not supported, ignoring ... [{}]",
+          log.info("AuthnContext contains SADRequest extension, but SCAL2 (SAD generation) is not supported, ignoring ... [{}]",
             logId);
         }
       }
@@ -159,30 +157,11 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
     final boolean isSignatureService = this.isSignatureServicePeer(context);
 
     final SignMessageContext signMessageContext = this.getSignMessageContext(context);
-    if (signMessageContext == null) {
-
-      // If the peer is a signature service and has only requested a sigmessage LoA we report an error.
-      //
-      if (isSignatureService) {
-        final AuthnContextClassContext authnContextClassContext = this.authnContextService.getAuthnContextClassContext(context);
-        for (final String loa : authnContextClassContext.getAuthnContextClassRefs()) {
-          if (this.isSignMessageURI(loa)) {
-            this.log.info("SP has requested '{}' but did not include SignMessage, removing ... [{}]", loa, logId);
-            authnContextClassContext.deleteAuthnContextClassRef(loa);
-          }
-        }
-        if (authnContextClassContext.isEmpty()) {
-          final String msg = "No valid AuthnContext URI:s were specified in AuthnRequest";
-          this.log.info("{} - can not proceed [{}]", msg, logId);
-          throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED, StatusCode.REQUESTER, StatusCode.NO_AUTHN_CONTEXT, msg);
-        }
-      }
-    }
-    else {
+    if (signMessageContext != null) {
       // If an ordinary SP included a SignMessage in the request, we simply ignore it.
       //
       if (!isSignatureService) {
-        this.log.warn("Requesting SP is not a signature service, but included SignMessage extension, ignoring ... [{}]", logId);
+        log.warn("Requesting SP is not a signature service, but included SignMessage extension, ignoring ... [{}]", logId);
         final AuthenticationContext authnContext = this.getAuthenticationContext(context);
         authnContext.removeSubcontext(SignMessageContext.class);
       }
@@ -195,17 +174,17 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
         if (signMessageContext.getSignMessage().getEncryptedMessage() != null) {
           try {
             final Message cleartextMessage = this.signatureSupportKeyService.decrypt(signMessageContext.getSignMessage());
-            this.log.debug("SignMessage was successfully decrypted [{}]", logId);
+            log.debug("SignMessage was successfully decrypted [{}]", logId);
             signMessageContext.setClearTextMessage(cleartextMessage);
           }
           catch (final DecryptionException e) {
             final String msg = String.format("Failed to decrypt SignMessage - %s", e.getMessage());
-            this.log.error("{} [{}]", msg, logId);
+            log.error("{} [{}]", msg, logId);
             throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.SIGN_MESSAGE_DECRYPTION_ERROR, msg);
           }
         }
         else {
-          this.log.debug("SignMessage was not encrypted [{}]", logId);
+          log.debug("SignMessage was not encrypted [{}]", logId);
         }
 
         signMessageContext.setDoDisplayMessage(true);
@@ -216,7 +195,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
             signMessageContext.getMimeType() != null ? signMessageContext.getMimeType().getMimeType()
                 : SignMessageMimeTypeEnum.TEXT.getMimeType());
           signMessageContext.setDoDisplayMessage(false);
-          this.log.warn("{} [{}]", dontDisplayReason, logId);
+          log.warn("{} [{}]", dontDisplayReason, logId);
 
           if (signMessageContext.mustShow()) {
             throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.SIGN_MESSAGE_TYPE_NOT_SUPPORTED,
@@ -234,7 +213,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
             signMessageContext.setMessageToDisplay(messageToDisplay);
           }
           catch (final SignMessageContentException e) {
-            this.log.error("Failed to process sign message: {} [{}]", e.getMessage(), logId);
+            log.error("Failed to process sign message: {} [{}]", e.getMessage(), logId);
 
             if (signMessageContext.mustShow()) {
               throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED,
@@ -253,30 +232,12 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
             (signMessageContext.getMessageToDisplay() == null || signMessageContext.getMessageToDisplay().matches("\\s*"))) {
 
           dontDisplayReason = "Sign message is empty or contains only non-visible characters";
-          this.log.warn("{} [{}]", dontDisplayReason, logId);
+          log.warn("{} [{}]", dontDisplayReason, logId);
           signMessageContext.setDoDisplayMessage(false);
 
           if (signMessageContext.mustShow()) {
             throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED,
               StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, "No sign message to show");
-          }
-        }
-
-        // If we can't display the sign message, we filter away all sigmessage URI:s.
-        //
-        if (!signMessageContext.isDoDisplayMessage()) {
-          final AuthnContextClassContext authnContextClassContext = this.authnContextService.getAuthnContextClassContext(context);
-          for (final String loa : authnContextClassContext.getAuthnContextClassRefs()) {
-            if (this.isSignMessageURI(loa)) {
-              this.log.info("SP has requested '{}' but IdP can not display SignMessage, removing ... [{}]", loa, logId);
-              authnContextClassContext.deleteAuthnContextClassRef(loa);
-            }
-          }
-          if (authnContextClassContext.isEmpty()) {
-            final String msg = String.format(
-              "SignMessage cannot be displayed (%s) and no suitable AuthnContext URI:s were specified in AuthnRequest", dontDisplayReason);
-            this.log.info("{} - can not proceed [{}]", msg, logId);
-            throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED, StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, msg);
           }
         }
 
@@ -286,7 +247,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
           if (!this.entityID.equals(signMessageContext.getSignMessage().getDisplayEntity())) {
             final String msg = String.format("DisplayEntity (%s) of SignMessage does not match IdP entityID (%s)",
               signMessageContext.getSignMessage().getDisplayEntity(), this.entityID);
-            this.log.info("{} - can not proceed [{}]", msg, logId);
+            log.info("{} - can not proceed [{}]", msg, logId);
             throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED,
               StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, "DisplayEntity of SignMessage does not match IdP entityID");
           }
@@ -304,14 +265,14 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
         //
         if (signMessageContext == null) {
           final String msg = "Request contained SADRequest but no SignMessage was received - not allowed";
-          this.log.info("{} - can not proceed [{}]", msg, logId);
+          log.info("{} - can not proceed [{}]", msg, logId);
           throw new IdpErrorStatusException(ExtAuthnEventIds.SWEID_BAD_REQUEST,
             StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, msg);
         }
         else if (!signMessageContext.isDoDisplayMessage()) {
           // If we cannot display the SignMessage we can not issue a SAD ...
           final String msg = "SignMessage can not be displayed and SAD is requested";
-          this.log.info("{} - can not proceed [{}]", msg, logId);
+          log.info("{} - can not proceed [{}]", msg, logId);
           throw new IdpErrorStatusException(ExtAuthnEventIds.SWEID_BAD_REQUEST,
             StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, msg);
         }
@@ -322,7 +283,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
         }
       }
       else {
-        this.log.warn("Requesting SP is not a signature service, but included SAPRequest extension in request, ignoring ... [{}]", logId);
+        log.warn("Requesting SP is not a signature service, but included SAPRequest extension in request, ignoring ... [{}]", logId);
         final AuthenticationContext authnContext = this.getAuthenticationContext(context);
         authnContext.removeSubcontext(SignatureActivationDataContext.class);
       }
@@ -345,7 +306,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
 
     final AuthnRequest authnRequest = this.getAuthnRequest(context);
     if (authnRequest == null) {
-      this.log.error("No AuthnRequest available [{}]", this.getLogString(context));
+      log.error("No AuthnRequest available [{}]", this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, "Missing AuthnRequest");
     }
 
@@ -355,7 +316,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
     //
     if (r.getRequestedVersion() != null && !SignSupportServiceImpl.supportedSadVersions.contains(r.getRequestedVersion())) {
       final String msg = String.format("Requested SAD version (%s) is not supported by the IdP", r.getRequestedVersion());
-      this.log.info("{} [{}]", msg, this.getLogString(context));
+      log.info("{} [{}]", msg, this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.BAD_SAD_REQUEST, msg);
     }
 
@@ -363,13 +324,13 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
     //
     if (!StringUtils.hasText(r.getRequesterID())) {
       final String msg = "RequesterID is not present in the SADRequest - invalid";
-      this.log.info("{} [{}]", msg, this.getLogString(context));
+      log.info("{} [{}]", msg, this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.BAD_SAD_REQUEST, msg);
     }
     final String issuer = authnRequest.getIssuer().getValue();
     if (!r.getRequesterID().equals(issuer)) {
       final String msg = String.format("Invalid RequestID of SADRequest (%s) - Issuer of AuthnRequest is '%s'", r.getRequesterID(), issuer);
-      this.log.info("{} [{}]", msg, this.getLogString(context));
+      log.info("{} [{}]", msg, this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.BAD_SAD_REQUEST, msg);
     }
 
@@ -377,7 +338,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
     //
     if (!StringUtils.hasText(r.getSignRequestID())) {
       final String msg = "SignRequestID is not present in the SADRequest - invalid";
-      this.log.info("{} [{}]", msg, this.getLogString(context));
+      log.info("{} [{}]", msg, this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.BAD_SAD_REQUEST, msg);
     }
 
@@ -385,7 +346,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
     //
     if (r.getDocCount() == null) {
       final String msg = "DocCount is not present in the SADRequest - invalid";
-      this.log.info("{} [{}]", msg, this.getLogString(context));
+      log.info("{} [{}]", msg, this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.BAD_SAD_REQUEST, msg);
     }
 
@@ -393,7 +354,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
     //
     if (!StringUtils.hasText(r.getID())) {
       final String msg = "ID attribute is not present in the SADRequest - invalid";
-      this.log.info("{} [{}]", msg, this.getLogString(context));
+      log.info("{} [{}]", msg, this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(ExtAuthnEventIds.BAD_SAD_REQUEST, msg);
     }
   }
@@ -405,7 +366,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
 
     final SignatureActivationDataContext sadContext = this.getSadContext(context);
     if (sadContext == null) {
-      this.log.error("No SignatureActivationDataContext available [{}]", this.getLogString(context));
+      log.error("No SignatureActivationDataContext available [{}]", this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, "Missing SignatureActivationDataContext");
     }
 
@@ -414,7 +375,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
       .findFirst()
       .orElse(null);
     if (subjectAttribute == null) {
-      this.log.error("No {} attribute available", subjectAttributeName);
+      log.error("No {} attribute available", subjectAttributeName);
       throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED, StatusCode.RESPONDER, StatusCode.UNKNOWN_PRINCIPAL,
         "No principal attribute available");
     }
@@ -434,7 +395,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
 
     sad.getSeElnSadext().setAttributeName(subjectAttributeName);
 
-    this.log.debug("Issuing SAD: {} []", sad, this.getLogString(context));
+    log.debug("Issuing SAD: {} []", sad, this.getLogString(context));
 
     // Sign the SAD and return it ...
     //
@@ -442,7 +403,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
       return this.signatureSupportKeyService.createSADJwt(sad);
     }
     catch (SignatureException | IOException e) {
-      this.log.error("Failed to sign SAD JWT", e);
+      log.error("Failed to sign SAD JWT", e);
       throw new IdpErrorStatusException(AuthnEventIds.AUTHN_EXCEPTION, StatusCode.RESPONDER, StatusCode.AUTHN_FAILED,
         "Failed to create SAD JWT");
     }
@@ -480,7 +441,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
   public boolean isSignatureServicePeer(final ProfileRequestContext context) {
     final EntityDescriptor peerMetadata = this.getPeerMetadata(context);
     if (peerMetadata == null) {
-      this.log.error("No metadata available for connecting SP");
+      log.error("No metadata available for connecting SP");
       return false;
     }
     return EntityCategoryMetadataHelper.getEntityCategories(peerMetadata)
@@ -509,22 +470,10 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
       throws ExternalAutenticationErrorCodeException {
     final AuthenticationContext authnContext = AbstractAuthenticationBaseService.authenticationContextLookupStrategy.apply(context);
     if (authnContext == null) {
-      this.log.error("No AuthenticationContext available [{}]", this.getLogString(context));
+      log.error("No AuthenticationContext available [{}]", this.getLogString(context));
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, "Missing AuthenticationContext");
     }
     return authnContext;
-  }
-
-  /**
-   * Predicate that tells if the supplied URI is a URI indicating sign message display.
-   *
-   * @param uri
-   *          the URI to test
-   * @return {@code true} if the supplied URI is for sign message, and {@code false} otherwise
-   */
-  protected boolean isSignMessageURI(final String uri) {
-    final LoaEnum loa = LoaEnum.parse(uri);
-    return loa != null && loa.isSignatureMessageUri();
   }
 
   /**
