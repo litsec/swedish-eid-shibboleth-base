@@ -65,7 +65,6 @@ import net.shibboleth.idp.saml.authn.principal.AuthnContextClassRefPrincipal;
 import net.shibboleth.idp.session.SessionException;
 import net.shibboleth.idp.session.SessionManager;
 import net.shibboleth.idp.session.context.SessionContext;
-import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.attribute.resolver.SAML2AttributeNameToIdMapperService;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
@@ -75,9 +74,10 @@ import se.litsec.shibboleth.idp.authn.context.strategy.SAMLPeerEntityContextLook
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
 import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.context.ProxiedStatusContext;
-import se.litsec.swedisheid.opensaml.saml2.authentication.psc.PrincipalSelection;
-import se.litsec.swedisheid.opensaml.saml2.signservice.SignMessageDigestIssuer;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
+import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
+import se.swedenconnect.opensaml.sweid.saml2.authn.psc.PrincipalSelection;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.SignMessageDigestIssuer;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.Message;
 
 /**
  * Abstract base class for controllers implementing "external authentication".

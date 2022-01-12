@@ -46,9 +46,8 @@ import net.shibboleth.utilities.java.support.service.ReloadableService;
  * 
  * @author Martin Lindström (martin.lindstrom@litsec.se)
  */
-public class ExtendedNodeProcessingAttachingBeanPostProcessor extends NodeProcessingAttachingBeanPostProcessor {
+public class ExtendedNodeProcessingAttachingBeanPostProcessor { /* extends NodeProcessingAttachingBeanPostProcessor { 
 
-  /** The registry of decoding rules. */
   @Nullable
   private final ReloadableService<AttributeTranscoderRegistry> _transcoderRegistry;
 
@@ -58,7 +57,6 @@ public class ExtendedNodeProcessingAttachingBeanPostProcessor extends NodeProces
     _transcoderRegistry = service;
   }
 
-  /** {@inheritDoc} */
   @Override
   public Object postProcessBeforeInitialization(final Object bean, final String beanName) {
     if (!(bean instanceof MetadataResolver) || bean instanceof ChainingMetadataResolver) {
@@ -119,5 +117,5 @@ public class ExtendedNodeProcessingAttachingBeanPostProcessor extends NodeProces
 
     return resolver;
   }
-
+*/
 }

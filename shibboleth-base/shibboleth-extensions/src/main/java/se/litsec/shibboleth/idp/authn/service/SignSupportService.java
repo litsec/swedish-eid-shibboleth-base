@@ -23,7 +23,7 @@ import org.opensaml.saml.saml2.core.Attribute;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.context.SignMessageContext;
 import se.litsec.shibboleth.idp.authn.context.SignatureActivationDataContext;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessageMimeTypeEnum;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessageMimeTypeEnum;
 
 /**
  * Service for handling requests from a "Signature Service".

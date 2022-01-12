@@ -11,7 +11,7 @@
     <version>2.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>Swedish eID :: Base packaging of Shibboleth IdP 3.X</name>
+  <name>Swedish eID :: Base packaging of Shibboleth IdP 4.X</name>
   <description>Base packaging of Shibboleth IdP 4.X for the Swedish eID Framework</description>
   <url>https://github.com/litsec/swedish-eid-shibboleth-base</url>
 
@@ -78,13 +78,7 @@
       <artifactId>cryptacular</artifactId>
       <scope>compile</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    
+        
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -107,14 +101,14 @@
     </dependency> 
  
     <dependency>
-      <groupId>se.litsec.opensaml</groupId>
-      <artifactId>opensaml4-ext</artifactId>
+      <groupId>se.swedenconnect.opensaml</groupId>
+      <artifactId>opensaml-addons</artifactId>
       <scope>compile</scope>
     </dependency>
      
     <dependency>
-      <groupId>se.litsec.opensaml.sweid</groupId>
-      <artifactId>swedish-eid-opensaml4</artifactId>
+      <groupId>se.swedenconnect.opensaml</groupId>
+      <artifactId>opensaml-swedish-eid</artifactId>
       <scope>compile</scope>
     </dependency>    
     
@@ -224,13 +218,10 @@
             <phase>process-resources</phase>
             <configuration>
               <target name="clean-shib-deps">
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/xmlsec-2.1.4.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcprov-jdk15on-1.64.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcpkix-jdk15on-1.64.jar" />
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/guava-28.2-jre.jar" />       
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/commons-lang3-3.9.jar" />
-                <!-- <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/commons-codec-1.14.jar" /> -->
-                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/checker-qual-2.10.0.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/xmlsec-2.1.6.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcprov-jdk15on-1.68.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/bcpkix-jdk15on-1.68.jar" />       
+                <!-- <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/checker-qual-2.10.0.jar" /> -->
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/stax2-api-3.1.4.jar" />                
               </target>
             </configuration>

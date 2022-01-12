@@ -27,7 +27,7 @@ import net.shibboleth.idp.attribute.transcoding.AttributeTranscoderRegistry;
 import net.shibboleth.idp.attribute.transcoding.TranscodingRule;
 import net.shibboleth.utilities.java.support.service.ReloadableService;
 import net.shibboleth.utilities.java.support.service.ServiceableComponent;
-import se.litsec.opensaml.saml2.attribute.AttributeBuilder;
+import se.swedenconnect.opensaml.saml2.attribute.AttributeBuilder;
 
 /**
  * A service bean that maps between an SAML v2 attribute name and its corresponding Shibboleth attribute ID. This is

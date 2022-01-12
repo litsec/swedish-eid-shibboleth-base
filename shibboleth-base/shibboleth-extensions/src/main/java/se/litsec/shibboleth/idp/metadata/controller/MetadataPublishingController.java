@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import se.litsec.opensaml.saml2.metadata.EntityDescriptorContainer;
+import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorContainer;
 
 /**
  * MVC controller for publishing signed, and up-to-date, SAML metadata.

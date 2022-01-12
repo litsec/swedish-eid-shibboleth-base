@@ -80,13 +80,13 @@
     </dependency>
 
     <dependency>
-      <groupId>se.litsec.opensaml</groupId>
-      <artifactId>opensaml4-ext</artifactId>
+      <groupId>se.swedenconnect.opensaml</groupId>
+      <artifactId>opensaml-addons</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>se.litsec.opensaml.sweid</groupId>
-      <artifactId>swedish-eid-opensaml4</artifactId>
+      <groupId>se.swedenconnect.opensaml</groupId>
+      <artifactId>opensaml-swedish-eid</artifactId>
     </dependency>
 
     <dependency>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2021 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import org.opensaml.xmlsec.encryption.support.DecryptionException;
 import net.shibboleth.utilities.java.support.component.IdentifiedComponent;
 import net.shibboleth.utilities.java.support.component.InitializableComponent;
 import net.shibboleth.utilities.java.support.component.UnmodifiableComponent;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessage;
-import se.litsec.swedisheid.opensaml.saml2.signservice.sap.SAD;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.Message;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessage;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.sap.SAD;
 
 /**
  * A wrapper service handling operations for Signature Service support that involves access to IdP private key

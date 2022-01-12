@@ -35,7 +35,6 @@ import org.springframework.util.StringUtils;
 
 import net.shibboleth.idp.authn.AuthnEventIds;
 import net.shibboleth.idp.authn.context.AuthenticationContext;
-import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
@@ -48,15 +47,16 @@ import se.litsec.shibboleth.idp.authn.service.SignMessageContentException;
 import se.litsec.shibboleth.idp.authn.service.SignMessagePreProcessor;
 import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.subsystem.signservice.SignatureSupportKeyService;
-import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
-import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
-import se.litsec.swedisheid.opensaml.saml2.signservice.SADFactory;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.Message;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessage;
-import se.litsec.swedisheid.opensaml.saml2.signservice.dss.SignMessageMimeTypeEnum;
-import se.litsec.swedisheid.opensaml.saml2.signservice.sap.SAD;
-import se.litsec.swedisheid.opensaml.saml2.signservice.sap.SADRequest;
-import se.litsec.swedisheid.opensaml.saml2.signservice.sap.SADVersion;
+import se.swedenconnect.opensaml.saml2.attribute.AttributeUtils;
+import se.swedenconnect.opensaml.saml2.metadata.EntityDescriptorUtils;
+import se.swedenconnect.opensaml.sweid.saml2.metadata.entitycategory.EntityCategoryConstants;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.SADFactory;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.Message;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessage;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.dss.SignMessageMimeTypeEnum;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.sap.SAD;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.sap.SADRequest;
+import se.swedenconnect.opensaml.sweid.saml2.signservice.sap.SADVersion;
 
 /**
  * Implementation of the {@link SignSupportService} interface.
@@ -288,7 +288,6 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
         authnContext.removeSubcontext(SignatureActivationDataContext.class);
       }
     }
-
   }
 
   /**
@@ -444,7 +443,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
       log.error("No metadata available for connecting SP");
       return false;
     }
-    return EntityCategoryMetadataHelper.getEntityCategories(peerMetadata)
+    return EntityDescriptorUtils.getEntityCategories(peerMetadata)
       .stream()
       .filter(c -> EntityCategoryConstants.SERVICE_TYPE_CATEGORY_SIGSERVICE.getUri().equals(c))
       .findFirst()
