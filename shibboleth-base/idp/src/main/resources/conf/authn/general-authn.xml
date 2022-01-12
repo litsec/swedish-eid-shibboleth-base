@@ -50,10 +50,6 @@
           <util:list>
             <bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="http://id.elegnamnden.se/loa/1.0/loa2"/>
             <bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="http://id.elegnamnden.se/loa/1.0/loa3"/>
-            <bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="http://id.elegnamnden.se/loa/1.0/loa4"/>
-            <bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="http://id.elegnamnden.se/loa/1.0/loa2-sigmessage"/>
-            <bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="http://id.elegnamnden.se/loa/1.0/loa3-sigmessage"/>
-            <bean parent="shibboleth.SAML2AuthnContextClassRef" c:classRef="http://id.elegnamnden.se/loa/1.0/loa4-sigmessage"/>
           </util:list>
         </property>
       </bean>

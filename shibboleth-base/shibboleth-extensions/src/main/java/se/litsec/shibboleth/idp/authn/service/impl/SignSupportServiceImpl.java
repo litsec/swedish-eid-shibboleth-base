@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Litsec AB
+ * Copyright 2017-2022 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ import se.litsec.opensaml.saml2.attribute.AttributeUtils;
 import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
 import se.litsec.shibboleth.idp.authn.ExternalAutenticationErrorCodeException;
 import se.litsec.shibboleth.idp.authn.IdpErrorStatusException;
-import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 import se.litsec.shibboleth.idp.authn.context.SignMessageContext;
 import se.litsec.shibboleth.idp.authn.context.SignatureActivationDataContext;
 import se.litsec.shibboleth.idp.authn.context.strategy.SignMessageContextLookup;
@@ -51,7 +50,6 @@ import se.litsec.shibboleth.idp.authn.service.SignMessageContentException;
 import se.litsec.shibboleth.idp.authn.service.SignMessagePreProcessor;
 import se.litsec.shibboleth.idp.authn.service.SignSupportService;
 import se.litsec.shibboleth.idp.subsystem.signservice.SignatureSupportKeyService;
-import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthenticationContextURI.LoaEnum;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
 import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
 import se.litsec.swedisheid.opensaml.saml2.signservice.SADFactory;
@@ -161,26 +159,7 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
     boolean isSignatureService = this.isSignatureServicePeer(context);    
 
     SignMessageContext signMessageContext = this.getSignMessageContext(context);
-    if (signMessageContext == null) {
-
-      // If the peer is a signature service and has only requested a sigmessage LoA we report an error.
-      //
-      if (isSignatureService) {
-        AuthnContextClassContext authnContextClassContext = this.authnContextService.getAuthnContextClassContext(context);
-        for (String loa : authnContextClassContext.getAuthnContextClassRefs()) {
-          if (this.isSignMessageURI(loa)) {
-            log.info("SP has requested '{}' but did not include SignMessage, removing ... [{}]", loa, logId);
-            authnContextClassContext.deleteAuthnContextClassRef(loa);
-          }
-        }
-        if (authnContextClassContext.isEmpty()) {
-          final String msg = "No valid AuthnContext URI:s were specified in AuthnRequest";
-          log.info("{} - can not proceed [{}]", msg, logId);
-          throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED, StatusCode.REQUESTER, StatusCode.NO_AUTHN_CONTEXT,msg);
-        }
-      }
-    }
-    else {
+    if (signMessageContext != null) {
       // If an ordinary SP included a SignMessage in the request, we simply ignore it.
       //
       if (!isSignatureService) {
@@ -258,24 +237,6 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
           if (signMessageContext.mustShow()) {
             throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED,
               StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, "No sign message to show");
-          }
-        }
-                
-        // If we can't display the sign message, we filter away all sigmessage URI:s.
-        //
-        if (!signMessageContext.isDoDisplayMessage()) {
-          AuthnContextClassContext authnContextClassContext = this.authnContextService.getAuthnContextClassContext(context);
-          for (String loa : authnContextClassContext.getAuthnContextClassRefs()) {
-            if (this.isSignMessageURI(loa)) {
-              log.info("SP has requested '{}' but IdP can not display SignMessage, removing ... [{}]", loa, logId);
-              authnContextClassContext.deleteAuthnContextClassRef(loa);
-            }
-          }
-          if (authnContextClassContext.isEmpty()) {
-            final String msg = String.format( 
-              "SignMessage cannot be displayed (%s) and no suitable AuthnContext URI:s were specified in AuthnRequest", dontDisplayReason);
-            log.info("{} - can not proceed [{}]", msg, logId);
-            throw new IdpErrorStatusException(AuthnEventIds.REQUEST_UNSUPPORTED, StatusCode.REQUESTER, StatusCode.REQUEST_DENIED, msg);
           }
         }
 
@@ -512,18 +473,6 @@ public class SignSupportServiceImpl extends AbstractAuthenticationBaseService im
       throw new ExternalAutenticationErrorCodeException(AuthnEventIds.REQUEST_UNSUPPORTED, "Missing AuthenticationContext");
     }
     return authnContext;
-  }
-
-  /**
-   * Predicate that tells if the supplied URI is a URI indicating sign message display.
-   * 
-   * @param uri
-   *          the URI to test
-   * @return {@code true} if the supplied URI is for sign message, and {@code false} otherwise
-   */
-  protected boolean isSignMessageURI(String uri) {
-    LoaEnum loa = LoaEnum.parse(uri);
-    return (loa != null && loa.isSignatureMessageUri());
   }
 
   /**

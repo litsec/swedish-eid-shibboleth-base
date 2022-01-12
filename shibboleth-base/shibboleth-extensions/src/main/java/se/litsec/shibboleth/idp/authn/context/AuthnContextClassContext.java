@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 Litsec AB
+ * Copyright 2017-2022 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,6 @@ public class AuthnContextClassContext extends BaseContext {
   /** AuthnContextClassRef URI:s requested by the SP. May be filtered along the process. */
   protected List<String> authnContextClassRefs;
 
-  /** Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages. */
-  private boolean proxiedIdPSupportsSignMessage = false;
-
   /**
    * Holds information whether the a remote IdP supports the concept on non notified eID schemes, or if it treats
    * notified and non notified eID schemes the same. (Applies to proxy IdP:s and certain schemes).
@@ -76,7 +73,6 @@ public class AuthnContextClassContext extends BaseContext {
   protected AuthnContextClassContext(AuthnContextClassContext context) {
     this.authnContextClassRefs = context.authnContextClassRefs;
     this.proxiedAuthnContextClassRefs = context.proxiedAuthnContextClassRefs;
-    this.proxiedIdPSupportsSignMessage = context.proxiedIdPSupportsSignMessage;
   }
 
   /**
@@ -97,25 +93,6 @@ public class AuthnContextClassContext extends BaseContext {
    */
   public void deleteAuthnContextClassRef(String uri) {
     this.authnContextClassRefs.remove(uri);
-  }
-
-  /**
-   * Used by Proxy-IdP:s to save whether the IdP that is used for authentication supports sign messages.
-   * 
-   * @return {@code true} if the peer IdP supports sign messages and {@code false} otherwise
-   */
-  public boolean isProxiedIdPSupportsSignMessage() {
-    return this.proxiedIdPSupportsSignMessage;
-  }
-
-  /**
-   * Assigns whether the peer IdP supports sign messages.
-   * 
-   * @param proxiedIdPSupportsSignMessage
-   *          flag
-   */
-  public void setProxiedIdPSupportsSignMessage(boolean proxiedIdPSupportsSignMessage) {
-    this.proxiedIdPSupportsSignMessage = proxiedIdPSupportsSignMessage;
   }
 
   /**

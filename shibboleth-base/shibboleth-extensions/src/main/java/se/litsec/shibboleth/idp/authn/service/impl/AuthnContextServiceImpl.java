@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Litsec AB
+ * Copyright 2017-2022 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.opensaml.profile.context.ProfileRequestContext;
-import org.opensaml.saml.saml2.metadata.EntityDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,9 +41,6 @@ import se.litsec.shibboleth.idp.authn.context.AuthnContextClassContext;
 import se.litsec.shibboleth.idp.authn.context.strategy.AuthnContextClassContextLookup;
 import se.litsec.shibboleth.idp.authn.context.strategy.RequestedPrincipalContextLookup;
 import se.litsec.shibboleth.idp.authn.service.AuthnContextService;
-import se.litsec.swedisheid.opensaml.saml2.authentication.LevelofAssuranceAuthenticationContextURI.LoaEnum;
-import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryConstants;
-import se.litsec.swedisheid.opensaml.saml2.metadata.entitycategory.EntityCategoryMetadataHelper;
 
 /**
  * Implementation of {@link AuthnContextService}.
@@ -179,18 +175,6 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
         }
       }
       
-      // Remove any sig message URI:s from what was requested if this is not a signature service.
-      //      
-      boolean isSignatureService = this.isSignatureServicePeer(context);
-      if (!isSignatureService) {
-        for (String loa : authnContextContext.getAuthnContextClassRefs()) {
-          if (this.isSignMessageURI(loa)) {
-            log.info("SP has requested '{}' but is not a signature service, removing ... [{}]", loa, logId);
-            authnContextContext.deleteAuthnContextClassRef(loa);
-          }
-        }
-      }      
-
       // Now, if we don't have any URI:s left there is an error. The SP specified URI:s, but they were not accepted.
       //
       if (authnContextContext.isEmpty()) {
@@ -227,25 +211,11 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
 
   /** {@inheritDoc} */
   @Override
-  public List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context, boolean signMessage)
+  public List<String> getPossibleAuthnContextClassRefs(ProfileRequestContext<?, ?> context)
       throws ExternalAutenticationErrorCodeException {
 
     AuthnContextClassContext authnContextContext = this.getAuthnContextClassContext(context);
-    List<String> possibleUris = null;
-    
-    if (signMessage) {
-      possibleUris = authnContextContext.getAuthnContextClassRefs()
-          .stream()
-          .filter(u -> this.isSignMessageURI(u))
-          .map(u -> this.toBaseURI(u))
-          .collect(Collectors.toList());
-    }
-    if (possibleUris == null || possibleUris.isEmpty()) {
-      possibleUris = authnContextContext.getAuthnContextClassRefs()
-          .stream()
-          .filter(u -> !this.isSignMessageURI(u))
-          .collect(Collectors.toList());
-    }
+    List<String> possibleUris = authnContextContext.getAuthnContextClassRefs();
     
     if (possibleUris.isEmpty()) {
       final String msg = "No AuthnContext URI:s can be used to authenticate user";
@@ -258,7 +228,7 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
 
   /** {@inheritDoc} */
   @Override
-  public String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri, boolean displayedSignMessage)
+  public String getReturnAuthnContextClassRef(ProfileRequestContext<?, ?> context, String authnContextUri)
       throws ExternalAutenticationErrorCodeException {
     
     AuthnContextClassContext authnContextContext = this.getAuthnContextClassContext(context);
@@ -266,25 +236,11 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     String uri = null;
     
     if (authnContextUri == null) {
-      if (displayedSignMessage) {
-        uri = authnContextContext.getAuthnContextClassRefs()
-          .stream()
-          .filter(u -> this.isSignMessageURI(u))
-          .findFirst()
-          .orElse(null);
-      }
-      if (uri == null) {
-        uri = !authnContextContext.getAuthnContextClassRefs().isEmpty() ? authnContextContext.getAuthnContextClassRefs().get(0) : null;
-      }  
+      uri = !authnContextContext.getAuthnContextClassRefs().isEmpty() 
+          ? authnContextContext.getAuthnContextClassRefs().get(0) : null;  
     }
     else {
-      if (displayedSignMessage) {
-        String sigMessageUri = this.toSignMessageURI(authnContextUri);
-        uri = authnContextContext.getAuthnContextClassRefs().contains(sigMessageUri) ? sigMessageUri : null;
-      }
-      if (uri == null) {
-        uri = authnContextContext.getAuthnContextClassRefs().contains(authnContextUri) ? authnContextUri : null;
-      }
+      uri = authnContextContext.getAuthnContextClassRefs().contains(authnContextUri) ? authnContextUri : null;
     }
     
     if (uri == null) {
@@ -295,76 +251,6 @@ public class AuthnContextServiceImpl extends AbstractAuthenticationBaseService i
     }
     
     return uri;
-  }
-
-  /**
-   * Predicate that tells if the supplied URI is a URI indicating sign message display.
-   * 
-   * @param uri
-   *          the URI to test
-   * @return {@code true} if the supplied URI is for sign message, and {@code false} otherwise
-   */
-  protected boolean isSignMessageURI(String uri) {
-    LoaEnum loa = LoaEnum.parse(uri);
-    return (loa != null && loa.isSignatureMessageUri());
-  }
-
-  /**
-   * Given a base URI, the method returns its corresponding sigmessage URI.
-   * 
-   * @param uri
-   *          the URI to transform
-   * @return the sigmessage URI, or {@code null} if no such exists
-   */
-  protected String toSignMessageURI(String uri) {
-    LoaEnum loa = LoaEnum.parse(uri);
-    if (loa == null) {
-      return null;
-    }
-    if (loa.isSignatureMessageUri()) {
-      return uri;
-    }
-    for (LoaEnum l : LoaEnum.values()) {
-      if (l.getBaseUri().equals(loa.getBaseUri()) && l.isSignatureMessageUri() && l.isNotified() == loa.isNotified()) {
-        return l.getUri();
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Given an URI its base form is returned. This means that the URI minus any potential sigmessage extension.
-   * 
-   * @param uri
-   *          the URI to convert
-   * @return the base URI
-   */
-  protected String toBaseURI(String uri) {
-    LoaEnum loa = LoaEnum.parse(uri);
-    if (loa != null && loa.isSignatureMessageUri()) {
-      return LoaEnum.minusSigMessage(loa).getUri();
-    }
-    return uri;
-  }
-
-  /**
-   * Predicate telling if the peer is a signature service.
-   * 
-   * @param context
-   *          the profile context
-   * @return {@code true} if the peer is a signature service and {@code false} otherwise
-   */
-  protected boolean isSignatureServicePeer(ProfileRequestContext<?, ?> context) {
-    EntityDescriptor peerMetadata = this.getPeerMetadata(context);
-    if (peerMetadata == null) {
-      log.error("No metadata available for connecting SP");
-      return false;
-    }
-    return EntityCategoryMetadataHelper.getEntityCategories(peerMetadata)
-      .stream()
-      .filter(c -> EntityCategoryConstants.SERVICE_TYPE_CATEGORY_SIGSERVICE.getUri().equals(c))
-      .findFirst()
-      .isPresent();
   }
 
   /**

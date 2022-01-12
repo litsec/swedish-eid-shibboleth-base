@@ -13,6 +13,14 @@
       <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.752.29.4.13" friendlyName="personalIdentityNumber" />
     </AttributeDefinition>
     
+    <AttributeDefinition id="mappedPersonalIdentityNumber" xsi:type="SubjectDerivedAttribute" principalAttributeName="mappedPersonalIdentityNumber">
+      <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.752.201.3.16" friendlyName="mappedPersonalIdentityNumber" />
+    </AttributeDefinition>
+    
+    <AttributeDefinition id="previousPersonalIdentityNumber" xsi:type="SubjectDerivedAttribute" principalAttributeName="previousPersonalIdentityNumber">
+      <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.752.201.3.15" friendlyName="previousPersonalIdentityNumber" />
+    </AttributeDefinition>
+    
     <AttributeDefinition id="sn" xsi:type="SubjectDerivedAttribute" principalAttributeName="sn">
       <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.4" friendlyName="sn" />
     </AttributeDefinition>
