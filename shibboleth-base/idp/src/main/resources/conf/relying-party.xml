@@ -60,7 +60,8 @@
       p:nameIDFormatPrecedence="#{{
             'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
             'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-            'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'}}" />
+            'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'}}" 
+      p:inboundInterceptorFlows="#{{ 'security-policy/saml2-sso', 'process-hok-request' }}" />
 
     <!-- Container for any overrides you want to add. -->
 
@@ -78,7 +79,7 @@
         <property name="profileConfigurations">
           <list>
             <bean parent="sweid.SAML2.SSO"
-              p:inboundInterceptorFlows="#{{ 'security-policy/saml2-sso', 'prevent-sso' }}" />          
+              p:inboundInterceptorFlows="#{{ 'security-policy/saml2-sso', 'prevent-sso', 'process-hok-request' }}" />          
           </list>
         </property>
       </bean>    

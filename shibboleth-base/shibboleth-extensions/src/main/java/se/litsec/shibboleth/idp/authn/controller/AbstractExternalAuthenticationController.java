@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2019 Litsec AB
+ * Copyright 2017-2022 Litsec AB
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
   /** The service for handling AuthnContext class processing. */
   private AuthnContextService authnContextService;
-
+  
   /** The service for signature service processing. */
   private SignSupportService signSupportService;
 
@@ -320,12 +320,25 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
     final String key = this.getExternalAuthenticationKey(httpRequest);
 
+    final Set<UsernamePrincipal> principalSet = subject.getPrincipals(UsernamePrincipal.class);
+    if (principalSet.isEmpty()) {
+      throw new ExternalAuthenticationException("Missing subject principal");
+    }
+    final String principalName = principalSet.iterator().next().getName();
+    this.preventAttributeReuse(httpRequest, principalName);
+
+    // Ensure that the uid attribute is there ...
+    //
     {
-      Set<UsernamePrincipal> principalSet = subject.getPrincipals(UsernamePrincipal.class);
-      if (principalSet.isEmpty()) {
-        throw new ExternalAuthenticationException("Missing subject principal");
+      final IdPAttributePrincipal uid = subject.getPrincipals(IdPAttributePrincipal.class).stream()
+        .filter(p -> "uid".equals(p.getName()))
+        .findFirst()
+        .orElse(null);
+      if (uid == null) {
+        final IdPAttribute attr = new IdPAttribute("uid");
+        attr.setValues(Arrays.asList(new StringAttributeValue(principalName)));
+        subject.getPrincipals().add(new IdPAttributePrincipal(attr));
       }
-      this.preventAttributeReuse(httpRequest, principalSet.iterator().next().getName());
     }
 
     // Assign the authenticated subject.
@@ -339,9 +352,7 @@ public abstract class AbstractExternalAuthenticationController implements Initia
 
     // Tell Shibboleth processing whether this result should be cached for SSO or not.
     if (cacheForSSO == null) {
-      cacheForSSO = this.getSignSupportService().isSignatureServicePeer(this.getProfileRequestContext(httpRequest))
-          ? Boolean.FALSE
-          : Boolean.TRUE;
+      cacheForSSO = this.determineCacheForSSO(this.getProfileRequestContext(httpRequest), subject);
     }
     httpRequest.setAttribute(ExternalAuthentication.DONOTCACHE_KEY, !cacheForSSO);
 
@@ -421,6 +432,43 @@ public abstract class AbstractExternalAuthenticationController implements Initia
       logger.error("Exception while checking IdP session", e);
       return;
     }
+  }
+
+  protected boolean determineCacheForSSO(final ProfileRequestContext<?, ?> context, final Subject subject) {
+    if (this.getSignSupportService().isSignatureServicePeer(context)) {
+      // No SSO for signature services ...
+      return false;
+    }
+    // We handle a special case where a Swedish samordningsnummber is supplied in the personalIdentityNumber
+    // attribute. This should only be issued if the SP has declared that it accepts such numbers in its
+    // metadata. The correct would be to implement support for this in a Shib interceptor, but for now we
+    // simply turn off SSO for such attributes...
+    //
+    final IdPAttributePrincipal personalIdentityNumber = subject.getPrincipals(IdPAttributePrincipal.class).stream()
+      .filter(p -> "personalIdentityNumber".equals(p.getName()) || "mappedPersonalIdentityNumber".equals(p.getName()))
+      .findFirst()
+      .orElse(null);
+
+    if (personalIdentityNumber != null) {
+      final String value = personalIdentityNumber.getAttribute().getValues().stream()
+        .filter(StringAttributeValue.class::isInstance)
+        .map(StringAttributeValue.class::cast)
+        .map(StringAttributeValue::getValue)
+        .findFirst()
+        .orElse(null);
+      if (value != null) {
+        try {
+          final Integer day = Integer.getInteger(value.substring(6, 8));
+          if (day >= 61) {
+            return false;
+          }
+        }
+        catch (final Exception e) {
+        }
+      }
+    }
+
+    return true;
   }
 
   /**

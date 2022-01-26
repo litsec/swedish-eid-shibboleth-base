@@ -8,6 +8,11 @@
     <!-- ========================================== -->
     <!--      Attribute Definitions                 -->
     <!-- ========================================== -->
+
+    <!-- Special purpose attribute that is never released, by may used for persistent NameID and more -->    
+    <AttributeDefinition id="uid" xsi:type="SubjectDerivedAttribute" principalAttributeName="uid">
+      <AttributeEncoder xsi:type="SAML2String" name="urn:oid:0.9.2342.19200300.100.1.1" friendlyName="uid" />
+    </AttributeDefinition>
     
     <AttributeDefinition id="personalIdentityNumber" xsi:type="SubjectDerivedAttribute" principalAttributeName="personalIdentityNumber">
       <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.2.752.29.4.13" friendlyName="personalIdentityNumber" />

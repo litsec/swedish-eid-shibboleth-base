@@ -31,35 +31,40 @@ public class ExtAuthnEventIds {
    * ID of event returned if the end user cancels an authentication process.
    */
   public static final String CANCEL_AUTHN = "CancelAuthn";
-  
+
   /**
    * ID of event returned if the authentication process is terminated due to a detected fraud attempt.
    */
   public static final String FRAUD = "Fraud";
-  
+
   /**
    * ID of event returned if the authentication process is terminated due to a possible (or suspected) fraud attempt.
    */
   public static final String POSSIBLE_FRAUD = "PossibleFraud";
-  
+
   /**
    * ID that signals that the IdP failed to decrypt an encrypted SignMessage.
    */
   public static final String SIGN_MESSAGE_DECRYPTION_ERROR = "SignMessageDecryptionError";
-  
+
   /**
    * ID that signals that the IdP does not support the given MIME type of a SignMessage.
    */
   public static final String SIGN_MESSAGE_TYPE_NOT_SUPPORTED = "SignMessageTypeNotSupported";
-  
+
   /**
    * ID that signals that the IdP rejected a request because it did not comply with the Swedish eID framework.
    */
   public static final String SWEID_BAD_REQUEST = "SwEidBadRequest";
-  
+
   /**
    * ID that signals that the IdP rejected a request because the SAD request was invalid.
    */
   public static final String BAD_SAD_REQUEST = "BadSadRequest";
-  
+
+  /**
+   * ID for the Holder-of-key profile. Is signalled if no client certificate is presented.
+   */
+  public static final String MISSING_CLIENT_TLS_CERTIFICATE = "MissingClientTlsCertificate";
+
 }

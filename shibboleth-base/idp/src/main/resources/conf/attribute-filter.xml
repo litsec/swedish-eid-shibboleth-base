@@ -6,14 +6,28 @@
         xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp/shibboleth-afp.xsd">
 
 
-<!-- 
+  <!-- 
     Default release policy: Nothing is released unless explicitly requested in metadata.
    -->
   <AttributeFilterPolicy id="attribute-release-default">
     <PolicyRequirementRule xsi:type="ANY" />
+    <AttributeRule attributeID="uid">
+      <DenyValueRule xsi:type="ANY" />
+    </AttributeRule>
+     
     <AttributeRule attributeID="personalIdentityNumber">
-      <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
-    </AttributeRule>    
+      <PermitValueRule xsi:type="AND">
+        <Rule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
+        <Rule xsi:type="OR">
+          <Rule xsi:type="AND">
+            <Rule xsi:type="ValueRegex" regex="^[1-2][0-9]{3}[0-1][0-9][6-9][0-9]{5}$" />
+            <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/general-ec/1.0/accepts-coordination-number" />          
+          </Rule>
+          <Rule xsi:type="ValueRegex" regex="^[1-2][0-9]{3}[0-1][0-9][0-3][0-9]{5}$" />
+        </Rule>
+      </PermitValueRule>
+    </AttributeRule>
+
     <AttributeRule attributeID="sn">
       <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
     </AttributeRule>
@@ -100,42 +114,34 @@
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/ec/1.0/loa3-name" />
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/ec/1.0/loa4-name" />      
     </PolicyRequirementRule>
-    <AttributeRule attributeID="sn">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="givenName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="displayName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
+    <AttributeRule attributeID="sn" permitAny="true" />
+    <AttributeRule attributeID="givenName" permitAny="true" />
+    <AttributeRule attributeID="displayName" permitAny="true" />
   </AttributeFilterPolicy>
-
+  
   <!--
     Attribute release according to "http://id.elegnamnden.se/ap/1.0/pnr-01"
     Natural Personal Identity with Civic Registration Number (personnummer)   
   -->  
   <AttributeFilterPolicy id="attribute-release-pnr-01">
     <PolicyRequirementRule xsi:type="OR">
-      <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa2-pnr" />
+      <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa2-pnr" /> 
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa3-pnr" />
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/loa4-pnr" />      
     </PolicyRequirementRule>
-    <AttributeRule attributeID="sn">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="givenName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="displayName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>    
+    <AttributeRule attributeID="sn" permitAny="true" />
+    <AttributeRule attributeID="givenName" permitAny="true" />
+    <AttributeRule attributeID="displayName" permitAny="true" />
     <AttributeRule attributeID="personalIdentityNumber">
-      <PermitValueRule xsi:type="ANY" />
+      <PermitValueRule xsi:type="OR">
+        <Rule xsi:type="AND">
+          <Rule xsi:type="ValueRegex" regex="^[1-2][0-9]{3}[0-1][0-9][6-9][0-9]{5}$" />
+          <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/general-ec/1.0/accepts-coordination-number" />          
+        </Rule>
+        <Rule xsi:type="ValueRegex" regex="^[1-2][0-9]{3}[0-1][0-9][0-3][0-9]{5}$" />
+      </PermitValueRule>
     </AttributeRule>
-    <AttributeRule attributeID="dateOfBirth">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
+    <AttributeRule attributeID="dateOfBirth" permitAny="true" />
     <AttributeRule attributeID="previousPersonalIdentityNumber">
       <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
     </AttributeRule>    
@@ -151,18 +157,10 @@
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/ec/1.0/loa3-orgid" />
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.swedenconnect.se/ec/1.0/loa4-orgid" />      
     </PolicyRequirementRule>
-    <AttributeRule attributeID="displayName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="orgAffiliation">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="o">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="organizationIdentifier">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
+    <AttributeRule attributeID="displayName" permitAny="true" />
+    <AttributeRule attributeID="orgAffiliation" permitAny="true" />
+    <AttributeRule attributeID="o" permitAny="true" />
+    <AttributeRule attributeID="organizationIdentifier" permitAny="true" />
   </AttributeFilterPolicy>   
   
   <!--
@@ -172,12 +170,8 @@
     <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
                            attributeName="http://macedir.org/entity-category" 
                            attributeValue="http://id.elegnamnden.se/st/1.0/sigservice" />
-    <AttributeRule attributeID="sad">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="signMessageDigest">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
+    <AttributeRule attributeID="sad" permitAny="true" />
+    <AttributeRule attributeID="signMessageDigest" permitAny="true" />
     <AttributeRule attributeID="userSignature">
       <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
     </AttributeRule>
@@ -191,51 +185,21 @@
     <PolicyRequirementRule xsi:type="OR">
       <Rule xsi:type="EntityAttributeExactMatch" attributeName="http://macedir.org/entity-category" attributeValue="http://id.elegnamnden.se/ec/1.0/eidas-naturalperson" />
     </PolicyRequirementRule>
-    <AttributeRule attributeID="sn">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="givenName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="displayName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>    
-    <AttributeRule attributeID="prid">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="pridPersistence">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="eidasPersonIdentifier">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="dateOfBirth">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="c">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>    
-    <AttributeRule attributeID="transactionIdentifier">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="birthName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="placeOfBirth">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="eidasNaturalPersonAddress">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="gender">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="mappedPersonalIdentityNumber">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="personalIdentityNumberBinding">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
+     <AttributeRule attributeID="sn" permitAny="true" />
+    <AttributeRule attributeID="givenName" permitAny="true" />
+    <AttributeRule attributeID="displayName" permitAny="true" />
+    <AttributeRule attributeID="prid" permitAny="true" />
+    <AttributeRule attributeID="pridPersistence" permitAny="true" />
+    <AttributeRule attributeID="eidasPersonIdentifier" permitAny="true" />
+    <AttributeRule attributeID="dateOfBirth" permitAny="true" />
+    <AttributeRule attributeID="c" permitAny="true" />
+    <AttributeRule attributeID="transactionIdentifier" permitAny="true" />
+    <AttributeRule attributeID="birthName" permitAny="true" />
+    <AttributeRule attributeID="placeOfBirth" permitAny="true" />
+    <AttributeRule attributeID="eidasNaturalPersonAddress" permitAny="true" />
+    <AttributeRule attributeID="gender" permitAny="true" />
+    <AttributeRule attributeID="mappedPersonalIdentityNumber" permitAny="true" />
+    <AttributeRule attributeID="personalIdentityNumberBinding" permitAny="true" />
   </AttributeFilterPolicy>
   
   <!--
@@ -245,21 +209,11 @@
     <PolicyRequirementRule xsi:type="EntityAttributeExactMatch" 
                            attributeName="http://macedir.org/entity-category" 
                            attributeValue="http://id.elegnamnden.se/ec/1.0/eidas-pnr-delivery" />
-    <AttributeRule attributeID="sn">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="givenName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="displayName">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>                           
-    <AttributeRule attributeID="personalIdentityNumber">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>
-    <AttributeRule attributeID="dateOfBirth">
-      <PermitValueRule xsi:type="ANY" />
-    </AttributeRule>    
+    <AttributeRule attributeID="sn" permitAny="true" />
+    <AttributeRule attributeID="givenName" permitAny="true" />
+    <AttributeRule attributeID="displayName" permitAny="true" />
+    <AttributeRule attributeID="personalIdentityNumber" permitAny="true" />
+    <AttributeRule attributeID="dateOfBirth" permitAny="true" />
     <AttributeRule attributeID="previousPersonalIdentityNumber">
       <PermitValueRule xsi:type="AttributeInMetadata" onlyIfRequired="false" />
     </AttributeRule>
