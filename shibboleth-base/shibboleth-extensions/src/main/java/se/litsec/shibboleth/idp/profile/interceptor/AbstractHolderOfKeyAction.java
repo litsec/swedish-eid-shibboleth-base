@@ -15,8 +15,6 @@
  */
 package se.litsec.shibboleth.idp.profile.interceptor;
 
-import javax.xml.namespace.QName;
-
 import org.opensaml.profile.context.ProfileRequestContext;
 
 import net.shibboleth.idp.profile.context.ProfileInterceptorContext;
@@ -30,12 +28,6 @@ import net.shibboleth.idp.profile.interceptor.AbstractProfileInterceptorAction;
 @SuppressWarnings("rawtypes")
 public class AbstractHolderOfKeyAction extends AbstractProfileInterceptorAction {
   
-  /** URI identifier for the Holder-of-key profile URI. */
-  public static final String HOK_WEBSSO_PROFILE_URI = "urn:oasis:names:tc:SAML:2.0:profiles:holder-of-key:SSO:browser";
-
-  /** The QName for the HoK ProtocolBinding attribute. */
-  public static final QName HOK_PROTOCOL_BINDING_ATTRIBUTE = new QName(HOK_WEBSSO_PROFILE_URI, "ProtocolBinding", "hoksso");
-
   /** Is the Holder-of-key profile active? */
   private boolean hokActive = false;
   

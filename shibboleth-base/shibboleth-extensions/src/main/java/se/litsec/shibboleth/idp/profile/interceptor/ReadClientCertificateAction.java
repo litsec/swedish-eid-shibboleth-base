@@ -15,25 +15,16 @@
  */
 package se.litsec.shibboleth.idp.profile.interceptor;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
-import org.opensaml.profile.action.ActionSupport;
 import org.opensaml.profile.context.ProfileRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import net.shibboleth.idp.profile.context.ProfileInterceptorContext;
 import net.shibboleth.utilities.java.support.component.ComponentInitializationException;
-import se.litsec.shibboleth.idp.authn.ExtAuthnEventIds;
-import se.litsec.shibboleth.idp.authn.context.ClientTlsCertificateContext;
+import se.litsec.shibboleth.idp.authn.context.HolderOfKeyContext;
+import se.litsec.shibboleth.idp.authn.utils.ClientCertificateGetter;
 
 /**
  * Actions that reads the client TLS certificate and saves it (for HoK-support).
@@ -42,42 +33,15 @@ import se.litsec.shibboleth.idp.authn.context.ClientTlsCertificateContext;
  */
 @SuppressWarnings("rawtypes")
 public class ReadClientCertificateAction extends AbstractHolderOfKeyAction {
-  
+
   /** Class logger. */
-  private final Logger log = LoggerFactory.getLogger(ReadClientCertificateAction.class);  
-  
-  /** Default attribute name that contains the client certificate. */
-  public static final String DEFAULT_ATTRIBUTE_NAME = "javax.servlet.request.X509Certificate";
-  
-  private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
-  private static final String END_CERT = "-----END CERTIFICATE-----";
+  private final Logger log = LoggerFactory.getLogger(ReadClientCertificateAction.class);
 
-  /**
-   * Should the certificate be read from a header? The alternative (and the default) is to read from a request
-   * attribute.
-   */
-  private boolean readFromHeader = false;
+  /** Should we try to read the client cert at this point or wait until the authenticator? */
+  private boolean readEagerly = true;
 
-  /** If {@code readFromHeader} is {@code true}, the action will read the client certificate from this header. */
-  private String headerName;
-
-  /**
-   * If {@code readFromHeader} is {@code false}, the action will read the client certificate from this request
-   * attribute.
-   */
-  private String attributeName;
-  
-  /** For decoding certificates. */
-  private static final CertificateFactory factory;
-
-  static {
-    try {
-      factory = CertificateFactory.getInstance("X.509");
-    }
-    catch (CertificateException e) {
-      throw new RuntimeException(e);
-    }
-  }
+  /** Bean that reads the client TLS certificate. */
+  private ClientCertificateGetter clientCertificateGetter;
 
   /**
    * Constructor.
@@ -92,85 +56,43 @@ public class ReadClientCertificateAction extends AbstractHolderOfKeyAction {
     if (!this.isHokActive()) {
       return;
     }
+    if (!this.readEagerly) {
+      return;
+    }
+
+    final HolderOfKeyContext holderOfKeyContext = new HolderOfKeyContext();
+    profileRequestContext.addSubcontext(holderOfKeyContext);
+
+    final X509Certificate clientCertificate = this.clientCertificateGetter.getCertificate(this.getHttpServletRequest());
+    holderOfKeyContext.setClientCertificateRead(true);
     
-    X509Certificate clientCertificate = null;
-    if (this.readFromHeader) {
-      final String pem = this.getHttpServletRequest().getHeader(this.headerName);
-      if (!StringUtils.hasText(pem)) {
-        clientCertificate = this.parseCertificate(pem);
-      }
-    }
-    else {
-      final X509Certificate[] certs = (X509Certificate[]) this.getHttpServletRequest().getAttribute(this.attributeName);
-      if (certs != null && certs.length > 0) {
-        clientCertificate = certs[0];
-      }
-    }
-    
-    if (clientCertificate == null) {
-      log.info("{} No client TLS certificate available", this.getLogPrefix());
-      ActionSupport.buildEvent(profileRequestContext, ExtAuthnEventIds.MISSING_CLIENT_TLS_CERTIFICATE);
-    }
-    else {
+    if (clientCertificate != null) {
       log.debug("{} Read client TLS certificate: {}", clientCertificate.getSubjectX500Principal());
-      profileRequestContext.addSubcontext(new ClientTlsCertificateContext(clientCertificate));
+      holderOfKeyContext.setClientCertificate(clientCertificate);
     }
-  }
-  
-  /**
-   * Parses the supplied text into a certificate.
-   * @param pem the PEM encoded certificate
-   * @return a X509Certificate
-   */
-  private X509Certificate parseCertificate(final String pem) {
-    if (pem.startsWith(BEGIN_CERT)) {
-      try (InputStream is = new ByteArrayInputStream(pem.getBytes(StandardCharsets.UTF_8))) {
-        return (X509Certificate) factory.generateCertificate(is);
-      }
-      catch (final CertificateException | IOException e) {
-      }
+    else {
+      log.debug("{} No client TLS certificate available", this.getLogPrefix());
     }
-    // OK, try with brute force ...
-    final String value = pem.replace(BEGIN_CERT, "").replace(END_CERT, "").replaceAll("\\s", "");
-    try (final InputStream is = new ByteArrayInputStream(Base64.getDecoder().decode(value))) {
-      return (X509Certificate) factory.generateCertificate(is);
-    }
-    catch (final CertificateException | IOException e) {
-      log.info("Failed to decode certificate from request header");
-      return null;
-    }
-  }
-  
-  /**
-   * Should the certificate be read from a header? The alternative (and the default) is to read from a request
-   * attribute.
-   * 
-   * @param readFromHeader
-   *          true if the action should read certificate from header
-   */
-  public void setReadFromHeader(final boolean readFromHeader) {
-    this.readFromHeader = readFromHeader;
   }
 
   /**
-   * If {@code readFromHeader} is {@code true}, the action will read the client certificate from the header given.
+   * Should we try to read the client cert at this point or wait until the authenticator?
    * 
-   * @param headerName
-   *          the header name
+   * @param readEagerly
+   *          whether to read certificate in this action
    */
-  public void setHeaderName(final String headerName) {
-    this.headerName = headerName;
+  public void setReadEagerly(final boolean readEagerly) {
+    this.readEagerly = readEagerly;
   }
 
   /**
-   * If {@code readFromHeader} is {@code false}, the action will read the client certificate from this request
-   * attribute.
+   * Assigns the bean that reads the client TLS certificate.
    * 
-   * @param attributeName
-   *          the request attribute name
+   * @param clientCertificateGetter
+   *          getter bean
    */
-  public void setAttributeName(final String attributeName) {
-    this.attributeName = attributeName;
+  public void setClientCertificateGetter(final ClientCertificateGetter clientCertificateGetter) {
+    this.clientCertificateGetter = clientCertificateGetter;
   }
 
   /**
@@ -180,16 +102,8 @@ public class ReadClientCertificateAction extends AbstractHolderOfKeyAction {
   protected void doInitialize() throws ComponentInitializationException {
     super.doInitialize();
     if (this.isHokActive()) {
-      if (this.readFromHeader) {
-        if (!StringUtils.hasText(this.headerName)) {
-          throw new ComponentInitializationException("headerName must be set");
-        }
-      }
-      else {
-        if (!StringUtils.hasText(this.attributeName)) {
-          this.attributeName = DEFAULT_ATTRIBUTE_NAME;
-          log.debug("Setting attributeName to {}", DEFAULT_ATTRIBUTE_NAME);
-        }
+      if (this.clientCertificateGetter == null) {
+        throw new ComponentInitializationException("clientCertificateGetter must be set");
       }
     }
   }

@@ -6,7 +6,7 @@
   <groupId>se.litsec.sweid.idp</groupId>
   <artifactId>shibboleth-base-dependency-bom</artifactId>
   <packaging>pom</packaging>
-  <version>1.8.0-SNAPSHOT</version>
+  <version>1.8.0</version>
 
   <name>Swedish eID :: Dependency BOM :: Shibboleth IdP base dependencies</name>
   <description>BOM (Bill of Materials) for dependencies for users of the base packaging of Shibboleth IdP 3.X for the Swedish eID Framework</description>
@@ -43,8 +43,8 @@
   <properties>
     <opensaml.version>3.4.5</opensaml.version>
     <opensaml-security-ext.version>1.0.7</opensaml-security-ext.version>
-    <opensaml-ext.version>1.4.4</opensaml-ext.version>
-    <opensaml.swedish-eid.version>1.4.0-SNAPSHOT</opensaml.swedish-eid.version>
+    <opensaml-ext.version>1.4.5</opensaml-ext.version>
+    <opensaml.swedish-eid.version>1.4.0</opensaml.swedish-eid.version>
 
     <shibboleth.version>3.4.6</shibboleth.version>
     <shibboleth.java-support.version>7.5.1</shibboleth.java-support.version>
@@ -58,10 +58,10 @@
     <spring.webflow.version>2.4.8.RELEASE</spring.webflow.version>
     <spring.mobile.version>1.1.5.RELEASE</spring.mobile.version>
 
-    <jackson.version>2.10.1</jackson.version>
+    <jackson.version>2.13.1</jackson.version>
 
     <slf4j.version>1.7.25</slf4j.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.2</junit.version>
   </properties>
 
   <repositories>
@@ -100,7 +100,7 @@
       <dependency>
         <groupId>se.swedenconnect.opensaml</groupId>
         <artifactId>opensaml-bom</artifactId>
-        <version>${opensaml.version}.R1</version>
+        <version>${opensaml.version}.R2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -711,31 +711,6 @@
         <version>${slf4j.version}</version>
         <scope>test</scope>
         <type>jar</type>
-      </dependency>
-
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>1.2.17</version>
-        <scope>test</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>javax.mail</groupId>
-            <artifactId>mail</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jdmk</groupId>
-            <artifactId>jmxtools</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jmx</groupId>
-            <artifactId>jmxri</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
     </dependencies>

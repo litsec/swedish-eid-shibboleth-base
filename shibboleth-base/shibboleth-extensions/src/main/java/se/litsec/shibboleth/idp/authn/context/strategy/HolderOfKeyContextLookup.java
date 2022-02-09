@@ -18,18 +18,18 @@ package se.litsec.shibboleth.idp.authn.context.strategy;
 import org.opensaml.messaging.context.navigate.ContextDataLookupFunction;
 import org.opensaml.profile.context.ProfileRequestContext;
 
-import se.litsec.shibboleth.idp.authn.context.ClientTlsCertificateContext;
+import se.litsec.shibboleth.idp.authn.context.HolderOfKeyContext;
 
 /**
- * Lookup function for finding a {@link ClientTlsCertificateContext}.
+ * Lookup function for finding a {@link HolderOfKeyContext}.
  * 
  * @author Martin Lindström (martin@litsec.se)
  */
-public class ClientTlsCertificateContextLookup implements ContextDataLookupFunction<ProfileRequestContext<?, ?>, ClientTlsCertificateContext> {
+public class HolderOfKeyContextLookup implements ContextDataLookupFunction<ProfileRequestContext<?, ?>, HolderOfKeyContext> {
 
   @Override
-  public ClientTlsCertificateContext apply(final ProfileRequestContext<?, ?> input) {
-    return input != null ? input.getSubcontext(ClientTlsCertificateContext.class, false) : null;
+  public HolderOfKeyContext apply(final ProfileRequestContext<?, ?> input) {
+    return input != null ? input.getSubcontext(HolderOfKeyContext.class, false) : null;
   }
 
 }

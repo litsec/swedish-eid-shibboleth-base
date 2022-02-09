@@ -20,5 +20,10 @@
     scope="singleton" lazy-init="true"
     c:resolverService-ref="shibboleth.AttributeResolverService" />
     
+  <bean id="sweid.ClientCertificateGetter" class="se.litsec.shibboleth.idp.authn.utils.ClientCertificateGetter"
+    p:readFromHeader="%{idp.hok.cert.read-from-header:false}"
+    p:headerName="%{idp.hok.cert.header-name:}"
+    p:attributeName="%{idp.hok.cert.attribute-name:javax.servlet.request.X509Certificate}" />
+    
     
 </beans>

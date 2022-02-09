@@ -99,7 +99,14 @@
         
         <evaluate expression="AddAttributeStatementToAssertion" />
         <evaluate expression="AddNameIDToSubjects" />
+        
+        <!-- Litsec patch -->
+        <!-- 
         <evaluate expression="AddSubjectConfirmationToSubjects" />
+        -->
+        <evaluate expression="ExtendedAddSubjectConfirmationToSubjects" />  
+        
+        
         <evaluate expression="AddNotBeforeConditionToAssertions" />
         <evaluate expression="AddNotOnOrAfterConditionToAssertions" />
         <evaluate expression="AddAudienceRestrictionToAssertions" />

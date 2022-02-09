@@ -77,7 +77,13 @@
     <bean id="UpdateAssertionForProxyIdp" 
       class="se.litsec.shibboleth.idp.authn.actions.UpdateAssertionForProxyIdpAction" scope="prototype"
       p:httpServletRequest-ref="shibboleth.HttpServletRequest">
-    </bean>    
+    </bean>
+    <bean id="ExtendedAddSubjectConfirmationToSubjects"
+        class="se.litsec.shibboleth.idp.authn.actions.HokEnabledAddSubjectConfirmationToSubjects" scope="prototype"
+        p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+        p:method="urn:oasis:names:tc:SAML:2.0:cm:bearer"
+        p:hokActive="%{idp.hok.active:false}" />    
+    
 
     <bean id="InitializeOutboundMessageContextForError"
             class="net.shibboleth.idp.saml.profile.impl.InitializeOutboundMessageContextForError" scope="prototype">

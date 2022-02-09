@@ -18,17 +18,21 @@
     <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
     <bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
     
-    <bean id="ReadClientCertAction" class="se.litsec.shibboleth.idp.profile.interceptor.ReadClientCertificateAction">
-      <property name="hokActive" value="%{idp.hok.active:false}" />
-      <property name="readFromHeader" value="%{idp.hok.cert.read-from-header:false}" />
-      <property name="headerName" value="%{idp.hok.cert.header-name}" />
-      <property name="attributeName" value="%{idp.hok.cert.attribute-name:javax.servlet.request.X509Certificate}" />
-    </bean>
+    <bean id="sweid.hok.HokActive" class="se.litsec.shibboleth.idp.profile.interceptor.IsHokActiveCondition"
+      p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+      p:hokActive="%{idp.hok.active:false}"
+      p:idpMetadata-ref="sweid.IdpMetadata" />
     
-    <bean id="CheckAssertionConsumerService" class="se.litsec.shibboleth.idp.profile.interceptor.CheckHokAssertionConsumerServiceAction">
-      <property name="hokActive" value="%{idp.hok.active:false}" />
-    </bean>
+    <bean id="ReadClientCertAction" class="se.litsec.shibboleth.idp.profile.interceptor.ReadClientCertificateAction"
+      p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+      p:httpServletResponse-ref="shibboleth.HttpServletResponse"
+      p:hokActive="%{idp.hok.active:false}"
+      p:readEagerly="%{idp.hok.cert.read-eagerly:true}"
+      p:clientCertificateGetter-ref="sweid.ClientCertificateGetter" />
     
-    
+    <bean id="CheckAssertionConsumerService" class="se.litsec.shibboleth.idp.profile.interceptor.CheckHokAssertionConsumerServiceAction"
+      p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+      p:httpServletResponse-ref="shibboleth.HttpServletResponse"
+      p:hokActive="%{idp.hok.active:false}" />
     
 </beans>

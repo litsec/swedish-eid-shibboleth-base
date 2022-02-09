@@ -19,6 +19,9 @@
     <end-state id="SwEidBadRequest" />
     <end-state id="BadSadRequest" />
     
+    <!-- HoK -->
+    <end-state id="MissingClientTlsCertificate" />
+    
     <global-transitions>
       <transition on="CancelAuthn" to="CancelAuthn" />
       <transition on="Fraud" to="Fraud" />

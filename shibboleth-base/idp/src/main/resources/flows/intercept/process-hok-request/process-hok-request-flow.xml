@@ -3,17 +3,24 @@
        xsi:schemaLocation="http://www.springframework.org/schema/webflow http://www.springframework.org/schema/webflow/spring-webflow.xsd"
        parent="intercept.abstract">
 
-    <input name="calledAsSubflow" type="boolean" required="true" />
+    <input name="calledAsSubflow" type="boolean" required="true" />   
     
+    
+    <decision-state id="CheckHokCondition">
+      <if test="flowRequestContext.getActiveFlow().getApplicationContext().getBean('sweid.hok.HokActive').apply(opensamlProfileRequestContext)"
+         then="ProcessHokRequest" else="proceed" />
+    </decision-state>
+        
     <action-state id="ProcessHokRequest">
       <evaluate expression="ReadClientCertAction" />
       <evaluate expression="CheckAssertionConsumerService" />      
-      <evaluate expression="'proceed'" />        
+      <evaluate expression="'proceed'" />
+            
       <transition on="proceed" to="proceed" />
     </action-state>
 
     <end-state id="proceed" />
-
+    
     <bean-import resource="process-hok-request-beans.xml" />
 
 </flow>

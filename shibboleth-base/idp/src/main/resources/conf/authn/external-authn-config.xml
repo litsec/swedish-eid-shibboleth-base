@@ -110,6 +110,11 @@
             <value>BadSadRequest</value>
           </list>
         </entry>
+        <entry key="MissingClientTlsCertificate">
+          <list>
+            <value>MissingClientTlsCertificate</value>
+          </list>
+        </entry>
         
     </util:map>    
     

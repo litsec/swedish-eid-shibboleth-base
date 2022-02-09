@@ -18,6 +18,8 @@
     <bean class="net.shibboleth.ext.spring.config.IdentifiableBeanPostProcessor" />
     <bean class="net.shibboleth.idp.profile.impl.ProfileActionBeanPostProcessor" />
     
-    <bean id="PreventSsoAction" class="se.litsec.shibboleth.idp.profile.interceptor.SsoPreventionInterceptorAction" />
+    <bean id="PreventSsoAction" class="se.litsec.shibboleth.idp.profile.interceptor.SsoPreventionInterceptorAction"
+      p:httpServletRequest-ref="shibboleth.HttpServletRequest"
+      p:httpServletResponse-ref="shibboleth.HttpServletResponse" />
     
 </beans>

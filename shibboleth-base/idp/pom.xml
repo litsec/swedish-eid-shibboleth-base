@@ -8,7 +8,7 @@
   <parent>
     <groupId>se.litsec.sweid.idp</groupId>
     <artifactId>shibboleth-base-parent</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0</version>
   </parent>
 
   <name>Swedish eID :: Base packaging of Shibboleth IdP 3.X</name>
@@ -239,6 +239,8 @@
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jackson-datatype-joda-2.8.3.jar" />
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/jsr305-3.0.1.jar" />
                 <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/dom4j-1.6.1.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/httpclient-4.5.3.jar" />
+                <delete file="${project.build.directory}/shibboleth-identity-provider-${shibboleth.version}/webapp/WEB-INF/lib/httpcore-4.4.8.jar" />
               </target>
             </configuration>
             <goals>
