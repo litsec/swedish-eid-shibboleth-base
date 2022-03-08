@@ -44,7 +44,7 @@
     <opensaml.version>4.0.1</opensaml.version>
     <opensaml-security-ext.version>2.0.1</opensaml-security-ext.version>
     <opensaml-ext.version>2.0.1</opensaml-ext.version>
-    <opensaml.swedish-eid.version>2.0.1</opensaml.swedish-eid.version>
+    <opensaml.swedish-eid.version>2.1.0</opensaml.swedish-eid.version>
 
     <shibboleth.version>4.0.1</shibboleth.version>
     <shibboleth.java-support.version>8.0.0</shibboleth.java-support.version>
