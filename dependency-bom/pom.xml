@@ -42,7 +42,7 @@
 
   <properties>
     <opensaml.version>4.0.1</opensaml.version>
-    <opensaml-security-ext.version>2.0.1</opensaml-security-ext.version>
+    <opensaml-security-ext.version>3.0.0</opensaml-security-ext.version>
     <opensaml-ext.version>2.0.1</opensaml-ext.version>
     <opensaml.swedish-eid.version>2.0.1</opensaml.swedish-eid.version>
 
